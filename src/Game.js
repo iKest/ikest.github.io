@@ -12,6 +12,7 @@ BasicGame.Game.prototype = {
 
 
         me.glowColors = [0xFF0000,0x0000FF,0xFFFFFF,0x00FF00,0xFFFF00,0xFF3DFF,0xFF9E3D];
+        me.sizeColors = me.glowColors.length;
         me.BLOCK = 0;
         me.EMPTY = 1;
         me.TILE = 2;
@@ -19,6 +20,8 @@ BasicGame.Game.prototype = {
         me.NOLOCK = 0;
         me.LOCK = 1;
         me.MOVINGLOCK = 2;
+        me.DIRECTPLUS = 3;
+        me.DIRECTMINUS = 4;
 
         me.levelGrid = [0, 0, 1, 1, 1, 1, 0, 0,
                         0, 1, 1, 1, 1, 1, 1, 0,
@@ -44,8 +47,6 @@ BasicGame.Game.prototype = {
         me.isDragging = false;
         me.dragDirection = '';
         me.isRelising = false;
-        me.seed = Date.now();
-        me.random = new Phaser.RandomDataGenerator([me.seed]);
         me.allDownRows = [];
         me.allLocks = 0;
         me.maxLocks = 6;
@@ -55,7 +56,6 @@ BasicGame.Game.prototype = {
         me.distY = 0;
         me.movingCol = 0;
         me.movingRow = 0;
-        me.step = 15;
         me.isGloved = false;
         me.isFilling = false;
         me.scoreSum = 0;
@@ -78,7 +78,10 @@ BasicGame.Game.prototype = {
                 leftShift: 0,
                 rightShift: 0,
                 directStatus: 0,
-                locked: false
+                locked: false,
+                dist: 0,
+                moving: false
+
             };
         }
 
@@ -88,7 +91,9 @@ BasicGame.Game.prototype = {
                 leftShift: 0,
                 rightShift: 0,
                 directStatus: 0,
-                locked: false
+                locked: false,
+                dist: 0,
+                moving: false    
             };
         }
 
@@ -105,6 +110,7 @@ BasicGame.Game.prototype = {
                 me.tileGrid[i].isGlow = false;
                 me.tileGrid[i].lockType = me.NOLOCK;
                 me.tileGrid[i].tileType = me.levelGrid[i];
+                me.tileGrid[i].tileColor = 0;
                 me.tileGrid[i].pos = i;
                 me.glow = me.add.image(0, 0, 'light');
                 me.glow.anchor.setTo(0.5, 0.5);
@@ -121,9 +127,6 @@ BasicGame.Game.prototype = {
         while (i--){
             if (me.tileGrid[i].tileType != me.BLOCK) {
                 me.fillEmptyTile(me.tileGrid[i]);
-                while (me.chekGlows(me.Col(i),me.Row(i))){
-                    me.fillEmptyTile(me.tileGrid[i]);
-                }     
             } 
             else {me.tileGrid[i].visible = false;}
         }
@@ -177,7 +180,6 @@ BasicGame.Game.prototype = {
 
         me.startX = me.input.worldX;
         me.startY = me.input.worldY;
-
         me.movingCol = me.pointCol(me.startY);
         me.movingRow = me.pointRow(me.startX);
         if (me.movingCol >=0 && me.movingCol < me.sizeCol && me.movingRow >=0 && me.movingRow < me.sizeRow && me.tileGrid[me.Pos(me.movingCol,me.movingRow)].tileType != me.BLOCK){
@@ -201,20 +203,30 @@ BasicGame.Game.prototype = {
             break;             
                 case 'horizontal':
                     if (me.isGloved) {
-                        me.tileGridColUpdate(me.movingCol);
-                        me.distX = me.delta(me.distX, me.stepTileX);
-                        me.isRelising = true;
+                        var col = me.sizeCol;
+                        while (col--) {
+                            if (me.lockCols[col].dragDirection !=0) {
+                                me.lockCols[col].dist = me.delta(me.lockCols[col].dist, me.stepTileX);
+                                me.tileGridColUpdate(col);
+                            }
+                        }
                     }
-                    else {me.turnOffGlows(); me.isRelising = true;}
+                    else {me.turnOffGlows();}
+                    me.isRelising = true;
                       
             break;          
                 case 'vertical':
                     if (me.isGloved) {
-                        me.tileGridRowUpdate(me.movingRow);
-                        me.distY = me.delta(me.distY, me.stepTileY);
-                        me.isRelising = true;
+                        var row = me.sizeRow;
+                        while (row--) {
+                            if (me.lockRows[row].dragDirection !=0) {
+                                me.lockRows[row].dist = me.delta(me.lockRows[row].dist, me.stepTileY);
+                                me.tileGridRowUpdate(row);
+                            }
+                        }
                     }
-                    else {me.turnOffGlows(); me.isRelising = true;}
+                    else {me.turnOffGlows();}
+                    me.isRelising = true;
             break;
         }
     },
@@ -229,11 +241,25 @@ BasicGame.Game.prototype = {
             var dragAngle=Math.abs(Math.atan2(me.distY,me.distX));
             if ((dragAngle>Math.PI/4 && dragAngle < 3*Math.PI/4)) {
                 me.dragDirection='vertical';
+                me.lockUpdate();
                 me.startY += me.distY;
+                me.lockRows[me.movingRow].moving = true;
+                me.lockRows[me.movingRow].directStatus = 1;
+                pos = me.movingRow;
+                while (pos++ < me.sizeRow-1 && me.lockRows[pos].directStatus != 0) {me.lockRows[pos].moving = true;}
+                pos = me.movingRow;
+                while (pos-- && me.lockRows[pos].directStatus != 0) {me.lockRows[pos].moving = true;}
             }
             else {
                 me.dragDirection='horizontal';
-                me.startX += me.distX;
+                me.lockUpdate();
+                me.startX += me.distX;  
+                me.lockCols[me.movingCol].moving = true;
+                me.lockCols[me.movingCol].directStatus = 1;
+                pos = me.movingCol;
+                while (pos++ < me.sizeCol-1 && me.lockCols[pos].directStatus != 0) {me.lockCols[pos].moving = true;}
+                pos = me.movingCol;
+                while (pos-- && me.lockCols[pos].directStatus != 0) {me.lockCols[pos].moving = true;}
             }
         }
     },
@@ -374,64 +400,66 @@ BasicGame.Game.prototype = {
         } 
     },
 
-    chekGlows: function(i,j) {
+    chekGlows: function(pos) {
         var me = this;
         var temp = 1;
+        var i = me.Col(pos);
+        var j = me.Row(pos);
         if (me.tileGrid[me.Pos(i,j)].tileType != me.BLOCK){
 
             if (j>0 && me.tileGrid[me.Pos(i,j-1)].tileType != me.BLOCK){
-                if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j-1)]].tileColor){
+                if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j-1)]].tileColor){
                     temp++;
                     if (i>0 && me.tileGrid[me.Pos(i-1,j-1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j-1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j-1)]].tileColor) {return true;}
                     }
                     if (j>1 && me.tileGrid[me.Pos(i,j-2)].tileType !=me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j-2)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j-2)]].tileColor) {return true;}
                     }
                     if (i<me.sizeCol-1 && me.tileGrid[me.Pos(i+1,j-1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j-1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j-1)]].tileColor) {return true;}
                     }
                 }
             } 
             if (i<me.sizeCol-1 && me.tileGrid[me.Pos(i+1,j)].tileType != me.BLOCK){
-                if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j)]].tileColor){
+                if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j)]].tileColor){
                     temp++;
                     if (j>0 && me.tileGrid[me.Pos(i+1,j-1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j-1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j-1)]].tileColor) {return true;}
                     }
                     if (i<me.sizeCol-2 && me.tileGrid[me.Pos(i+2,j)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+2,j)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+2,j)]].tileColor) {return true;}
                     }
                     if (j<me.sizeRow-1 && me.tileGrid[me.Pos(i+1,j+1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j+1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j+1)]].tileColor) {return true;}
                     }
                 }
             } 
             if (j<me.sizeRow-1 && me.tileGrid[me.Pos(i,j+1)].tileType != me.BLOCK){
-                if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j+1)]].tileColor){
+                if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j+1)]].tileColor){
                     temp++;
                     if (i<me.sizeCol-1 && me.tileGrid[me.Pos(i+1,j+1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j+1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i+1,j+1)]].tileColor) {return true;}
                     }
                     if (j<me.sizeRow-2 && me.tileGrid[me.Pos(i,j+2)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j+2)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i,j+2)]].tileColor) {return true;}
                     }
                     if (i>0 && me.tileGrid[me.Pos(i-1,j+1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j+1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j+1)]].tileColor) {return true;}
                     }
                 }
             } 
             if (i>0 && me.tileGrid[me.Pos(i-1,j)].tileType != me.BLOCK){
-                if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j)]].tileColor){
+                if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j)]].tileColor){
                     temp++;
                     if (j<me.sizeRow-1 && me.tileGrid[me.Pos(i-1,j+1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j+1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j+1)]].tileColor) {return true;}
                     }
                     if (i>1 && me.tileGrid[me.Pos(i-2,j)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-2,j)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-2,j)]].tileColor) {return true;}
                     }
                     if (j>0 && me.tileGrid[me.Pos(i-1,j-1)].tileType != me.BLOCK) {
-                        if (me.tileGrid[me.theoryGrid[me.Pos(i,j)]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j-1)]].tileColor) {return true;}
+                        if (me.tileGrid[me.theoryGrid[pos]].tileColor == me.tileGrid[me.theoryGrid[me.Pos(i-1,j-1)]].tileColor) {return true;}
                     }
                 }
             } 
@@ -444,7 +472,7 @@ BasicGame.Game.prototype = {
         var me = this;
         var isGloved = false;
         for(var i = 0; i < me.allLenght; i++) {
-            if (me.tileGrid[me.theoryGrid[i]].tileType != me.BLOCK && me.chekGlows(me.Col(i),me.Row(i))) {
+            if (me.tileGrid[me.theoryGrid[i]].tileType != me.BLOCK && me.chekGlows(i)) {
                 if (showGlows){me.tileGrid[me.theoryGrid[i]].children[0].visible = true;}
                 me.tileGrid[me.theoryGrid[i]].isGlow = true;
                 isGloved = true;
@@ -592,58 +620,121 @@ BasicGame.Game.prototype = {
                     if (me.distX > me.lockCols[me.movingCol].rightShift) {me.distX = me.lockCols[me.movingCol].rightShift;}
                     else if (me.distX < me.lockCols[me.movingCol].leftShift) {me.distX = me.lockCols[me.movingCol].leftShift;}
                 }
-                me.horizontalMoving(me.movingCol, me.distX);
+                var col = me.sizeCol;
+                while (col--) {
+                    if (me.lockCols[col].moving) {
+                        me.lockCols[col].dist = me.lockCols[col].directStatus * me.distX;
+                        if (me.lockCols[col].locked) {
+                            if (me.lockCols[col].dist > me.lockCols[col].rightShift) {me.lockCols[col].dist = me.lockCols[col].rightShift;}
+                            else if (me.lockCols[col].dist < me.lockCols[col].leftShift) {me.lockCols[col].dist = me.lockCols[col].leftShift;}
+                        }
+                        me.horizontalMoving(col, me.lockCols[col].dist);
+                    }
+                }
                 me.isGloved = me.turnOnGlows(true);
-                me.showTempTilesHorizontal(me.movingCol, me.distX);  
+                col = me.sizeCol;
+                while (col--) {      
+                    if (me.lockCols[col].moving) {
+                        me.lockCols[col].dist = me.lockCols[col].directStatus * me.distX;
+                        if (me.lockCols[col].locked) {
+                            if (me.lockCols[col].dist > me.lockCols[col].rightShift) {me.lockCols[col].dist = me.lockCols[col].rightShift;}
+                            else if (me.lockCols[col].dist < me.lockCols[col].leftShift) {me.lockCols[col].dist = me.lockCols[col].leftShift;}
+                        }
+                        me.showTempTilesHorizontal(col, me.lockCols[col].dist);
+                    }
+                } 
             break;          
             case 'vertical':
                 if (me.lockRows[me.movingRow].locked) {
                     if (me.distY > me.lockRows[me.movingRow].rightShift) {me.distY = me.lockRows[me.movingRow].rightShift;}
                     else if (me.distY < me.lockRows[me.movingRow].leftShift) {me.distY = me.lockRows[me.movingRow].leftShift;}
                 }
-                me.verticalMoving(me.movingRow, me.distY);
+                var row = me.sizeRow;
+                while (row--) {        
+                    if (me.lockRows[row].moving) {
+                        me.lockRows[row].dist = me.lockRows[row].directStatus * me.distY;
+                        if (me.lockRows[row].locked) {
+                            if (me.lockRows[row].dist > me.lockRows[row].rightShift) {me.lockRows[row].dist = me.lockRows[row].rightShift;}
+                            else if (me.lockRows[row].dist < me.lockRows[row].leftShift) {me.lockRows[row].dist = me.lockRows[row].leftShift;}
+                        }  
+                        me.verticalMoving(row, me.lockRows[row].dist);
+                    }
+                }
                 me.isGloved = me.turnOnGlows(true);
-                me.showTempTilesVertical(me.movingRow, me.distY);
+                row = me.sizeRow;
+                while (row--) {    
+                    if (me.lockRows[row].moving) {
+                        me.lockRows[row].dist = me.lockRows[row].directStatus * me.distY;
+                        if (me.lockRows[row].locked) {
+                            if (me.lockRows[row].dist > me.lockRows[row].rightShift) {me.lockRows[row].dist = me.lockRows[row].rightShift;}
+                            else if (me.lockRows[row].dist < me.lockRows[row].leftShift) {me.lockRows[row].dist = me.lockRows[row].leftShift;}
+                        }  
+                        me.showTempTilesVertical(row, me.lockRows[row].dist);
+                    }
+                }
             break;
         }
     },
 
     relising: function () {
         var me = this;
+        var step;
         switch(me.dragDirection){                                 
             case 'horizontal':
-                if (me.distX !=0){
-                    me.step = Math.ceil(Math.abs(me.distX/10));
-                    if (Math.abs(me.distX)<me.step) {me.distX = 0;}
-                    else {
-                        if (me.distX > 0) {me.distX -= me.step;} else {me.distX += me.step;}
+                var col = me.sizeCol;
+                var doIt = false;
+                while (col--) {
+                    if (me.lockCols[col].dist !=0) {doIt = true; col = 0;}
+                }
+                if (doIt) {
+                    col = me.sizeCol;
+                    while (col--) {
+                        if (me.lockCols[col].dist !=0){
+                            step = Math.ceil(Math.abs(me.lockCols[col].dist/10));
+                            if (Math.abs(me.lockCols[col].dist)<=step) {me.lockCols[col].dist = 0;}
+                            else {
+                                if (me.lockCols[col].dist > 0) {me.lockCols[col].dist -= step;} else {me.lockCols[col].dist += step;}
+                            }
+                            
+                            me.horizontalMoving(col, me.lockCols[col].dist);
+                            me.showTempTilesHorizontal(col, me.lockCols[col].dist);
+                        } 
                     }
-                    
-                    me.horizontalMoving(me.movingCol, me.distX);
-                    me.showTempTilesHorizontal(me.movingCol, me.distX);
-                } 
-                else {
-                    me.isRelising = false;
-                    me.dragDirection = '';
-                    if (me.isGloved) {me.scoreSum+= me.removeGlowTiles(); me.chekDownEmpties();} 
-                    else {me.input.onDown.add(me.pickTile, me);}  
-                }  
-            break;          
-            case 'vertical':
-                if (me.distY !=0){
-                    me.step = Math.ceil(Math.abs(me.distY/10));
-                    if (Math.abs(me.distY)<me.step) {me.distY = 0;}
-                    else {
-                        if (me.distY > 0) {me.distY -= me.step;} else {me.distY += me.step;}
-                    }
-                    me.verticalMoving(me.movingRow, me.distY);
-                    me.showTempTilesVertical(me.movingRow, me.distY);
                 }
                 else {
                     me.isRelising = false;
                     me.dragDirection = '';
                     if (me.isGloved) {me.scoreSum+= me.removeGlowTiles(); me.chekDownEmpties();} 
-                    else {me.input.onDown.add(me.pickTile, me);}
+                    else {
+                        me.input.onDown.add(me.pickTile, me);}  
+                }  
+            break;          
+            case 'vertical':
+                var row = me.sizeRow;
+                var doIt = false;
+                while (row--) {
+                    if (me.lockRows[row].dist !=0) {doIt = true; row = 0;}
+                }
+                if (doIt) {
+                    row = me.sizeRow;
+                    while (row--) {
+                        if (me.lockRows[row].dist !=0){
+                            step = Math.ceil(Math.abs(me.lockRows[row].dist/10));
+                            if (Math.abs(me.lockRows[row].dist)<=step) {me.lockRows[row].dist = 0;}
+                            else {
+                                if (me.lockRows[row].dist > 0) {me.lockRows[row].dist -= step;} else {me.lockRows[row].dist += step;}
+                            }
+                            me.verticalMoving(row, me.lockRows[row].dist);
+                            me.showTempTilesVertical(row, me.lockRows[row].dist);
+                        }
+                    }
+                }
+                else {
+                    me.isRelising = false;
+                    me.dragDirection = '';
+                    if (me.isGloved) {me.scoreSum+= me.removeGlowTiles(); me.chekDownEmpties();} 
+                    else {
+                        me.input.onDown.add(me.pickTile, me);}
                 }
             break;
         }
@@ -680,13 +771,13 @@ BasicGame.Game.prototype = {
             if(me.chance(me.chanceLock)) {
                 var ableTiles = [];
                 for (var pos = 0; pos<me.tileGrid.length; pos++){
-                    if (me.tileGrid[pos].tileType!=me.BLOCK && !me.tileGrid[pos].lockType != me.NOLOCK  && !me.lockCols[me.Col(pos)].locked && !me.lockRows[me.Row(pos)].locked) {
+                    if (me.tileGrid[pos].tileType!=me.BLOCK && !me.tileGrid[pos].lockType != me.NOLOCK  && !me.lockCols[me.Col(pos)].locked && !me.lockRows[me.Row(pos)].locked && me.lockCols[me.Col(pos)].directStatus == 0 && me.lockRows[me.Row(pos)].directStatus == 0) {
                         ableTiles.push(pos);
                     }
                 }
                 if (ableTiles.length > 0) {
-                    pos = me.random.integerInRange(0, ableTiles.length - 1);
-                    me.tileGrid[ableTiles[pos]].lockType = me.random.integerInRange(1, 2);
+                    pos = me.rnd.integerInRange(0, ableTiles.length - 1);
+                    me.tileGrid[ableTiles[pos]].lockType = me.rnd.integerInRange(1, 4);
                     me.tileGrid[ableTiles[pos]].children[1].frame =  me.tileGrid[ableTiles[pos]].lockType - 1;
                     me.tileGrid[ableTiles[pos]].children[1].visible = true;
                     me.lockColUpdate(me.Col(ableTiles[pos]));
@@ -712,7 +803,14 @@ BasicGame.Game.prototype = {
 
     fillEmptyTile: function (tile) {
         var me = this;
-        tile.tileColor = me.random.integerInRange(0, me.glowColors.length - 1);
+        var tiles = [];
+        var temp = me.sizeColors;
+        while (temp--) {
+            tile.tileColor = temp;
+            if (!me.chekGlows(tile.pos)) {tiles.push(temp);}
+        }
+        if (tiles.length > 0) {tile.tileColor = tiles[me.rnd.integerInRange(0, tiles.length - 1)];}
+        else {tile.tileColor = me.rnd.integerInRange(0, me.sizeColors - 1);}
         tile.tint = me.glowColors[tile.tileColor]; 
         tile.children[0].tint = me.glowColors[tile.tileColor];
         tile.children[1].tint = me.glowColors[tile.tileColor];
@@ -727,7 +825,7 @@ BasicGame.Game.prototype = {
     chance: function (chance) {
         var me = this;
         if (chance === undefined) { chance = 50; }
-        return chance > 0 && (me.random.integerInRange(0, 100) <= chance);
+        return chance > 0 && (me.rnd.integerInRange(0, 100) <= chance);
     },
     
     lockColUpdate: function (col) {
@@ -738,13 +836,16 @@ BasicGame.Game.prototype = {
         var temp = 0;
         var pos;
         me.lockCols[col].locked = false;
+        me.lockCols[col].directStatus = 0;
+        me.lockCols[col].dist = 0;
+        me.lockCols[col].moving = false;
         
         while (row--) {
             if (me.tileGrid[me.Pos(col,row)].lockType == me.LOCK) {
                 me.lockCols[col].locked = true;
-                me.lockCols[col].leftShift = -5; 
+                left = 0; 
+                right = 0;
                 me.lockCols[col].rightShift = 5; 
-                return false;
             }
             else if (me.tileGrid[me.Pos(col,row)].lockType == me.MOVINGLOCK) {
                 me.lockCols[col].locked = true;
@@ -756,6 +857,14 @@ BasicGame.Game.prototype = {
                 temp = 0;                
                 while (pos++ < me.sizeRow-1 && me.tileGrid[me.Pos(col,pos)].tileType !==me.BLOCK){temp++;}
                 if (temp < right) {right = temp;}
+            }
+            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTPLUS) {
+                if (me.lockCols[col].directStatus == -1) {me.lockCols[col].directStatus = 0;}
+                else {me.lockCols[col].directStatus = 1;}
+            }
+            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTMINUS) {
+                if (me.lockCols[col].directStatus == 1) {me.lockCols[col].directStatus = 0;}
+                else {me.lockCols[col].directStatus = -1;}
             }
         }
         if (me.lockCols[col].locked){
@@ -771,13 +880,16 @@ BasicGame.Game.prototype = {
         var right = me.sizeCol-1;
         var pos;
         me.lockRows[row].locked = false;
+        me.lockRows[row].directStatus = 0;
+        me.lockRows[row].dist = 0;
+        me.lockRows[row].moving = false;
         
         while (col--) {
             if (me.tileGrid[me.Pos(col,row)].lockType == me.LOCK) {
                 me.lockRows[row].locked = true;
-                me.lockRows[row].leftShift = -5; 
+                left = 0; 
+                right = 0;
                 me.lockRows[row].rightShift = 5; 
-                return false;
             }
             else if (me.tileGrid[me.Pos(col,row)].lockType == me.MOVINGLOCK) {
                 me.lockRows[row].locked = true;
@@ -789,6 +901,14 @@ BasicGame.Game.prototype = {
                 temp = 0;                
                 while (pos++ < me.sizeRow-1 && me.tileGrid[me.Pos(pos,row)].tileType !==me.BLOCK){temp++;}
                 if (temp < right) {right = temp;}
+            }
+            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTPLUS) {
+                if (me.lockRows[row].directStatus == -1) {me.lockRows[row].directStatus = 0;}
+                else {me.lockRows[row].directStatus = 1;}
+            }
+            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTMINUS) {
+                if (me.lockRows[row].directStatus == 1) {me.lockRows[row].directStatus = 0;}
+                else {me.lockRows[row].directStatus = -1;}
             }
         }
         if (me.lockRows[row].locked) {
