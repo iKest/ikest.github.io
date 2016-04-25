@@ -25,9 +25,9 @@ BasicGame.Preloader.prototype = {
 		//	Here we load the rest of the assets our game needs.
 		//	As this is just a Project Template I've not provided these assets, swap them for your own.
 		this.load.image('light', 'assets/images/light.png');
-		this.load.image('smoke', 'assets/images/smoke.png');
 		this.load.image('block', 'assets/images/block.png');
-		this.load.image('ball', 'assets/images/ball.png');
+		this.load.spritesheet('fairies', 'assets/images/fairies.png', 69, 71);
+		this.load.image('bg', 'assets/images/bg.jpg');
 		this.load.spritesheet('locker', 'assets/images/locker.png', 54, 54);
 		//	+ lots of other required assets here
 
