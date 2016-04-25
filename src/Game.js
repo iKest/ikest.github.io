@@ -11,7 +11,8 @@ BasicGame.Game.prototype = {
         var me = this;
 
 
-        me.glowColors = [0xFF0000,0x0000FF,0xFFFFFF,0x00FF00,0xFFFF00,0xFF3DFF,0xFF9E3D];
+        me.glowColors = [0xFFDEAD,0xB0E0E6,0xFFFFFF,0x90EE90,0xFFC0CB,0xFAA460,0xF0E68C];
+        me.tileColors = ['fairy1','fairy2','fairy3','fairy4','fairy5','fairy6','fairy7'];
         me.sizeColors = me.glowColors.length;
         me.BLOCK = 0;
         me.EMPTY = 1;
@@ -20,8 +21,7 @@ BasicGame.Game.prototype = {
         me.NOLOCK = 0;
         me.LOCK = 1;
         me.MOVINGLOCK = 2;
-        me.DIRECTPLUS = 3;
-        me.DIRECTMINUS = 4;
+
 
         me.levelGrid = [0, 0, 1, 1, 1, 1, 0, 0,
                         0, 1, 1, 1, 1, 1, 1, 0,
@@ -31,6 +31,28 @@ BasicGame.Game.prototype = {
                         1, 1, 1, 0, 0, 1, 1, 1,
                         0, 1, 1, 1, 1, 1, 1, 0,
                         0, 0, 1, 1, 1, 1, 0, 0];
+
+
+        me.animFairy =[[],[],[],[],[],[],[]];
+   
+        for (var i = 0; i < 36; i++) {
+            me.animFairy[0][i] = i;
+            me.animFairy[1][i] = i + 36;
+            me.animFairy[2][i] = i + 72;
+            me.animFairy[3][i] = i + 108;
+            me.animFairy[4][i] = i + 144;
+            me.animFairy[5][i] = i + 180;
+            me.animFairy[6][i] = i + 216;
+        }
+        for (var i = 34; i > -1; i--) {
+            me.animFairy[0][70-i] = i;
+            me.animFairy[1][70-i] = i + 36;
+            me.animFairy[2][70-i] = i + 72;
+            me.animFairy[3][70-i] = i + 108;
+            me.animFairy[4][70-i] = i + 144;
+            me.animFairy[5][70-i] = i + 180;
+            me.animFairy[6][70-i] = i + 216;
+        }
 
         
         me.sizeRow = 8;
@@ -42,7 +64,7 @@ BasicGame.Game.prototype = {
         me.stepTileX = 80;
         me.stepTileY = 80;
         me.zeroPointX = 40;
-        me.zeroPointY = 40;
+        me.zeroPointY = 200;
         me.isGloved = false;
         me.isDragging = false;
         me.dragDirection = '';
@@ -50,7 +72,7 @@ BasicGame.Game.prototype = {
         me.allDownRows = [];
         me.allLocks = 0;
         me.maxLocks = 6;
-        me.chanceLock = 50;
+        me.chanceLock = 70;
 
         me.distX = 0;
         me.distY = 0;
@@ -77,11 +99,7 @@ BasicGame.Game.prototype = {
             me.lockCols[i] = {
                 leftShift: 0,
                 rightShift: 0,
-                directStatus: 0,
-                locked: false,
-                dist: 0,
-                moving: false
-
+                locked: false
             };
         }
 
@@ -90,38 +108,48 @@ BasicGame.Game.prototype = {
             me.lockRows[i] = {
                 leftShift: 0,
                 rightShift: 0,
-                directStatus: 0,
-                locked: false,
-                dist: 0,
-                moving: false    
+                locked: false
             };
         }
-
+        me.bg = me.add.image(0, 150, 'bg');
+        me.animLockArr = [];
+        me.animMovingLockArr = [];
+        me.lockanim = ['', 'lock', 'movinglock'];
+        me.animLockArr = Phaser.ArrayUtils.numberArrayStep(59, 0, -1);
+        me.animMovingLockArr = Phaser.ArrayUtils.numberArrayStep(119, 60, -1);
 
         me.tileGrid = [];
         me.theoryGrid = [];
         me.theoryGrid = Phaser.ArrayUtils.numberArray(0, me.allLenght-1);
         var i = me.allLenght;
         while(i--){
-                me.tileGrid[i] = me.add.sprite(me.zeroPointX + me.Row(i)*me.stepTileX, me.zeroPointY+me.Col(i)*me.stepTileY, 'ball');
+                me.tileGrid[i] = me.add.sprite(me.zeroPointX + me.Row(i)*me.stepTileX, me.zeroPointY+me.Col(i)*me.stepTileY, 'fairies');
                 me.tileGrid[i].anchor.setTo(0.5, 0.5);
-                me.tileGrid[i].scale.setTo(.9,.9);
                 me.tileGrid[i].mask = me.mask;
                 me.tileGrid[i].isGlow = false;
                 me.tileGrid[i].lockType = me.NOLOCK;
                 me.tileGrid[i].tileType = me.levelGrid[i];
                 me.tileGrid[i].tileColor = 0;
                 me.tileGrid[i].pos = i;
-                me.glow = me.add.image(0, 0, 'light');
+                me.tileGrid[i].animations.add('fairy1', me.animFairy[0], 20, true);
+                me.tileGrid[i].animations.add('fairy2', me.animFairy[1], 20, true); 
+                me.tileGrid[i].animations.add('fairy3', me.animFairy[2], 20, true); 
+                me.tileGrid[i].animations.add('fairy4', me.animFairy[3], 20, true); 
+                me.tileGrid[i].animations.add('fairy5', me.animFairy[4], 20, true); 
+                me.tileGrid[i].animations.add('fairy6', me.animFairy[5], 20, true); 
+                me.tileGrid[i].animations.add('fairy7', me.animFairy[6], 20, true); 
+                me.glow = me.add.sprite(0, 0, 'light');
                 me.glow.anchor.setTo(0.5, 0.5);
                 me.glow.alpha = 0.5;
                 me.glow.scale.setTo(.5,.5);
                 me.tileGrid[i].addChild(me.glow);
                 me.tileGrid[i].children[0].visible = false;
-                me.locker = me.add.image(0, 0, 'locker');
+                me.locker = me.add.sprite(0, 0, 'locker');
                 me.locker.anchor.setTo(0.5, 0.5);
                 me.tileGrid[i].addChild(me.locker);
                 me.tileGrid[i].children[1].visible = false;
+                me.tileGrid[i].children[1].animations.add('lock', me.animLockArr, 1).onComplete.add(me.removeLock ,me);
+                me.tileGrid[i].children[1].animations.add('movinglock', me.animMovingLockArr, 1).onComplete.add(me.removeLock ,me);
         }
         var i = me.allLenght;
         while (i--){
@@ -135,22 +163,21 @@ BasicGame.Game.prototype = {
         me.tempTile = [];
         var i = me.tempSize;
         while (i--){
-            me.tempTile[i] = me.add.sprite(0,0,'ball');
+            me.tempTile[i] = me.add.sprite(0,0,'fairies');
             me.tempTile[i].anchor.setTo(0.5, 0.5);
-            me.tempTile[i].scale.setTo(.9,.9);
+           
             me.tempTile[i].mask = me.mask;
-            me.glow = me.add.image(0, 0, 'light');
+            me.glow = me.add.sprite(0, 0, 'light');
             me.glow.anchor.setTo(0.5, 0.5);
             me.glow.alpha = 0.5;
             me.glow.scale.setTo(.5,.5);
             me.tempTile[i].addChild(me.glow);
             me.tempTile[i].children[0].visible = false;    
             me.tempTile[i].visible = false;
-            me.locker = me.add.image(0, 0, 'locker', 1);
+            me.locker = me.add.sprite(0, 0, 'locker');
             me.locker.anchor.setTo(0.5, 0.5);
             me.tempTile[i].addChild(me.locker);
             me.tempTile[i].children[1].visible = false; 
-
         }
         var i = me.allLenght;
         while (i--){
@@ -203,13 +230,8 @@ BasicGame.Game.prototype = {
             break;             
                 case 'horizontal':
                     if (me.isGloved) {
-                        var col = me.sizeCol;
-                        while (col--) {
-                            if (me.lockCols[col].dragDirection !=0) {
-                                me.lockCols[col].dist = me.delta(me.lockCols[col].dist, me.stepTileX);
-                                me.tileGridColUpdate(col);
-                            }
-                        }
+                        me.distX = me.delta(me.distX, me.stepTileX);
+                        me.tileGridColUpdate(me.movingCol);    
                     }
                     else {me.turnOffGlows();}
                     me.isRelising = true;
@@ -217,13 +239,8 @@ BasicGame.Game.prototype = {
             break;          
                 case 'vertical':
                     if (me.isGloved) {
-                        var row = me.sizeRow;
-                        while (row--) {
-                            if (me.lockRows[row].dragDirection !=0) {
-                                me.lockRows[row].dist = me.delta(me.lockRows[row].dist, me.stepTileY);
-                                me.tileGridRowUpdate(row);
-                            }
-                        }
+                        me.distY = me.delta(me.distY, me.stepTileY);
+                        me.tileGridRowUpdate(me.movingRow);       
                     }
                     else {me.turnOffGlows();}
                     me.isRelising = true;
@@ -241,25 +258,13 @@ BasicGame.Game.prototype = {
             var dragAngle=Math.abs(Math.atan2(me.distY,me.distX));
             if ((dragAngle>Math.PI/4 && dragAngle < 3*Math.PI/4)) {
                 me.dragDirection='vertical';
-                me.lockUpdate();
                 me.startY += me.distY;
-                me.lockRows[me.movingRow].moving = true;
-                me.lockRows[me.movingRow].directStatus = 1;
-                pos = me.movingRow;
-                while (pos++ < me.sizeRow-1 && me.lockRows[pos].directStatus != 0) {me.lockRows[pos].moving = true;}
-                pos = me.movingRow;
-                while (pos-- && me.lockRows[pos].directStatus != 0) {me.lockRows[pos].moving = true;}
+                me.lockUpdate();
             }
             else {
                 me.dragDirection='horizontal';
-                me.lockUpdate();
                 me.startX += me.distX;  
-                me.lockCols[me.movingCol].moving = true;
-                me.lockCols[me.movingCol].directStatus = 1;
-                pos = me.movingCol;
-                while (pos++ < me.sizeCol-1 && me.lockCols[pos].directStatus != 0) {me.lockCols[pos].moving = true;}
-                pos = me.movingCol;
-                while (pos-- && me.lockCols[pos].directStatus != 0) {me.lockCols[pos].moving = true;}
+                me.lockUpdate();
             }
         }
     },
@@ -528,12 +533,14 @@ BasicGame.Game.prototype = {
         me.isGloved = false;
         for(var i = 0; i < me.allLenght; i++) {
             if (me.tileGrid[i].tileType != me.BLOCK && me.tileGrid[i].isGlow) {
+                me.tileGrid[i].animations.stop(me.tileColors[me.tileGrid[i].tileColor]);
                 me.tileGrid[i].visible = false;
                 me.tileGrid[i].children[0].visible = false;
                 me.tileGrid[i].isGlow = false;
                 me.tileGrid[i].tileType = me.EMPTY;
                 score++;
                 if (me.tileGrid[i].lockType != me.NOLOCK) {
+                    me.tileGrid[i].children[1].animations.stop(me.lockanim[me.tileGrid[i].lockType], true);
                     me.tileGrid[i].lockType = me.NOLOCK;
                     me.tileGrid[i].children[1].visible = false;
                     me.allLocks--;
@@ -620,58 +627,18 @@ BasicGame.Game.prototype = {
                     if (me.distX > me.lockCols[me.movingCol].rightShift) {me.distX = me.lockCols[me.movingCol].rightShift;}
                     else if (me.distX < me.lockCols[me.movingCol].leftShift) {me.distX = me.lockCols[me.movingCol].leftShift;}
                 }
-                var col = me.sizeCol;
-                while (col--) {
-                    if (me.lockCols[col].moving) {
-                        me.lockCols[col].dist = me.lockCols[col].directStatus * me.distX;
-                        if (me.lockCols[col].locked) {
-                            if (me.lockCols[col].dist > me.lockCols[col].rightShift) {me.lockCols[col].dist = me.lockCols[col].rightShift;}
-                            else if (me.lockCols[col].dist < me.lockCols[col].leftShift) {me.lockCols[col].dist = me.lockCols[col].leftShift;}
-                        }
-                        me.horizontalMoving(col, me.lockCols[col].dist);
-                    }
-                }
+                me.horizontalMoving(me.movingCol, me.distX); 
                 me.isGloved = me.turnOnGlows(true);
-                col = me.sizeCol;
-                while (col--) {      
-                    if (me.lockCols[col].moving) {
-                        me.lockCols[col].dist = me.lockCols[col].directStatus * me.distX;
-                        if (me.lockCols[col].locked) {
-                            if (me.lockCols[col].dist > me.lockCols[col].rightShift) {me.lockCols[col].dist = me.lockCols[col].rightShift;}
-                            else if (me.lockCols[col].dist < me.lockCols[col].leftShift) {me.lockCols[col].dist = me.lockCols[col].leftShift;}
-                        }
-                        me.showTempTilesHorizontal(col, me.lockCols[col].dist);
-                    }
-                } 
+                me.showTempTilesHorizontal(me.movingCol, me.distX);
             break;          
             case 'vertical':
                 if (me.lockRows[me.movingRow].locked) {
                     if (me.distY > me.lockRows[me.movingRow].rightShift) {me.distY = me.lockRows[me.movingRow].rightShift;}
                     else if (me.distY < me.lockRows[me.movingRow].leftShift) {me.distY = me.lockRows[me.movingRow].leftShift;}
-                }
-                var row = me.sizeRow;
-                while (row--) {        
-                    if (me.lockRows[row].moving) {
-                        me.lockRows[row].dist = me.lockRows[row].directStatus * me.distY;
-                        if (me.lockRows[row].locked) {
-                            if (me.lockRows[row].dist > me.lockRows[row].rightShift) {me.lockRows[row].dist = me.lockRows[row].rightShift;}
-                            else if (me.lockRows[row].dist < me.lockRows[row].leftShift) {me.lockRows[row].dist = me.lockRows[row].leftShift;}
-                        }  
-                        me.verticalMoving(row, me.lockRows[row].dist);
-                    }
-                }
+                }  
+                me.verticalMoving(me.movingRow, me.distY);
                 me.isGloved = me.turnOnGlows(true);
-                row = me.sizeRow;
-                while (row--) {    
-                    if (me.lockRows[row].moving) {
-                        me.lockRows[row].dist = me.lockRows[row].directStatus * me.distY;
-                        if (me.lockRows[row].locked) {
-                            if (me.lockRows[row].dist > me.lockRows[row].rightShift) {me.lockRows[row].dist = me.lockRows[row].rightShift;}
-                            else if (me.lockRows[row].dist < me.lockRows[row].leftShift) {me.lockRows[row].dist = me.lockRows[row].leftShift;}
-                        }  
-                        me.showTempTilesVertical(row, me.lockRows[row].dist);
-                    }
-                }
+                me.showTempTilesVertical(me.movingRow, me.distY);
             break;
         }
     },
@@ -681,60 +648,37 @@ BasicGame.Game.prototype = {
         var step;
         switch(me.dragDirection){                                 
             case 'horizontal':
-                var col = me.sizeCol;
-                var doIt = false;
-                while (col--) {
-                    if (me.lockCols[col].dist !=0) {doIt = true; col = 0;}
-                }
-                if (doIt) {
-                    col = me.sizeCol;
-                    while (col--) {
-                        if (me.lockCols[col].dist !=0){
-                            step = Math.ceil(Math.abs(me.lockCols[col].dist/10));
-                            if (Math.abs(me.lockCols[col].dist)<=step) {me.lockCols[col].dist = 0;}
-                            else {
-                                if (me.lockCols[col].dist > 0) {me.lockCols[col].dist -= step;} else {me.lockCols[col].dist += step;}
-                            }
-                            
-                            me.horizontalMoving(col, me.lockCols[col].dist);
-                            me.showTempTilesHorizontal(col, me.lockCols[col].dist);
-                        } 
+                if (me.distX !=0){
+                    step = Math.ceil(Math.abs(me.distX/10));
+                    if (Math.abs(me.distX)<=step) {me.distX = 0;}
+                    else {
+                        if (me.distX > 0) {me.distX -= step;} else {me.distX += step;}
                     }
-                }
+                    me.horizontalMoving(me.movingCol, me.distX);
+                    me.showTempTilesHorizontal(me.movingCol, me.distX);
+                } 
                 else {
                     me.isRelising = false;
                     me.dragDirection = '';
                     if (me.isGloved) {me.scoreSum+= me.removeGlowTiles(); me.chekDownEmpties();} 
-                    else {
-                        me.input.onDown.add(me.pickTile, me);}  
+                    else {me.input.onDown.add(me.pickTile, me);}  
                 }  
             break;          
             case 'vertical':
-                var row = me.sizeRow;
-                var doIt = false;
-                while (row--) {
-                    if (me.lockRows[row].dist !=0) {doIt = true; row = 0;}
-                }
-                if (doIt) {
-                    row = me.sizeRow;
-                    while (row--) {
-                        if (me.lockRows[row].dist !=0){
-                            step = Math.ceil(Math.abs(me.lockRows[row].dist/10));
-                            if (Math.abs(me.lockRows[row].dist)<=step) {me.lockRows[row].dist = 0;}
-                            else {
-                                if (me.lockRows[row].dist > 0) {me.lockRows[row].dist -= step;} else {me.lockRows[row].dist += step;}
-                            }
-                            me.verticalMoving(row, me.lockRows[row].dist);
-                            me.showTempTilesVertical(row, me.lockRows[row].dist);
-                        }
+                if (me.distY !=0){
+                    step = Math.ceil(Math.abs(me.distY/10));
+                    if (Math.abs(me.distY)<=step) {me.distY = 0;}
+                    else {
+                        if (me.distY > 0) {me.distY -= step;} else {me.distY += step;}
                     }
+                    me.verticalMoving(me.movingRow, me.distY);
+                    me.showTempTilesVertical(me.movingRow, me.distY);
                 }
                 else {
                     me.isRelising = false;
                     me.dragDirection = '';
                     if (me.isGloved) {me.scoreSum+= me.removeGlowTiles(); me.chekDownEmpties();} 
-                    else {
-                        me.input.onDown.add(me.pickTile, me);}
+                    else {me.input.onDown.add(me.pickTile, me);}
                 }
             break;
         }
@@ -771,14 +715,14 @@ BasicGame.Game.prototype = {
             if(me.chance(me.chanceLock)) {
                 var ableTiles = [];
                 for (var pos = 0; pos<me.tileGrid.length; pos++){
-                    if (me.tileGrid[pos].tileType!=me.BLOCK && !me.tileGrid[pos].lockType != me.NOLOCK  && !me.lockCols[me.Col(pos)].locked && !me.lockRows[me.Row(pos)].locked && me.lockCols[me.Col(pos)].directStatus == 0 && me.lockRows[me.Row(pos)].directStatus == 0) {
+                    if (me.tileGrid[pos].tileType!=me.BLOCK && !me.tileGrid[pos].lockType != me.NOLOCK  && !me.lockCols[me.Col(pos)].locked && !me.lockRows[me.Row(pos)].locked) {
                         ableTiles.push(pos);
                     }
                 }
                 if (ableTiles.length > 0) {
                     pos = me.rnd.integerInRange(0, ableTiles.length - 1);
-                    me.tileGrid[ableTiles[pos]].lockType = me.rnd.integerInRange(1, 4);
-                    me.tileGrid[ableTiles[pos]].children[1].frame =  me.tileGrid[ableTiles[pos]].lockType - 1;
+                    me.tileGrid[ableTiles[pos]].lockType = me.rnd.integerInRange(1, 2);
+                    me.tileGrid[ableTiles[pos]].children[1].animations.play(me.lockanim[me.tileGrid[ableTiles[pos]].lockType]);
                     me.tileGrid[ableTiles[pos]].children[1].visible = true;
                     me.lockColUpdate(me.Col(ableTiles[pos]));
                     me.lockRowUpdate(me.Row(ableTiles[pos]));
@@ -792,12 +736,13 @@ BasicGame.Game.prototype = {
     cloneAfromB: function (a,b) {
         var me = this;
         a.tileColor = b.tileColor;
-        a.tint = me.glowColors[a.tileColor];
+        a.frame = b.frame;
         a.visible = b.visible;
         a.children[0].tint = me.glowColors[a.tileColor];
         a.children[0].visible = b.children[0].visible;
         a.children[1].tint = me.glowColors[a.tileColor];
         a.children[1].frame = b.children[1].frame;
+        a.children[1].alpha = b.children[1].alpha;
         a.children[1].visible = b.children[1].visible;
     },
 
@@ -811,7 +756,8 @@ BasicGame.Game.prototype = {
         }
         if (tiles.length > 0) {tile.tileColor = tiles[me.rnd.integerInRange(0, tiles.length - 1)];}
         else {tile.tileColor = me.rnd.integerInRange(0, me.sizeColors - 1);}
-        tile.tint = me.glowColors[tile.tileColor]; 
+        tile.animations.play(me.tileColors[tile.tileColor]);
+        tile.animations.next(me.rnd.integerInRange(0, me.animFairy[tile.tileColor].length-1));
         tile.children[0].tint = me.glowColors[tile.tileColor];
         tile.children[1].tint = me.glowColors[tile.tileColor];
         tile.tileType = me.TILE;
@@ -836,7 +782,6 @@ BasicGame.Game.prototype = {
         var temp = 0;
         var pos;
         me.lockCols[col].locked = false;
-        me.lockCols[col].directStatus = 0;
         me.lockCols[col].dist = 0;
         me.lockCols[col].moving = false;
         
@@ -845,7 +790,7 @@ BasicGame.Game.prototype = {
                 me.lockCols[col].locked = true;
                 left = 0; 
                 right = 0;
-                me.lockCols[col].rightShift = 5; 
+                //me.lockCols[col].rightShift = 10; 
             }
             else if (me.tileGrid[me.Pos(col,row)].lockType == me.MOVINGLOCK) {
                 me.lockCols[col].locked = true;
@@ -858,18 +803,10 @@ BasicGame.Game.prototype = {
                 while (pos++ < me.sizeRow-1 && me.tileGrid[me.Pos(col,pos)].tileType !==me.BLOCK){temp++;}
                 if (temp < right) {right = temp;}
             }
-            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTPLUS) {
-                if (me.lockCols[col].directStatus == -1) {me.lockCols[col].directStatus = 0;}
-                else {me.lockCols[col].directStatus = 1;}
-            }
-            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTMINUS) {
-                if (me.lockCols[col].directStatus == 1) {me.lockCols[col].directStatus = 0;}
-                else {me.lockCols[col].directStatus = -1;}
-            }
         }
         if (me.lockCols[col].locked){
-            me.lockCols[col].leftShift = left*me.stepTileX-5;
-            me.lockCols[col].rightShift = right*me.stepTileX+5; 
+            me.lockCols[col].leftShift = left*me.stepTileX-7;
+            me.lockCols[col].rightShift = right*me.stepTileX+7; 
         }
     },
     
@@ -880,7 +817,6 @@ BasicGame.Game.prototype = {
         var right = me.sizeCol-1;
         var pos;
         me.lockRows[row].locked = false;
-        me.lockRows[row].directStatus = 0;
         me.lockRows[row].dist = 0;
         me.lockRows[row].moving = false;
         
@@ -889,7 +825,7 @@ BasicGame.Game.prototype = {
                 me.lockRows[row].locked = true;
                 left = 0; 
                 right = 0;
-                me.lockRows[row].rightShift = 5; 
+                //me.lockRows[row].rightShift = 5; 
             }
             else if (me.tileGrid[me.Pos(col,row)].lockType == me.MOVINGLOCK) {
                 me.lockRows[row].locked = true;
@@ -902,18 +838,10 @@ BasicGame.Game.prototype = {
                 while (pos++ < me.sizeRow-1 && me.tileGrid[me.Pos(pos,row)].tileType !==me.BLOCK){temp++;}
                 if (temp < right) {right = temp;}
             }
-            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTPLUS) {
-                if (me.lockRows[row].directStatus == -1) {me.lockRows[row].directStatus = 0;}
-                else {me.lockRows[row].directStatus = 1;}
-            }
-            else if (me.tileGrid[me.Pos(col,row)].lockType == me.DIRECTMINUS) {
-                if (me.lockRows[row].directStatus == 1) {me.lockRows[row].directStatus = 0;}
-                else {me.lockRows[row].directStatus = -1;}
-            }
         }
         if (me.lockRows[row].locked) {
-            me.lockRows[row].leftShift = left*me.stepTileY-5; 
-            me.lockRows[row].rightShift = right*me.stepTileY+5;
+            me.lockRows[row].leftShift = left*me.stepTileY-7; 
+            me.lockRows[row].rightShift = right*me.stepTileY+7;
         }
     },
     
@@ -929,7 +857,13 @@ BasicGame.Game.prototype = {
         while (i--){
             me.lockRowUpdate(i);
         }
-    }
+    },
 
+    removeLock: function (tar) {
+        var me = this;
+        tar.parent.lockType = me.NOLOCK;
+        tar.visible = false;
+        me.allLocks--;
+    }
 
 };
