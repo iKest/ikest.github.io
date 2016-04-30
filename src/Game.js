@@ -9,6 +9,7 @@ BasicGame.Game.prototype = {
     init: function () {
 
         var me = this;
+        console.log('init:',me);
 
 
         me.glowColors = [0xFFDEAD,0xB0E0E6,0xFFFFFF,0x90EE90,0xFFC0CB,0xFAA460,0xF0E68C];
@@ -23,14 +24,14 @@ BasicGame.Game.prototype = {
         me.MOVINGLOCK = 2;
 
 
-        me.levelGrid = [1, 1, 0, 0, 0, 0, 1, 1,
-                        1, 0, 1, 1, 1, 1, 0, 1,
-                        0, 1, 0, 1, 1, 0, 1, 0,
+        me.levelGrid = [0, 0, 1, 1, 1, 1, 0, 0,
                         0, 1, 1, 1, 1, 1, 1, 0,
-                        0, 1, 0, 1, 1, 0, 1, 0,
-                        0, 1, 1, 0, 0, 1, 1, 0,
-                        1, 0, 1, 1, 1, 1, 0, 1,
-                        1, 1, 0, 0, 0, 0, 1, 1];
+                        1, 1, 1, 0, 0, 1, 1, 1,
+                        1, 1, 0, 1, 1, 0, 1, 1,
+                        1, 1, 0, 1, 1, 0, 1, 1,
+                        1, 1, 1, 0, 0, 1, 1, 1,
+                        0, 1, 1, 1, 1, 1, 1, 0,
+                        0, 0, 1, 1, 1, 1, 0, 0];
 
 
         me.animFairy =[[],[],[],[],[],[],[]];
@@ -86,6 +87,7 @@ BasicGame.Game.prototype = {
     create: function () {
 
         var me = this;
+         console.log('create:', me);
 
         me.mask = me.game.add.graphics(0,0);
         me.mask.beginFill(0x000000);
@@ -111,7 +113,7 @@ BasicGame.Game.prototype = {
                 locked: false
             };
         }
-        me.bg = me.add.image(0, 150, 'bg');
+        me.bg = me.add.image(0, 160, 'bg');
         me.animLockArr = [];
         me.animMovingLockArr = [];
         me.lockanim = ['', 'lock', 'movinglock'];
