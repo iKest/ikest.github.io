@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+  <head>
+   <script src="js/phaser.min.js"></script>
+	 <script src="src/Boot.js"></script>
+	 <script src="src/Preloader.js"></script>
+	 <script src="src/MainMenu.js"></script>
+	 <script src="src/Game.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>iKest.GitHub.io by iKest</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="without-description">
+        <h1>iKest.GitHub.io</h1>
+        <p></p>
+        <p class="view"><a href="https://github.com/iKest">View the Project on GitHub <small>iKest</small></a></p>
+        <ul>
+          <li class="single"><a href="https://github.com/iKest/ikest.github.io">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      
+        <div id="gameContainer"></div>
+
+<script type="text/javascript">
+window.onload = function() {
+	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
+
+
+function preload() {
+
+    
+    game.load.spritesheet('balls','balls.png',16,16);
+    game.load.spritesheet('bricks','bricks.png',32,32);
+    game.load.image('arrow', 'red_arrow.png');
+
+}
+
+var balls;
+var cursors;
+var bricks;
+var sprite;
+
+var ballRate = 100;
+var ballTime = 0;
+var ball;
+var brick;
+
+function create() {
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.arcade.checkCollision.down = false;
+
+    game.stage.backgroundColor = '#d5d4d6';
+
+    balls = game.add.group();
+    balls.enableBody = true;
+    balls.physicsBodyType = Phaser.Physics.ARCADE;
+
+    bricks = game.add.group();
+    bricks.enableBody = true;
+    bricks.physicsBodyType = Phaser.Physics.ARCADE;
+
+
+    for (var i = 0; i < 32; i++) {
+        for (var j = 0; j < 15; j++) {
+                var color = game.rnd.integerInRange(0, 30);
+                if (color < 6) {
+                    var br = bricks.create(i*32, j*32, 'bricks');
+                    br.frame = color;
+                    br.body.bounce.set(1);
+                    br.body.immovable = true;
+                }
+
+        }
+    }
+
+    for (var i = 0; i < 30; i++)
+    {
+        var b = balls.create(0, 0, 'balls');
+        b.name = 'ball' + i;
+        b.anchor.set(0.5);
+        b.exists = false;
+        b.visible = false;
+        b.frame = game.rnd.integerInRange(0, 5);
+        b.checkWorldBounds = true;
+        game.physics.enable(b, Phaser.Physics.ARCADE);
+        b.body.collideWorldBounds = true;
+        //b.body.setCircle(8);
+        b.body.bounce.set(1);
+        b.events.onOutOfBounds.add(resetBall, this);
+    }
+    sprite = game.add.sprite(512, 750, 'arrow');
+    sprite.anchor.set(0.5);
+    game.physics.enable(sprite, Phaser.Physics.ARCADE);
+    sprite.body.allowRotation = false;
+
+}
+
+
+    function update () {
+
+        sprite.rotation = game.physics.arcade.angleToPointer(sprite);
+        if (game.input.activePointer.isDown){
+            fireBall();
+        }
+        //game.physics.arcade.collide(balls);
+        //game.physics.arcade.collide(balls, bricks);
+        game.physics.arcade.collide(balls, bricks, ballHitBrick, null, this);
+    }
+
+
+
+    function fireBall() {
+
+        if (game.time.now > ballTime){
+            var ball = balls.getFirstExists(false);
+            if (ball){
+                ball.reset(sprite.x, sprite.y);
+                ball.frame = game.rnd.integerInRange(0, 5);
+                ballTime = game.time.now + ballRate;
+                game.physics.arcade.moveToPointer(ball, 300);
+            }
+        }
+    }
+
+    function resetBall (ball) {
+
+        ball.kill();
+    }
+
+    function ballHitBrick (_ball, _brick) {
+
+        _brick.kill();
+    }
+};
+</script>
+     
+    </div>
+    <footer>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
