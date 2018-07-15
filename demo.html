@@ -34,7 +34,7 @@
 
 <script type="text/javascript">
 window.onload = function() {
-	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update });
+	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update, render:render });
 
 function init() {
 
@@ -143,7 +143,10 @@ function create() {
         //game.physics.arcade.collide(balls, bricks);
         game.physics.arcade.collide(balls, bricks, ballHitBrick, null, this);
     }
+     function render () {
+        game.debug.text('fps:'+game.time.fps || '--', 2, 14, '#00ff00'); 
 
+    },
 
 
     function fireBall() {
