@@ -34,9 +34,35 @@
 
 <script type="text/javascript">
 window.onload = function() {
-	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'gameContainer', { preload: preload, create: create, update: update });
+	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update });
 
+function init() {
 
+        //  Unless you specifically know your game needs to support multi-touch I would recommend setting this to 1
+        this.input.maxPointers = 1;
+
+        //  Phaser will automatically pause if the browser tab the game is in loses focus. You can disable that here:
+        this.stage.disableVisibilityChange = true;
+
+        if (this.game.device.desktop)
+        {
+            //  If you have any desktop specific settings, they can go in here
+            //this.scale.pageAlignHorizontally = true;
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(400, 320, 1024, 768);
+            //this.scale.forceLandscape = true;
+            this.scale.pageAlignHorizontally = true;
+        }
+        else
+        {
+            //  Same goes for mobile settings.
+            //  In this case we're saying "scale the game, no lower than 480x260 and no higher than 1024x768"
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(400, 320, 1024, 768);
+            //this.scale.forceLandscape = true;
+            this.scale.pageAlignHorizontally = true;
+        }
+    }
 function preload() {
 
     
