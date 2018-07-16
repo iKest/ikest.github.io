@@ -101,7 +101,7 @@ function create() {
                     var br = bricks.create(i*32, j*32, 'bricks');
                     br.frame = color;
                     br.body.bounce.set(1);
-                    br.body.immovable = true;
+                    br.body.immovable = true; br.heals = color +1;
                 }
 
         }
@@ -166,7 +166,7 @@ function create() {
 
     function ballHitBrick (_ball, _brick) {
 
-        _brick.kill();
+        _brick.damage(); _brick.frame = brick.heals - 1;
     }
 };
 </script>
