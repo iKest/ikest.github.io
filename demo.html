@@ -38,22 +38,13 @@ function init() {
 
         game.stage.disableVisibilityChange = true;
 
-        if (game.device.desktop)
-        {
         
-            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            game.scale.setMinMax(400, 320, 800, 600);
-            //this.scale.forceLandscape = true;
-            game.scale.pageAlignHorizontally = true;
-        }
-        else
-        {
-            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            game.scale.setMinMax(400, 320, 800, 600);
-            //this.scale.forceLandscape = true;
-            game.scale.pageAlignHorizontally = true;
-        }
 
+            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            game.scale.setMinMax(400, 320, 800, 600);
+            game.scale.forceLandscape = true;
+            game.scale.pageAlignHorizontally = true;
+       
 
 }
 
