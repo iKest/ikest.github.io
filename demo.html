@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-   <script src="/phaser.min.js"></script>
+   <script src="phaser.min.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>iKest.GitHub.io by iKest</title>
@@ -30,41 +30,38 @@
 
 <script type="text/javascript">
 window.onload = function() {
-	var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update, render:render });
+
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update, render:render });
 
 function init() {
-
-        //  Unless you specifically know your game needs to support multi-touch I would recommend setting this to 1
         game.input.maxPointers = 1;
 
-        //  Phaser will automatically pause if the browser tab the game is in loses focus. You can disable that here:
         game.stage.disableVisibilityChange = true;
 
         if (game.device.desktop)
         {
-            //  If you have any desktop specific settings, they can go in here
-            //this.scale.pageAlignHorizontally = true;
+        
             game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            game.scale.setMinMax(400, 320, 1024, 768);
+            game.scale.setMinMax(400, 320, 800, 600);
             //this.scale.forceLandscape = true;
             game.scale.pageAlignHorizontally = true;
         }
         else
         {
-            //  Same goes for mobile settings.
-            //  In this case we're saying "scale the game, no lower than 480x260 and no higher than 1024x768"
             game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            game.scale.setMinMax(400, 320, 1024, 768);
+            game.scale.setMinMax(400, 320, 800, 600);
             //this.scale.forceLandscape = true;
             game.scale.pageAlignHorizontally = true;
         }
-	game.time.advancedTiming = true;
-    }
+
+
+}
+
 function preload() {
 
-    
-    game.load.spritesheet('balls','balls.png',16,16);
-    game.load.spritesheet('bricks','bricks.png',32,32);
+    game.time.advancedTiming = true;
+    game.load.spritesheet('balls','balls_sheet.png',32,32);
+    game.load.spritesheet('bricks','bricks_sheet.png',40,40);
     game.load.image('arrow', 'red_arrow.png');
 
 }
@@ -94,20 +91,22 @@ function create() {
     bricks.physicsBodyType = Phaser.Physics.ARCADE;
 
 
-    for (var i = 0; i < 32; i++) {
-        for (var j = 0; j < 15; j++) {
+    for (var i = 0; i < 20; i++) {
+        for (var j = 0; j < 10; j++) {
                 var color = game.rnd.integerInRange(0, 30);
+                var health = game.rnd.integerInRange(0, 5);
                 if (color < 6) {
-                    var br = bricks.create(i*32, j*32, 'bricks');
-                    br.frame = color;
+                    var br = bricks.create(i*40, j*40, 'bricks');
+                    br.frame = color*6+health;
                     br.body.bounce.set(1);
-                    br.body.immovable = true; br.health = color +1;
+                    br.body.immovable = true;
+                    br.health = health +1;
                 }
 
         }
     }
 
-    for (var i = 0; i < 30; i++)
+    for (var i = 0; i < 15; i++)
     {
         var b = balls.create(0, 0, 'balls');
         b.name = 'ball' + i;
@@ -122,7 +121,7 @@ function create() {
         b.body.bounce.set(1);
         b.events.onOutOfBounds.add(resetBall, this);
     }
-    sprite = game.add.sprite(512, 750, 'arrow');
+    sprite = game.add.sprite(400, 590, 'arrow');
     sprite.anchor.set(0.5);
     game.physics.enable(sprite, Phaser.Physics.ARCADE);
     sprite.body.allowRotation = false;
@@ -140,9 +139,9 @@ function create() {
         //game.physics.arcade.collide(balls, bricks);
         game.physics.arcade.collide(balls, bricks, ballHitBrick, null, this);
     }
-     function render () {
-        game.debug.text('fps:'+game.time.fps || '--', 2, 14, '#00ff00'); 
 
+    function render() {
+        game.debug.text('fps:'+game.time.fps || '--', 2, 14, '#00ff00'); 
     }
 
 
@@ -166,12 +165,15 @@ function create() {
 
     function ballHitBrick (_ball, _brick) {
 
-        _brick.damage(1); _brick.frame = _brick.health - 1;
+        _brick.damage(1);
+        _brick.frame = _brick.frame - 1;
     }
-};
+
+}
+
 </script>
-     
-    </div>
+
+</div>
     <footer>
       <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
     </footer>
