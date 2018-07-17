@@ -30,11 +30,9 @@
 <script type="text/javascript">
 window.onload = function() {
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameContainer', { preload: preload, create: create, update: update, render:render });
-
-
-function preload() {
-    game.input.maxPointers = 1;
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameContainer', { init:init, preload: preload, create: create, update: update, render:render });
+function init() {
+ game.input.maxPointers = 1;
     if (game.device.desktop) {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.setMinMax(480,320,800,600)
@@ -52,6 +50,10 @@ function preload() {
 
 
     game.time.advancedTiming = true;
+}
+
+function preload() {
+    
     game.load.spritesheet('balls','balls_sheet.png',32,32);
     game.load.spritesheet('bricks','bricks_sheet.png',40,40);
     game.load.image('arrow', 'red_arrow.png');
