@@ -24,7 +24,7 @@
         <ul>
           <li class="single"><a href="https://github.com/iKest/ikest.github.io">View On <strong>GitHub</strong></a></li>
         </ul>
-      
+       </header>
         <div id="gameContainer"></div>
 
 <script type="text/javascript">
@@ -35,13 +35,14 @@ function init() {
  game.input.maxPointers = 1;
     if (game.device.desktop) {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        game.scale.setMinMax(480,320,800,600)
+        game.scale.setMinMax(640,480,800,600)
         game.scale.pageAlignHorizontally = true;
         game.scale.pageAlignVertically = true;
     }
     else {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.setMinMax(640, 480);
+        game.scale.pageAlignHorizontally = true;
         game.scale.pageAlignVertically = true;
      
         game.scale.forceOrientation(false,true);
@@ -166,7 +167,6 @@ function create() {
 }
 
 </script>
-          </header>
     </div>
     <footer>
       <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
