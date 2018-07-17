@@ -23,7 +23,7 @@ EPT.Game.prototype = {
 	    this.bricks.physicsBodyType = Phaser.Physics.ARCADE;
 
 
-	    for (var i = 0; i < 20; i++) {
+	    for (var i = 0; i < 24; i++) {
         for (var j = 0; j < 10; j++) {
                 var color = this.rnd.integerInRange(0, 30);
                 var health = this.rnd.integerInRange(0, 5);
@@ -52,7 +52,7 @@ EPT.Game.prototype = {
         b.body.bounce.set(1);
         b.events.onOutOfBounds.add(this.resetBall, this);
     }
-    this.arrow = this.add.sprite(400, 590, 'arrow');
+    this.arrow = this.add.sprite(480, 620, 'arrow');
     this.arrow.anchor.set(0.5);
     this.physics.enable(this.arrow, Phaser.Physics.ARCADE);
     this.arrow.body.allowRotation = false;
