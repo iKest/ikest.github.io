@@ -45,8 +45,8 @@ function preload() {
     else {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.setMinMax(800, 600);
-        
-        game.scale.pageAlignVertically = true;
+        game.scale.pageAlignHorizontally = true;
+     
         game.scale.forceOrientation(true,false);
     }
     game.scale.refresh();
