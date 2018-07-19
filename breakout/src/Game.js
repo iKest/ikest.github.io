@@ -6,7 +6,7 @@ EPT.Game.prototype = {
 
 		this. _ballRate = 100;
 		this. _ballTime = 0;
-		
+		this._score = 0;
 
 
 		this.physics.startSystem(Phaser.Physics.ARCADE);
@@ -57,10 +57,20 @@ br.color = this.colors[color];
     this.arrow.anchor.set(0.5);
     this.physics.enable(this.arrow, Phaser.Physics.ARCADE);
     this.arrow.body.allowRotation = false;
+this.initUI();
     this.camera.resetFX();
 	this.camera.flash(0x000000, 500, false);
 	},
-	
+	initUI: function() {
+
+		var fontScore = { font: "32px Arial", fill: "#000" };
+
+		var fontScoreWhite = { font: "32px Arial", fill: "#FFF" };
+
+		this.textScore = this.add.text(30, this.world.height-20, 'Score: '+this._score, fontScore);
+
+		this.textScore.anchor.set(0,1);
+},
 	update: function() {
 		this.arrow.rotation = this.physics.arcade.angleToPointer(this.arrow);
         if (this.input.activePointer.isDown){
@@ -93,6 +103,11 @@ br.color = this.colors[color];
 
         _brick.damage(1);
         _brick.frame = _brick.frame - 1;
+this._score += 10;
+
+		this.textScore.setText('Score: '+this._score);
+
+
 var randX = _brick.x;
 
 		var randY = _brick.y;
