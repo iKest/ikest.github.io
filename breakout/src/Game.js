@@ -92,6 +92,20 @@ EPT.Game.prototype = {
 
         _brick.damage(1);
         _brick.frame = _brick.frame - 1;
+var randX = _brick.x;
+
+		var randY = _brick.y;
+
+		var pointsAdded = this.add.text(randX, randY, '+10',
+
+			{ font: "48px Arial", fill: "#000", stroke: "#FFF", strokeThickness: 10 });
+
+		pointsAdded.anchor.set(0.5, 0.5);
+
+		this.add.tween(pointsAdded).to({ alpha: 0, y: randY-50 }, 1000, Phaser.Easing.Linear.None, true);
+
+
+
         this.camera.shake(0.01, 100, true, Phaser.Camera.SHAKE_BOTH, true);
     }
 };
