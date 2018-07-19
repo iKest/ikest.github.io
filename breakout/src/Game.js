@@ -13,7 +13,7 @@ EPT.Game.prototype = {
 	    this.physics.arcade.checkCollision.down = false;
 
 	    this.stage.backgroundColor = '#d5d4d6';
-
+this.colors = ['#0000FF', '#008000', '#808080', '#FFA500', '#800080', '#FF0000'];
 	    this.balls = this.add.group();
 	    this.balls.enableBody = true;
 	    this.balls.physicsBodyType = Phaser.Physics.ARCADE;
@@ -30,6 +30,7 @@ EPT.Game.prototype = {
                 if (color < 6) {
                     var br = this.bricks.create(i*40, j*40, 'bricks');
                     br.frame = color*6+health;
+br.color = this.colors[color];
                     br.body.bounce.set(1);
                     br.body.immovable = true;
                     br.health = health +1;
@@ -98,7 +99,7 @@ var randX = _brick.x;
 
 		var pointsAdded = this.add.text(randX, randY, '+10',
 
-			{ font: "48px Arial", fill: "#000", stroke: "#FFF", strokeThickness: 10 });
+			{ font: "40px Arial", fill: _brick.color, stroke: "#FFF", strokeThickness: 10 });
 
 		pointsAdded.anchor.set(0.5, 0.5);
 
