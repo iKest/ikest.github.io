@@ -1,2 +1,2572 @@
-!function(){"use strict";var t="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{};function e(t,e){return t(e={exports:{}},e.exports),e.exports}var i=e(function(t,e){var i;t.exports=((i=function(){var t=0,e=document.createElement("div");function n(t){return e.appendChild(t.dom),t}function s(i){for(var n=0;n<e.children.length;n++)e.children[n].style.display=n===i?"block":"none";t=i}e.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000",e.addEventListener("click",function(i){i.preventDefault(),s(++t%e.children.length)},!1);var r=(performance||Date).now(),h=r,a=0,o=n(new i.Panel("FPS","#0ff","#002")),l=n(new i.Panel("MS","#0f0","#020"));if(self.performance&&self.performance.memory)var c=n(new i.Panel("MB","#f08","#201"));return s(0),{REVISION:16,dom:e,addPanel:n,showPanel:s,begin:function(){r=(performance||Date).now()},end:function(){a++;var t=(performance||Date).now();if(l.update(t-r,200),h+1e3<=t&&(o.update(1e3*a/(t-h),100),h=t,a=0,c)){var e=performance.memory;c.update(e.usedJSHeapSize/1048576,e.jsHeapSizeLimit/1048576)}return t},update:function(){r=this.end()},domElement:e,setMode:s}}).Panel=function(t,e,i){var n=1/0,s=0,r=Math.round,h=r(window.devicePixelRatio||1),a=80*h,o=48*h,l=3*h,c=2*h,u=3*h,f=15*h,d=74*h,p=30*h,v=document.createElement("canvas");v.width=a,v.height=o,v.style.cssText="width:80px;height:48px";var m=v.getContext("2d");return m.font="bold "+9*h+"px Helvetica,Arial,sans-serif",m.textBaseline="top",m.fillStyle=i,m.fillRect(0,0,a,o),m.fillStyle=e,m.fillText(t,l,c),m.fillRect(u,f,d,p),m.fillStyle=i,m.globalAlpha=.9,m.fillRect(u,f,d,p),{dom:v,update:function(o,g){n=Math.min(n,o),s=Math.max(s,o),m.fillStyle=i,m.globalAlpha=1,m.fillRect(0,0,a,f),m.fillStyle=e,m.fillText(r(o)+" "+t+" ("+r(n)+"-"+r(s)+")",l,c),m.drawImage(v,u+h,f,d-h,p,u,f,d-h,p),m.fillRect(u+d-h,f,h,p),m.fillStyle=i,m.globalAlpha=.9,m.fillRect(u+d-h,f,h,r((1-o/g)*p))}}},i)}),n=e(function(t){"function"==typeof Object.create?t.exports=function(t,e){t.super_=e,t.prototype=Object.create(e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}})}:t.exports=function(t,e){t.super_=e;var i=function(){};i.prototype=e.prototype,t.prototype=new i,t.prototype.constructor=t}});function s(){}function r(){r.init.call(this)}function h(t){return void 0===t._maxListeners?r.defaultMaxListeners:t._maxListeners}function a(t,e,i,n){var r,a,o,l;if("function"!=typeof i)throw new TypeError('"listener" argument must be a function');if((a=t._events)?(a.newListener&&(t.emit("newListener",e,i.listener?i.listener:i),a=t._events),o=a[e]):(a=t._events=new s,t._eventsCount=0),o){if("function"==typeof o?o=a[e]=n?[i,o]:[o,i]:n?o.unshift(i):o.push(i),!o.warned&&(r=h(t))&&r>0&&o.length>r){o.warned=!0;var c=new Error("Possible EventEmitter memory leak detected. "+o.length+" "+e+" listeners added. Use emitter.setMaxListeners() to increase limit");c.name="MaxListenersExceededWarning",c.emitter=t,c.type=e,c.count=o.length,l=c,"function"==typeof console.warn?console.warn(l):console.log(l)}}else o=a[e]=i,++t._eventsCount;return t}function o(t,e,i){var n=!1;function s(){t.removeListener(e,s),n||(n=!0,i.apply(t,arguments))}return s.listener=i,s}function l(t){var e=this._events;if(e){var i=e[t];if("function"==typeof i)return 1;if(i)return i.length}return 0}function c(t,e){for(var i=new Array(e);e--;)i[e]=t[e];return i}s.prototype=Object.create(null),r.EventEmitter=r,r.usingDomains=!1,r.prototype.domain=void 0,r.prototype._events=void 0,r.prototype._maxListeners=void 0,r.defaultMaxListeners=10,r.init=function(){this.domain=null,r.usingDomains&&(void 0).active&&(void 0).Domain,this._events&&this._events!==Object.getPrototypeOf(this)._events||(this._events=new s,this._eventsCount=0),this._maxListeners=this._maxListeners||void 0},r.prototype.setMaxListeners=function(t){if("number"!=typeof t||t<0||isNaN(t))throw new TypeError('"n" argument must be a positive number');return this._maxListeners=t,this},r.prototype.getMaxListeners=function(){return h(this)},r.prototype.emit=function(t){var e,i,n,s,r,h,a,o="error"===t;if(h=this._events)o=o&&null==h.error;else if(!o)return!1;if(a=this.domain,o){if(e=arguments[1],!a){if(e instanceof Error)throw e;var l=new Error('Uncaught, unspecified "error" event. ('+e+")");throw l.context=e,l}return e||(e=new Error('Uncaught, unspecified "error" event')),e.domainEmitter=this,e.domain=a,e.domainThrown=!1,a.emit("error",e),!1}if(!(i=h[t]))return!1;var u="function"==typeof i;switch(n=arguments.length){case 1:!function(t,e,i){if(e)t.call(i);else for(var n=t.length,s=c(t,n),r=0;r<n;++r)s[r].call(i)}(i,u,this);break;case 2:!function(t,e,i,n){if(e)t.call(i,n);else for(var s=t.length,r=c(t,s),h=0;h<s;++h)r[h].call(i,n)}(i,u,this,arguments[1]);break;case 3:!function(t,e,i,n,s){if(e)t.call(i,n,s);else for(var r=t.length,h=c(t,r),a=0;a<r;++a)h[a].call(i,n,s)}(i,u,this,arguments[1],arguments[2]);break;case 4:!function(t,e,i,n,s,r){if(e)t.call(i,n,s,r);else for(var h=t.length,a=c(t,h),o=0;o<h;++o)a[o].call(i,n,s,r)}(i,u,this,arguments[1],arguments[2],arguments[3]);break;default:for(s=new Array(n-1),r=1;r<n;r++)s[r-1]=arguments[r];!function(t,e,i,n){if(e)t.apply(i,n);else for(var s=t.length,r=c(t,s),h=0;h<s;++h)r[h].apply(i,n)}(i,u,this,s)}return!0},r.prototype.addListener=function(t,e){return a(this,t,e,!1)},r.prototype.on=r.prototype.addListener,r.prototype.prependListener=function(t,e){return a(this,t,e,!0)},r.prototype.once=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.on(t,o(this,t,e)),this},r.prototype.prependOnceListener=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.prependListener(t,o(this,t,e)),this},r.prototype.removeListener=function(t,e){var i,n,r,h,a;if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');if(!(n=this._events))return this;if(!(i=n[t]))return this;if(i===e||i.listener&&i.listener===e)0==--this._eventsCount?this._events=new s:(delete n[t],n.removeListener&&this.emit("removeListener",t,i.listener||e));else if("function"!=typeof i){for(r=-1,h=i.length;h-- >0;)if(i[h]===e||i[h].listener&&i[h].listener===e){a=i[h].listener,r=h;break}if(r<0)return this;if(1===i.length){if(i[0]=void 0,0==--this._eventsCount)return this._events=new s,this;delete n[t]}else!function(t,e){for(var i=e,n=i+1,s=t.length;n<s;i+=1,n+=1)t[i]=t[n];t.pop()}(i,r);n.removeListener&&this.emit("removeListener",t,a||e)}return this},r.prototype.removeAllListeners=function(t){var e,i;if(!(i=this._events))return this;if(!i.removeListener)return 0===arguments.length?(this._events=new s,this._eventsCount=0):i[t]&&(0==--this._eventsCount?this._events=new s:delete i[t]),this;if(0===arguments.length){for(var n,r=Object.keys(i),h=0;h<r.length;++h)"removeListener"!==(n=r[h])&&this.removeAllListeners(n);return this.removeAllListeners("removeListener"),this._events=new s,this._eventsCount=0,this}if("function"==typeof(e=i[t]))this.removeListener(t,e);else if(e)do{this.removeListener(t,e[e.length-1])}while(e[0]);return this},r.prototype.listeners=function(t){var e,i=this._events;return i&&(e=i[t])?"function"==typeof e?[e.listener||e]:function(t){for(var e=new Array(t.length),i=0;i<e.length;++i)e[i]=t[i].listener||t[i];return e}(e):[]},r.listenerCount=function(t,e){return"function"==typeof t.listenerCount?t.listenerCount(e):l.call(t,e)},r.prototype.listenerCount=l,r.prototype.eventNames=function(){return this._eventsCount>0?Reflect.ownKeys(this._events):[]};var u=t.performance&&t.performance.now?function(){return performance.now()}:Date.now||function(){return+new Date},f="undefined"!=typeof global?global:"undefined"!=typeof self?self:"undefined"!=typeof window?window:{};function d(){throw new Error("setTimeout has not been defined")}function p(){throw new Error("clearTimeout has not been defined")}var v=d,m=p;function g(t){if(v===setTimeout)return setTimeout(t,0);if((v===d||!v)&&setTimeout)return v=setTimeout,setTimeout(t,0);try{return v(t,0)}catch(e){try{return v.call(null,t,0)}catch(e){return v.call(this,t,0)}}}"function"==typeof f.setTimeout&&(v=setTimeout),"function"==typeof f.clearTimeout&&(m=clearTimeout);var y,x=[],w=!1,b=-1;function M(){w&&y&&(w=!1,y.length?x=y.concat(x):b=-1,x.length&&_())}function _(){if(!w){var t=g(M);w=!0;for(var e=x.length;e;){for(y=x,x=[];++b<e;)y&&y[b].run();b=-1,e=x.length}y=null,w=!1,function(t){if(m===clearTimeout)return clearTimeout(t);if((m===p||!m)&&clearTimeout)return m=clearTimeout,clearTimeout(t);try{m(t)}catch(e){try{return m.call(null,t)}catch(e){return m.call(this,t)}}}(t)}}function Y(t,e){this.fun=t,this.array=e}Y.prototype.run=function(){this.fun.apply(null,this.array)};function X(){}var S=X,A=X,E=X,B=X,L=X,P=X,k=X;var R=f.performance||{},C=R.now||R.mozNow||R.msNow||R.oNow||R.webkitNow||function(){return(new Date).getTime()};var T=new Date;for(var D={nextTick:function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var i=1;i<arguments.length;i++)e[i-1]=arguments[i];x.push(new Y(t,e)),1!==x.length||w||g(_)},title:"browser",browser:!0,env:{},argv:[],version:"",versions:{},on:S,addListener:A,once:E,off:B,removeListener:L,removeAllListeners:P,emit:k,binding:function(t){throw new Error("process.binding is not supported")},cwd:function(){return"/"},chdir:function(t){throw new Error("process.chdir is not supported")},umask:function(){return 0},hrtime:function(t){var e=.001*C.call(R),i=Math.floor(e),n=Math.floor(e%1*1e9);return t&&(i-=t[0],(n-=t[1])<0&&(i--,n+=1e9)),[i,n]},platform:"browser",release:{},config:{},uptime:function(){return(new Date-T)/1e3}},I=e(function(e){(function(){var t,i,n,s,r,h;"undefined"!=typeof performance&&null!==performance&&performance.now?e.exports=function(){return performance.now()}:null!=D&&D.hrtime?(e.exports=function(){return(t()-r)/1e6},i=D.hrtime,s=(t=function(){var t;return 1e9*(t=i())[0]+t[1]})(),h=1e9*D.uptime(),r=s-h):Date.now?(e.exports=function(){return Date.now()-n},n=Date.now()):(e.exports=function(){return(new Date).getTime()-n},n=(new Date).getTime())}).call(t)}),F="undefined"==typeof window?t:window,O=["moz","webkit"],W="AnimationFrame",z=F["request"+W],H=F["cancel"+W]||F["cancelRequest"+W],N=0;!z&&N<O.length;N++)z=F[O[N]+"Request"+W],H=F[O[N]+"Cancel"+W]||F[O[N]+"CancelRequest"+W];if(!z||!H){var U=0,j=0,q=[];z=function(t){if(0===q.length){var e=I(),i=Math.max(0,1e3/60-(e-U));U=i+e,setTimeout(function(){var t=q.slice(0);q.length=0;for(var e=0;e<t.length;e++)if(!t[e].cancelled)try{t[e].callback(U)}catch(t){setTimeout(function(){throw t},0)}},Math.round(i))}return q.push({handle:++j,callback:t,cancelled:!1}),j},H=function(t){for(var e=0;e<q.length;e++)q[e].handle===t&&(q[e].cancelled=!0)}}var $=function(t){return z.call(F,t)};$.cancel=function(){H.apply(F,arguments)},$.polyfill=function(t){t||(t=F),t.requestAnimationFrame=z,t.cancelAnimationFrame=H};var Q=V;function V(t){if(!(this instanceof V))return new V(t);this.running=!1,this.last=u(),this._frame=0,this._tick=this.tick.bind(this),t&&this.on("tick",t)}n(V,r.EventEmitter),V.prototype.start=function(){if(!this.running)return this.running=!0,this.last=u(),this._frame=$(this._tick),this},V.prototype.stop=function(){return this.running=!1,0!==this._frame&&$.cancel(this._frame),this._frame=0,this},V.prototype.tick=function(){this._frame=$(this._tick);var t=u(),e=t-this.last;this.emit("tick",e),this.last=t};const J=5e3,K=.3,G=.01,Z=40,tt=0,et=20,it=-6,nt=0,st=4,rt=7,ht=10,at=1e3,ot=100,lt=!1;var ct=e(function(t){var e=Object.prototype.hasOwnProperty,i="~";function n(){}function s(t,e,i){this.fn=t,this.context=e,this.once=i||!1}function r(t,e,n,r,h){if("function"!=typeof n)throw new TypeError("The listener must be a function");var a=new s(n,r||t,h),o=i?i+e:e;return t._events[o]?t._events[o].fn?t._events[o]=[t._events[o],a]:t._events[o].push(a):(t._events[o]=a,t._eventsCount++),t}function h(t,e){0==--t._eventsCount?t._events=new n:delete t._events[e]}function a(){this._events=new n,this._eventsCount=0}Object.create&&(n.prototype=Object.create(null),(new n).__proto__||(i=!1)),a.prototype.eventNames=function(){var t,n,s=[];if(0===this._eventsCount)return s;for(n in t=this._events)e.call(t,n)&&s.push(i?n.slice(1):n);return Object.getOwnPropertySymbols?s.concat(Object.getOwnPropertySymbols(t)):s},a.prototype.listeners=function(t){var e=i?i+t:t,n=this._events[e];if(!n)return[];if(n.fn)return[n.fn];for(var s=0,r=n.length,h=new Array(r);s<r;s++)h[s]=n[s].fn;return h},a.prototype.listenerCount=function(t){var e=i?i+t:t,n=this._events[e];return n?n.fn?1:n.length:0},a.prototype.emit=function(t,e,n,s,r,h){var a=i?i+t:t;if(!this._events[a])return!1;var o,l,c=this._events[a],u=arguments.length;if(c.fn){switch(c.once&&this.removeListener(t,c.fn,void 0,!0),u){case 1:return c.fn.call(c.context),!0;case 2:return c.fn.call(c.context,e),!0;case 3:return c.fn.call(c.context,e,n),!0;case 4:return c.fn.call(c.context,e,n,s),!0;case 5:return c.fn.call(c.context,e,n,s,r),!0;case 6:return c.fn.call(c.context,e,n,s,r,h),!0}for(l=1,o=new Array(u-1);l<u;l++)o[l-1]=arguments[l];c.fn.apply(c.context,o)}else{var f,d=c.length;for(l=0;l<d;l++)switch(c[l].once&&this.removeListener(t,c[l].fn,void 0,!0),u){case 1:c[l].fn.call(c[l].context);break;case 2:c[l].fn.call(c[l].context,e);break;case 3:c[l].fn.call(c[l].context,e,n);break;case 4:c[l].fn.call(c[l].context,e,n,s);break;default:if(!o)for(f=1,o=new Array(u-1);f<u;f++)o[f-1]=arguments[f];c[l].fn.apply(c[l].context,o)}}return!0},a.prototype.on=function(t,e,i){return r(this,t,e,i,!1)},a.prototype.once=function(t,e,i){return r(this,t,e,i,!0)},a.prototype.removeListener=function(t,e,n,s){var r=i?i+t:t;if(!this._events[r])return this;if(!e)return h(this,r),this;var a=this._events[r];if(a.fn)a.fn!==e||s&&!a.once||n&&a.context!==n||h(this,r);else{for(var o=0,l=[],c=a.length;o<c;o++)(a[o].fn!==e||s&&!a[o].once||n&&a[o].context!==n)&&l.push(a[o]);l.length?this._events[r]=1===l.length?l[0]:l:h(this,r)}return this},a.prototype.removeAllListeners=function(t){var e;return t?(e=i?i+t:t,this._events[e]&&h(this,e)):(this._events=new n,this._eventsCount=0),this},a.prototype.off=a.prototype.removeListener,a.prototype.addListener=a.prototype.on,a.prefixed=i,a.EventEmitter=a,t.exports=a});const ut=function(t,e,i){return e===i?0:e<i?-t:null==e?1:null==i?-1:t},ft=function(t,e,i,n,s,r){return mt(t(s),t(r),e,i,n,s,r)},dt=function(t,e,i,n,s,r){return mt(s[t],r[t],e,i,n,s,r)},pt=function(t,e,i,n,s,r){const h=t.asc||t.desc,a=t.asc?1:-1;if(!h)throw Error("sort: Invalid 'by' sorting configuration.\n      Expecting object with 'asc' or 'desc' key");return vt(h)(h,e,i,a,s,r)},vt=function(t){const e=typeof t;return"string"===e?dt:"function"===e?ft:pt},mt=function(t,e,i,n,s,r,h){if(t===e||null==t&&null==e){if(i.length>n){return vt(i[n])(i[n],i,n+1,s,r,h)}return 0}return ut(s,t,e)},gt=function(t,e,i){if(!Array.isArray(e))return e;let n;return Array.isArray(i)&&i.length<2&&([i]=i),n=i?"string"==typeof i?function(t,e,i,n){return ut(t,i[e],n[e])}.bind(void 0,t,i):"function"==typeof i?function(t,e,i,n){return ut(t,e(i),e(n))}.bind(void 0,t,i):vt(i[0]).bind(void 0,i.shift(),i,0,t):ut.bind(void 0,t),e.sort(n)};var yt=function(t){return{asc:e=>gt(1,t,e),desc:e=>gt(-1,t,e),by:e=>{if(!Array.isArray(t))return t;if(!Array.isArray(e))throw Error("sort: Invalid usage of 'by' sorter. Array syntax is required.\n          Did you mean to use 'asc' or 'desc' sorter instead?");if(1===e.length){const i=e[0].asc?1:-1,n=e[0].asc||e[0].desc;if(!n)throw Error("sort: Invalid 'by' sorting configuration.\n            Expecting object with 'asc' or 'desc' key");return gt(i,t,n)}const i=pt.bind(void 0,e.shift(),e,0,void 0);return t.sort(i)}}},xt=function(t,e,i,n,s){var r=n-t,h=s-e;return r*r+h*h<=i*i},wt=function(t,e,i,n,s,r,h){var a=[s-t,r-e],o=[i-t,n-e],l=bt(o,o),c=bt(a,o)/l,u=[o[0]*(c=(c=c<0?0:c)>1?1:c)+t-s,o[1]*c+e-r];return bt(u,u)<=h*h};function bt(t,e){return t[0]*e[0]+t[1]*e[1]}var Mt=function(t,e,i,n,s,r,h){var a=i/2,o=n/2,l=Math.abs(s-(t+i/2)),c=Math.abs(r-(e+n/2));if(l>a+h||c>o+h)return!1;if(l<=a||c<=o)return!0;var u=l-a,f=c-o;return u*u+f*f<=h*h};function _t(t,e,i,n){return Math.sqrt(Math.pow(t-i,2)+Math.pow(e-n,2))}var Yt,Xt,St,At=function(t,e,i,n,s,r,h){return h=h||1,Math.abs(_t(t,e,i,n)-(_t(t,e,s,r)+_t(i,n,s,r)))<=h},Et=function(t,e,i,n){var s,r,h=t.length,a=!1;for(s=0,r=h-2;s<h;s+=2)t[s+1]>i!=t[r+1]>i&&e<(t[r]-t[s])*(i-t[s+1])/(t[r+1]-t[s+1])+t[s]&&(a=!a),r=s;if(a)return!0;for(s=0;s<h;s+=2){var o,l,c=t[s],u=t[s+1];if(s===h-2?(o=t[0],l=t[1]):(o=t[s+2],l=t[s+3]),At(c,u,o,l,e,i,n))return!0}return!1},Bt=function(t,e,i,n){if(Et(t,e,i))return!0;for(var s=t.length,r=0;r<s-2;r+=2)if(wt(t[r],t[r+1],t[r+2],t[r+3],e,i,n))return!0;return wt(t[0],t[1],t[s-2],t[s-1],e,i,n)},Lt=10;function Pt(){Yt=[],Xt=[];for(var t=0;t<=Lt;t++){var e=4<<t;Yt[t]=.5/Math.cos(4*Math.acos(0)/e),Xt[t]=.5/(Math.cos(2*Math.acos(0)/e)*Math.cos(2*Math.acos(0)/e))}St=!0}function kt(t,e,i,n,s,r,h){for(var a=1;a<=Lt;a++){var o=(i+s)*Yt[a],l=(n+r)*Yt[a],c=t-o,u=e-l;if(c*c+u*u<=h)return!0;var f=s-o,d=r-l;if(c*f+u*d>=0&&c*f+u*d<=f*f+d*d&&(u*f-c*d>=0||h*(f*f+d*d)>=(u*f-c*d)*(u*f-c*d)))return!0;var p=i-o,v=n-l;if(c*p+u*v>=0&&c*p+u*v<=p*p+v*v&&(u*p-c*v<=0||h*(p*p+v*v)>=(u*p-c*v)*(u*p-c*v)))return!0;var m=(i+o)*Xt[a],g=(n+l)*Xt[a];if((m-t)*(m-t)+(g-e)*(g-e)<h)s=o,r=l;else{var y=o-m+o,x=l-g+l;if(!((y-t)*(y-t)+(x-e)*(x-e)<h)){var w=m-o,b=g-l;if(u*w-c*b<=0||h*(w*w+b*b)>(u*w-c*b)*(u*w-c*b))if(c*w+u*b>0){if(Math.abs(c*w+u*b)<=w*w+b*b||(t-m)*(i-m)+(e-g)*(n-g)>=0){s=o,r=l;continue}}else if(-(c*w+u*b)<=w*w+b*b||(t-y)*(s-y)+(e-x)*(r-x)>=0){i=o,n=l;continue}return!1}i=o,n=l}}return!1}var Rt={ellipseCircle:function(t,e,i,n,s,r,h){St||Pt();var a=Math.abs(s-t),o=Math.abs(r-e);return a*a+(n-o)*(n-o)<=h*h||(i-a)*(i-a)+o*o<=h*h||a*n+o*i<=i*n||(a*n+o*i-i*n)*(a*n+o*i-i*n)<=h*h*(i*i+n*n)&&a*i-o*n>=-n*n&&a*i-o*n<=i*i||((a-i)*(a-i)+(o-n)*(o-n)<=h*h||a<=i&&o-h<=n||o<=n&&a-h<=i)&&kt(a,o,i,0,0,n,h*h)},ellipseEllipse:function(t,e,i,n,s,r,h,a){St||Pt();var o=Math.abs(s-t)*a,l=Math.abs(r-e)*h;i*=a;var c=h*a;return o*o+((n*=h)-l)*(n-l)<=c*c||(i-o)*(i-o)+l*l<=c*c||o*n+l*i<=i*n||(o*n+l*i-i*n)*(o*n+l*i-i*n)<=c*c*(i*i+n*n)&&o*i-l*n>=-n*n&&o*i-l*n<=i*i||((o-i)*(o-i)+(l-n)*(l-n)<=c*c||o<=i&&l-c<=n||l<=n&&o-c<=i)&&kt(o,l,i,0,0,n,c*c)}},Ct=function(t,e,i,n,s,r,h){return Rt.ellipseCircle(t,e,i,n,s,r,h)},Tt=function(t,e,i,n,s,r,h,a){a=a||1;var o=0;return o+=xt(t,e,i,n,s)?1:0,o+=xt(t,e,i,n+r,s)?1:0,o+=xt(t,e,i,n,s+h)?1:0,0===(o+=xt(t,e,i,n+r,s+h)?1:0)?Mt(n,s,r,h,t,e,i):o>=1&&o<=3||(4===o?!(xt(t,e,i-a,n,s)&&xt(t,e,i-a,n+r,s)&&xt(t,e,i-a,n,s+h)&&xt(t,e,i-a,n+r,s+h)):void 0)},Dt=function(t,e,i,n,s,r,h,a){return a=a||1,wt(n,s,r,h,t,e,i)&&!(xt(t,e,i-a,n,s)&&xt(t,e,i-a,r,h))},It=function(t,e,i,n,s,r){return r=r||1,xt(t,e,i,n,s)&&!xt(t,e,i-r,n,s)},Ft=function(t,e,i,n,s,r,h,a){var o=i-t,l=n-e,c=h-s,u=a-r,f=(-l*(t-s)+o*(e-r))/(-c*l+o*u),d=(c*(e-r)-u*(t-s))/(-c*l+o*u);return f>=0&&f<=1&&d>=0&&d<=1},Ot=function(t,e,i,n,s,r){var h=s.length;if(Et(s,t,e,r))return!0;for(var a=0;a<h;a+=2){var o=(a+2)%h;if(Ft(t,e,i,n,s[a],s[a+1],s[o],s[o+1]))return!0}return!1},Wt=function(t,e){for(var i,n,s,r,h,a,o=t,l=e,c=[o,l],u=0;u<c.length;u++)for(var f=c[u],d=0;d<f.length;d+=2){var p=(d+2)%f.length,v={x:f[p+1]-f[d+1],y:f[d]-f[p]};for(i=n=null,a=0;a<o.length;a+=2)s=v.x*o[a]+v.y*o[a+1],(null===i||s<i)&&(i=s),(null===n||s>n)&&(n=s);for(r=h=null,a=0;a<l.length;a+=2)s=v.x*l[a]+v.y*l[a+1],(null===r||s<r)&&(r=s),(null===h||s>h)&&(h=s);if(n<r||h<i)return!1}return!0},zt=function(t,e,i,n,s){return Wt(t,[e,i,e+n,i,e+n,i+s,e,i+s])},Ht=function(t,e,i,n,s,r,h,a){s-=t,h-=t,r-=e,a-=e;var o=Math.pow(h-s,2)/i/i+Math.pow(a-r,2)/n/n,l=2*s*(h-s)/i/i+2*r*(a-r)/n/n,c=l*l-4*o*(s*s/i/i+r*r/n/n-1);if(0===c){var u=-l/2/o;return u>=0&&u<=1}if(c>0){var f=Math.sqrt(c),d=(-l+f)/2/o,p=(-l-f)/2/o;return d>=0&&d<=1||p>=0&&p<=1}return!1},Nt=function(t,e,i,n,s,r,h,a){return Ht(s,r,h,a,t,e,i,n)},Ut=function(t,e,i,n,s){if(Et(t,e,i))return!0;for(var r=t.length,h=0;h<r-2;h+=2)if(Nt(t[h],t[h+1],t[h+2],t[h+3],e,i,n,s))return!0;return Nt(t[0],t[1],t[r-2],t[r-1],e,i,n,s)},jt=function(t,e,i,n,s,r){return s>=t&&s<=t+i&&r>=e&&r<=e+n},qt=function(t,e,i,n,s){const r=Math.atan2(n-e,i-t)-Math.PI/2,h=s/2,a=Math.cos(r)*h,o=Math.sin(r)*h;return[t-a,e-o,i-a,n-o,i+a,n+o,t+a,e+o]},$t=function(t,e,i,n,s,r,h,a,o,l){return o||l?function(t,e,i,n,s,r,h,a,o,l){if(o&&l)return Wt(qt(t,e,i,n,o),qt(s,r,h,a,l));if(o)return Ot(s,r,h,a,qt(t,e,i,n,o));if(l)return Ot(t,e,i,n,qt(s,r,h,a,o))}(t,e,i,n,s,r,h,a,o,l):Ft(t,e,i,n,s,r,h,a)};var Qt=function(t,e,i,n,s,r,h,a){return!(!jt(s,r,h,a,t,e)&&!jt(s,r,h,a,i,n))||($t(t,e,i,n,s,r,s+h,r)||$t(t,e,i,n,s+h,r,s+h,r+a)||$t(t,e,i,n,s,r+a,s+h,r+a)||$t(t,e,i,n,s,r,s,r+a))},Vt=function(t,e,i,n,s,r,h,a){return jt(s,r,h,a,t,e)||Ht(t,e,i,n,s,r,s+h,r)||Ht(t,e,i,n,s,r+a,s+h,r+a)||Ht(t,e,i,n,s,r,s,r+a)||Ht(t,e,i,n,s+h,r,s+h,r+a)},Jt=function(t,e,i,n,s,r){return Math.pow(s-t,2)/(i*i)+Math.pow(r-e,2)/(n*n)<=1},Kt={circlePoint:xt,circleCircle:function(t,e,i,n,s,r){var h=t-n,a=s-e,o=i+r;return h*h+a*a<=o*o},circleLine:function(t,e,i,n,s,r,h){return wt(n,s,r,h,t,e,i)},circleBox:function(t,e,i,n,s,r,h){return Mt(n,s,r,h,t,e,i)},circlePolygon:function(t,e,i,n){return Bt(n,t,e,i)},circleEllipse:function(t,e,i,n,s,r,h){return Ct(n,s,r,h,t,e,i)},circleOutlineBox:Tt,circleOutlineLine:Dt,circleOutlinePoint:It,polygonPoint:Et,polygonLine:function(t,e,i,n,s,r){return Ot(e,i,n,s,t,r)},polygonPolygon:Wt,polygonBox:zt,polygonCircle:Bt,polygonEllipse:Ut,boxPoint:jt,boxBox:function(t,e,i,n,s,r,h,a){return t<s+h&&t+i>s&&e<r+a&&e+n>r},boxLine:function(t,e,i,n,s,r,h,a){return Qt(s,r,h,a,t,e,i,n)},boxPolygon:function(t,e,i,n,s){return zt(s,t,e,i,n)},boxCircle:Mt,boxEllipse:function(t,e,i,n,s,r,h,a){return Vt(s,r,h,a,t,e,i,n)},boxCircleOutline:function(t,e,i,n,s,r,h,a){return Tt(s,r,h,t,e,i,n,a)},pointBox:function(t,e,i,n,s,r){return jt(i,n,s,r,t,e)},pointPolygon:function(t,e,i,n){return Et(i,t,e,n)},pointCircle:function(t,e,i,n,s){return xt(i,n,s,t,e)},pointLine:function(t,e,i,n,s,r){return At(i,n,s,r,t,e)},pointEllipse:function(t,e,i,n,s,r){return Jt(i,n,s,r,t,e)},pointCircleOutline:function(t,e,i,n,s,r){return It(t,e,i,n,s,r)},lineLine:$t,lineBox:Qt,linePolygon:Ot,lineCircle:wt,linePoint:At,lineEllipse:Nt,lineCircleOutline:function(t,e,i,n,s,r,h,a){return Dt(s,r,h,t,e,i,n,a)},ellipsePoint:Jt,ellipseLine:Ht,ellipseBox:Vt,ellipseCircle:Ct,ellipseEllipse:function(t,e,i,n,s,r,h,a){return Rt.ellipseEllipse(t,e,i,n,s,r,h,a)},ellipsePolygon:function(t,e,i,n,s){return Ut(s,t,e,i,n)}},Gt=Kt.polygonPolygon,Zt=Kt.polygonCircle,te=e(function(t,e){t.exports=function(){function t(t,n,s,r,h){!function t(i,n,s,r,h){for(;r>s;){if(r-s>600){var a=r-s+1,o=n-s+1,l=Math.log(a),c=.5*Math.exp(2*l/3),u=.5*Math.sqrt(l*c*(a-c)/a)*(o-a/2<0?-1:1),f=Math.max(s,Math.floor(n-o*c/a+u)),d=Math.min(r,Math.floor(n+(a-o)*c/a+u));t(i,n,f,d,h)}var p=i[n],v=s,m=r;for(e(i,s,n),h(i[r],p)>0&&e(i,s,r);v<m;){for(e(i,v,m),v++,m--;h(i[v],p)<0;)v++;for(;h(i[m],p)>0;)m--}0===h(i[s],p)?e(i,s,m):e(i,++m,r),m<=n&&(s=m+1),n<=m&&(r=m-1)}}(t,n,s||0,r||t.length-1,h||i)}function e(t,e,i){var n=t[e];t[e]=t[i],t[i]=n}function i(t,e){return t<e?-1:t>e?1:0}var n=function(t){void 0===t&&(t=9),this._maxEntries=Math.max(4,t),this._minEntries=Math.max(2,Math.ceil(.4*this._maxEntries)),this.clear()};function s(t,e,i){if(!i)return e.indexOf(t);for(var n=0;n<e.length;n++)if(i(t,e[n]))return n;return-1}function r(t,e){h(t,0,t.children.length,e,t)}function h(t,e,i,n,s){s||(s=p(null)),s.minX=1/0,s.minY=1/0,s.maxX=-1/0,s.maxY=-1/0;for(var r=e;r<i;r++){var h=t.children[r];a(s,t.leaf?n(h):h)}return s}function a(t,e){return t.minX=Math.min(t.minX,e.minX),t.minY=Math.min(t.minY,e.minY),t.maxX=Math.max(t.maxX,e.maxX),t.maxY=Math.max(t.maxY,e.maxY),t}function o(t,e){return t.minX-e.minX}function l(t,e){return t.minY-e.minY}function c(t){return(t.maxX-t.minX)*(t.maxY-t.minY)}function u(t){return t.maxX-t.minX+(t.maxY-t.minY)}function f(t,e){return t.minX<=e.minX&&t.minY<=e.minY&&e.maxX<=t.maxX&&e.maxY<=t.maxY}function d(t,e){return e.minX<=t.maxX&&e.minY<=t.maxY&&e.maxX>=t.minX&&e.maxY>=t.minY}function p(t){return{children:t,height:1,leaf:!0,minX:1/0,minY:1/0,maxX:-1/0,maxY:-1/0}}function v(e,i,n,s,r){for(var h=[i,n];h.length;)if(!((n=h.pop())-(i=h.pop())<=s)){var a=i+Math.ceil((n-i)/s/2)*s;t(e,a,i,n,r),h.push(i,a,a,n)}}return n.prototype.all=function(){return this._all(this.data,[])},n.prototype.search=function(t){var e=this.data,i=[];if(!d(t,e))return i;for(var n=this.toBBox,s=[];e;){for(var r=0;r<e.children.length;r++){var h=e.children[r],a=e.leaf?n(h):h;d(t,a)&&(e.leaf?i.push(h):f(t,a)?this._all(h,i):s.push(h))}e=s.pop()}return i},n.prototype.collides=function(t){var e=this.data;if(!d(t,e))return!1;for(var i=[];e;){for(var n=0;n<e.children.length;n++){var s=e.children[n],r=e.leaf?this.toBBox(s):s;if(d(t,r)){if(e.leaf||f(t,r))return!0;i.push(s)}}e=i.pop()}return!1},n.prototype.load=function(t){if(!t||!t.length)return this;if(t.length<this._minEntries){for(var e=0;e<t.length;e++)this.insert(t[e]);return this}var i=this._build(t.slice(),0,t.length-1,0);if(this.data.children.length)if(this.data.height===i.height)this._splitRoot(this.data,i);else{if(this.data.height<i.height){var n=this.data;this.data=i,i=n}this._insert(i,this.data.height-i.height-1,!0)}else this.data=i;return this},n.prototype.insert=function(t){return t&&this._insert(t,this.data.height-1),this},n.prototype.clear=function(){return this.data=p([]),this},n.prototype.remove=function(t,e){if(!t)return this;for(var i,n,r,h=this.data,a=this.toBBox(t),o=[],l=[];h||o.length;){if(h||(h=o.pop(),n=o[o.length-1],i=l.pop(),r=!0),h.leaf){var c=s(t,h.children,e);if(-1!==c)return h.children.splice(c,1),o.push(h),this._condense(o),this}r||h.leaf||!f(h,a)?n?(i++,h=n.children[i],r=!1):h=null:(o.push(h),l.push(i),i=0,n=h,h=h.children[0])}return this},n.prototype.toBBox=function(t){return t},n.prototype.compareMinX=function(t,e){return t.minX-e.minX},n.prototype.compareMinY=function(t,e){return t.minY-e.minY},n.prototype.toJSON=function(){return this.data},n.prototype.fromJSON=function(t){return this.data=t,this},n.prototype._all=function(t,e){for(var i=[];t;)t.leaf?e.push.apply(e,t.children):i.push.apply(i,t.children),t=i.pop();return e},n.prototype._build=function(t,e,i,n){var s,h=i-e+1,a=this._maxEntries;if(h<=a)return r(s=p(t.slice(e,i+1)),this.toBBox),s;n||(n=Math.ceil(Math.log(h)/Math.log(a)),a=Math.ceil(h/Math.pow(a,n-1))),(s=p([])).leaf=!1,s.height=n;var o=Math.ceil(h/a),l=o*Math.ceil(Math.sqrt(a));v(t,e,i,l,this.compareMinX);for(var c=e;c<=i;c+=l){var u=Math.min(c+l-1,i);v(t,c,u,o,this.compareMinY);for(var f=c;f<=u;f+=o){var d=Math.min(f+o-1,u);s.children.push(this._build(t,f,d,n-1))}}return r(s,this.toBBox),s},n.prototype._chooseSubtree=function(t,e,i,n){for(;n.push(e),!e.leaf&&n.length-1!==i;){for(var s=1/0,r=1/0,h=void 0,a=0;a<e.children.length;a++){var o=e.children[a],l=c(o),u=(f=t,d=o,(Math.max(d.maxX,f.maxX)-Math.min(d.minX,f.minX))*(Math.max(d.maxY,f.maxY)-Math.min(d.minY,f.minY))-l);u<r?(r=u,s=l<s?l:s,h=o):u===r&&l<s&&(s=l,h=o)}e=h||e.children[0]}var f,d;return e},n.prototype._insert=function(t,e,i){var n=i?t:this.toBBox(t),s=[],r=this._chooseSubtree(n,this.data,e,s);for(r.children.push(t),a(r,n);e>=0&&s[e].children.length>this._maxEntries;)this._split(s,e),e--;this._adjustParentBBoxes(n,s,e)},n.prototype._split=function(t,e){var i=t[e],n=i.children.length,s=this._minEntries;this._chooseSplitAxis(i,s,n);var h=this._chooseSplitIndex(i,s,n),a=p(i.children.splice(h,i.children.length-h));a.height=i.height,a.leaf=i.leaf,r(i,this.toBBox),r(a,this.toBBox),e?t[e-1].children.push(a):this._splitRoot(i,a)},n.prototype._splitRoot=function(t,e){this.data=p([t,e]),this.data.height=t.height+1,this.data.leaf=!1,r(this.data,this.toBBox)},n.prototype._chooseSplitIndex=function(t,e,i){for(var n,s,r,a,o,l,u,f=1/0,d=1/0,p=e;p<=i-e;p++){var v=h(t,0,p,this.toBBox),m=h(t,p,i,this.toBBox),g=(s=v,r=m,a=void 0,o=void 0,l=void 0,u=void 0,a=Math.max(s.minX,r.minX),o=Math.max(s.minY,r.minY),l=Math.min(s.maxX,r.maxX),u=Math.min(s.maxY,r.maxY),Math.max(0,l-a)*Math.max(0,u-o)),y=c(v)+c(m);g<f?(f=g,n=p,d=y<d?y:d):g===f&&y<d&&(d=y,n=p)}return n},n.prototype._chooseSplitAxis=function(t,e,i){var n=t.leaf?this.compareMinX:o,s=t.leaf?this.compareMinY:l;this._allDistMargin(t,e,i,n)<this._allDistMargin(t,e,i,s)&&t.children.sort(n)},n.prototype._allDistMargin=function(t,e,i,n){t.children.sort(n);for(var s=this.toBBox,r=h(t,0,e,s),o=h(t,i-e,i,s),l=u(r)+u(o),c=e;c<i-e;c++){var f=t.children[c];a(r,t.leaf?s(f):f),l+=u(r)}for(var d=i-e-1;d>=e;d--){var p=t.children[d];a(o,t.leaf?s(p):p),l+=u(o)}return l},n.prototype._adjustParentBBoxes=function(t,e,i){for(var n=i;n>=0;n--)a(e[n],t)},n.prototype._condense=function(t){for(var e=t.length-1,i=void 0;e>=0;e--)0===t[e].children.length?e>0?(i=t[e-1].children).splice(i.indexOf(t[e]),1):this.clear():r(t[e],this.toBBox)},n}()}),ee=ne,ie=ne;function ne(t,e){if(!(this instanceof ne))return new ne(t,e);if(this.data=t||[],this.length=this.data.length,this.compare=e||se,this.length>0)for(var i=(this.length>>1)-1;i>=0;i--)this._down(i)}function se(t,e){return t<e?-1:t>e?1:0}ne.prototype={push:function(t){this.data.push(t),this.length++,this._up(this.length-1)},pop:function(){if(0!==this.length){var t=this.data[0];return this.length--,this.length>0&&(this.data[0]=this.data[this.length],this._down(0)),this.data.pop(),t}},peek:function(){return this.data[0]},_up:function(t){for(var e=this.data,i=this.compare,n=e[t];t>0;){var s=t-1>>1,r=e[s];if(i(n,r)>=0)break;e[t]=r,t=s}e[t]=n},_down:function(t){for(var e=this.data,i=this.compare,n=this.length>>1,s=e[t];t<n;){var r=1+(t<<1),h=r+1,a=e[r];if(h<this.length&&i(e[h],a)<0&&(r=h,a=e[h]),i(a,s)>=0)break;e[t]=a,t=r}e[t]=s}},ee.default=ie;var re=ae,he=ae;function ae(t,e,i,n,s,r){for(var h,a,o,l,c=t.data,u=[],f=t.toBBox,d=new ee(null,oe);c;){for(h=0;h<c.children.length;h++)a=c.children[h],o=le(e,i,c.leaf?f(a):a),(!r||o<=r)&&d.push({node:a,isItem:c.leaf,dist:o});for(;d.length&&d.peek().isItem;)if(l=d.pop().node,s&&!s(l)||u.push(l),n&&u.length===n)return u;(c=d.pop())&&(c=c.node)}return u}function oe(t,e){return t.dist-e.dist}function le(t,e,i){var n=ce(t,i.minX,i.maxX),s=ce(e,i.minY,i.maxY);return n*n+s*s}function ce(t,e,i){return t<e?e-t:t<=i?0:t-i}re.default=he;var ue="EPSILON"in Number?Number.EPSILON:2.220446049250313e-16,fe=function(t,e){return Math.abs(t-e)<ue};const de=(t,e)=>{let i=t+Math.random()*(e+1-t);return i=Math.floor(i)},pe=t=>0|t,ve=(t,e,i,n,s,r)=>{const h=i-t,a=n-e;return{x:pe(r*h-s*a+t),y:pe(s*h+r*a+e)}},me=(t,e,i,n)=>{const s=2*Math.PI*Math.random(),r=Math.random()+Math.random(),h=(r>1?2-r:r)*(i-.5*n);return{x:pe(Math.cos(s)*h+t),y:pe(Math.sin(s)*h+e)}},ge=(t,e,i)=>t+(e-t)*i,ye=(t,e)=>Math.atan2(Math.sin(t-e),Math.cos(t-e)),xe=(t,e,i,n)=>{const s=t-i,r=e-n;return s*s+r*r},we=2*Math.PI;function be(t){const e=t%we;return e<0?e+we:e}const{sqrt:Me}=Math,_e=(t,e,i,n,s,r,h)=>{const a=[],o=(r-n)*(r-n)+(h-s)*(h-s),l=2*((r-n)*(n-t)+(h-s)*(s-e)),c=l*l-4*o*(t*t+e*e+n*n+s*s-2*(t*n+e*s)-i*i);if(c>0){const t=Me(c),e=(-l+t)/(2*o),i=(-l-t)/(2*o);e>=0&&e<=1&&a.push({x:ge(n,r,e),y:ge(s,h,e)}),i>=0&&i<=1&&a.push({x:ge(n,r,i),y:ge(s,h,i)})}return a},Ye=(t,e,i,n,s,r,h)=>{const a=_e(t,e,i,n,s,r,s),o=_e(t,e,i,r,s,r,h),l=_e(t,e,i,r,h,n,h),c=_e(t,e,i,n,h,n,s),u=[],f=i*i,d=n-t,p=s-e,v=r-t,m=h-e,g=d*d,y=p*p,x=v*v,w=m*m;return a.length>0&&(2===a.length?a[0].x>a[1].x?u.push(a[1],a[0]):u.push(a[0],a[1]):u.push(a[0])),x+y<f&&u.push({x:r,y:s}),o.length>0&&(2===o.length?o[0].y>o[1].y?u.push(o[1],o[0]):u.push(o[0],o[1]):u.push(o[0])),x+w<f&&u.push({x:r,y:h}),l.length>0&&(2===l.length?l[0].x<l[1].x?u.push(l[1],l[0]):u.push(l[0],l[1]):u.push(l[0])),g+w<f&&u.push({x:n,y:h}),c.length>0&&(2===c.length?c[0].y<c[1].y?u.push(c[1],c[0]):u.push(c[0],c[1]):u.push(c[0])),g+y<f&&u.push({x:n,y:s}),u},Xe=(t,e,i,n,s,r,h)=>{const a={type:0,isec:[]},o=t-s,l=e-r,c=i*o+n*l;let u=h*h-o*o+l*l+c*c;if(u<0)return a;if(c<(u=Math.sqrt(u))){if(fe(u,0))return a.type=1,a.isec.push({x:i*c+t,y:n*c+e}),a;if(c+u>=0){u=-u,a.type=2;const s=c-u;return a.isec.push({x:i*s+t,y:n*s+e}),a}return a}a.type=3;const f=c-u,d=c+u;return a.isec.push({x:i*f+t,y:n*f+e},{x:i*d+t,y:n*d+e}),a};class Se{constructor(t,e){if(this.gameMap=t,this.x=+(e.x||0),this.y=+(e.y||0),this.width=e.size||e.width||0,this.height=e.size||e.height||0,!this.width||!this.height)throw new Error("element size can not be undefined");this.lightDirection=!0,this.point=e.point,this.lightSize=this.width/2,this.minX=this.x-this.width,this.minY=this.y-this.width,this.maxX=this.x+this.width,this.maxY=this.y+this.width}render(){this.lightSize+=this.lightDirection?1:-1,(this.lightSize>this.width||this.lightSize<this.width/2)&&(this.lightDirection=!this.lightDirection);const t=this.gameMap.view.relativeX(this.x),e=this.gameMap.view.relativeY(this.y),i=this.gameMap.view.relativeW(this.width);this.gameMap.ctx.fillStyle="\t#FFA07A",this.gameMap.ctx.globalAlpha=.2,this.gameMap.ctx.beginPath(),this.gameMap.ctx.arc(t,e,this.lightSize*i/this.width,0,2*Math.PI),this.gameMap.ctx.fill(),this.gameMap.ctx.globalAlpha=1,this.gameMap.ctx.beginPath(),this.gameMap.ctx.arc(t,e,i/2,0,2*Math.PI),this.gameMap.ctx.fill()}}class Ae{constructor(t,e,i,n,s,r,h,a,o){this.x=t,this.y=e,this.vx=i,this.vy=n,this.speed=s,this.angle=r,this.sin=Math.sin(r),this.cos=Math.cos(r),this.nextAngle=r,this.poly={},this.aabb={},this.aabb.parent=this,this.snake=o,this.aabb.snakeIdx=o.idx,this.setIdx(a),this.calcPoly(h),this.isHead=!1}setNext(t,e,i){this.nextX=t,this.nextY=e,this.nextAngle=i,this.nextSin=Math.sin(i),this.nextCos=Math.cos(i),this.calcPoly(.5*this.width)}setXY(t,e){this.x=t,this.y=e,this.calcPoly(.5*this.width)}calcRotates(t){const e=ve(this.x,this.y,this.x,this.y+t,this.sin,this.cos),i=ve(this.x,this.y,this.x,this.y-t,this.sin,this.cos),n=ve(this.nextX,this.nextY,this.nextX,this.nextY+t,this.nextSin,this.nextCos);return{rotateLeft:i,rotateRight:e,nextRotateLeft:ve(this.nextX,this.nextY,this.nextX,this.nextY-t,this.nextSin,this.nextCos),nextRotateRight:n}}setIdx(t){this.aabb.idx=t}calcPoly(t){const e=this.calcRotates(.5*t);this.poly.l0X=e.nextRotateLeft.x,this.poly.l0Y=e.nextRotateLeft.y,this.poly.r0X=e.nextRotateRight.x,this.poly.r0Y=e.nextRotateRight.y,this.poly.l1X=e.rotateLeft.x,this.poly.l1Y=e.rotateLeft.y,this.poly.r1X=e.rotateRight.x,this.poly.r1Y=e.rotateRight.y,this.width=t}getPoly(t){return fe(t,this.width)||this.calcPoly(t),this.poly}setAABB(t){const e=this.calcRotates(.5*t);this.aabb.minX=Math.min(e.rotateRight.x,e.rotateLeft.x,e.nextRotateLeft.x,e.nextRotateRight.x),this.aabb.minY=Math.min(e.rotateRight.y,e.rotateLeft.y,e.nextRotateLeft.y,e.nextRotateRight.y),this.aabb.maxX=Math.max(e.rotateRight.x,e.rotateLeft.x,e.nextRotateLeft.x,e.nextRotateRight.x),this.aabb.maxY=Math.max(e.rotateRight.y,e.rotateLeft.y,e.nextRotateLeft.y,e.nextRotateRight.y)}getAABB(){return this.aabb}destroy(){this.poly=void 0,this.aabb.parent=void 0,this.aabb=void 0}}var Ee=e(function(t,e){!function(){function e(t,e,i){this.next=i,i&&(i.prev=this),this.prev=e,e&&(e.next=this),this.data=t}function i(){if(!(this instanceof i))return new i;this._head=null,this._tail=null,this.length=0}i.prototype={push:function(t){this._tail=new e(t,this._tail,null),this._head||(this._head=this._tail),this.length++},pop:function(){if(0!==this.length){var t=this._tail;return this._tail=t.prev,t.prev&&(t.prev=this._tail.next=null),this.length--,1===this.length?this._head=this._tail:0===this.length&&(this._head=this._tail=null),t.data}},unshift:function(t){this._head=new e(t,null,this._head),this._tail||(this._tail=this._head),this.length++},shift:function(){if(0!==this.length){var t=this._head;return this._head=t.next,t.next&&(t.next=this._head.prev=null),this.length--,1===this.length?this._tail=this._head:0===this.length&&(this._head=this._tail=null),t.data}},item:function(t){t<0&&(t=this.length+t);for(var e=this._head;t-- >0&&e;)e=e.next;return e?e.data:void 0},slice:function(t,e){if(t||(t=0),e||(e=this.length),e<0&&(e=this.length+e),t<0&&(t=this.length+t),e===t)return[];if(e<t)throw new Error("invalid offset: "+t+","+e+" (length="+this.length+")");for(var i=e-t,n=new Array(i),s=0,r=this._head;t-- >0&&r;)r=r.next;for(;s<i&&r;)n[s++]=r.data,r=r.next;return n},drop:function(){i.call(this)},forEach:function(t,e){for(var i=this._head,n=0,s=this.length;n<s&&i;)t.call(e||this,i.data,n,this),i=i.next,n++},map:function(t,e){var n=new i;return this.forEach(function(i,s,r){n.push(t.call(e||r,i,s,r))}),n},filter:function(t,e){var n=new i;return this.forEach(function(i,s,r){t.call(e||r,i,s,r)&&n.push(i)}),n},reduce:function(t,e,i){var n=0,s=this._head,r=this.length;for(e||(n=1,e=s&&s.data,s=s&&s.next);n<r&&s;)e=t.call(i||this,e,s.data,this),n++,s=s.next;return e}},t.exports=i}()});class Be extends Ee{constructor(){super()}every(t,e){let i,n=this._head,s=0;const r=this.length;let h=!0;for(;s<r&&n&&h;)h=t.call(e||this,n.data,i,s,this),i=n.data,n=n.next,s+=1}getHead(){if(this._head)return this._head.data}getTail(){if(this._tail)return this._tail.data}}const{log:Le}=console;class Pe{constructor(t,e){this.gameMap=t,this.x=+(e.x||0),this.y=+(e.y||0),this.width=+(e.size||e.width||0),this.height=+(e.size||e.height||0),this.shadowSize=this.width+et,this.needResize=!1,this.point=0,this.isSpeedUp=!1,this.fillColor="",this.stopped=!1,this.head={},this.head.aabb={},this.head.aabb.snakeIdx=this.idx=e.idx,this.head.aabb.parent=this.head,this.head.snake=this,this.head.getPoly=t=>this.head.poly,this.head.getAABB=()=>this.head.aabb,this.head.isHead=!0,this.head.poly={},this.head.width=this.width,this.closestDistance=5e3,this.visionAngle=170,this.closestSnake=null,this.closestFood=null,this.closestSnakeID=null,this.closestFoodID=null,this.colliders=this.gameMap.globalColliders,this.movementQueue=new Be,this.mIdx=0,this.collidersArray=[],this.speed=this.oldSpeed=K,this.turnSpeed=G,this.vx=0,this.vy=0,this.oldVx=0,this.oldVy=0,this.fillColor=e.fillColor||"#fff",this.angle=this.toAngle=e.angle||0,this.length=this.lastLength=e.length||0,this.viewLength=0,this.isPlayer=e.isPlayer,this.key=e.key,this.distances=[],this.updateSize(),this.turnAround(0),this.calcHead()}zeroClosest(){this.closestDistance=5e3}setXY(t,e){this.x=t,this.y=e,this.calcHead()}setAngle(t){this.angle=t,this.toAngle=t,this.velocity(),this.calcHead()}setClosest(t){this.closestDistance=t}updateSize(t=0){this.width+=.5*t,this.height+=.5*t,this.lastLength=this.length,this.length+=10*t,this.width>this.shadowSize&&(this.shadowSize+=et,this.needResize=!0),this.head.width=this.width}turnAround(t){const e=ye(this.toAngle,this.angle),i=this.turnSpeed*t*this.gameMap.scale;if(Math.abs(e)<=i)this.angle=this.toAngle,this.tau=0;else{this.angle+=Math.sign(e)*i;const t=this.height*Math.sin(this.angle);this.tau=this.speed/t}this.vx=Math.cos(this.angle),this.vy=Math.sin(this.angle)}speedUp(){this.isSpeedUp||(this.isSpeedUp=!0,this.oldSpeed=this.speed,this.speed*=2)}speedDown(){this.isSpeedUp&&(this.isSpeedUp=!1,this.speed=this.oldSpeed)}eat(t){this.point+=t.point;const e=t.point/200;this.updateSize(e)}update(t){if(this.stopped||fe(this.speed,0))return;let e=!1;const i=this.speed*t;let n=this.movementQueue.getTail();if(n&&fe(n.angle,this.angle)&&(this.colliders.remove(n.getAABB()),n.speed+=i,e=!0),e||(n=new Ae(this.x,this.y,this.vx,this.vy,i,this.angle,this.width,this.mIdx,this),this.movementQueue.push(n),this.mIdx+=1),this.viewLength+=i,this.turnAround(t),this.x+=this.vx*i,this.y+=this.vy*i,n.setNext(this.x,this.y,this.angle),n.setAABB(this.shadowSize),this.colliders.insert(n.getAABB()),this.movementQueue.length>0&&this.viewLength>this.length){let t;for(;this.movementQueue.length>0&&this.viewLength>this.length;)t=this.movementQueue.shift(),this.colliders.remove(t.getAABB()),this.viewLength-=t.speed;const e=this.length-this.viewLength;if(e>0){const i=e/t.speed;t.speed=e;const n=t.nextX-(t.nextX-t.x)*i,s=t.nextY-(t.nextY-t.y)*i;t.setXY(n,s),t.setAABB(this.shadowSize),this.movementQueue.unshift(t),this.colliders.insert(t.getAABB()),this.viewLength+=t.speed}}this.needResize&&(this.needResize=!1,this.mIdx=0,this.movementQueue.forEach(t=>{this.colliders.remove(t.getAABB()),t.setAABB(this.shadowSize),t.setIdx(this.mIdx),this.mIdx+=1,this.collidersArray.push(t.getAABB())}),Le(`${this.key} resize width ${this.collidersArray.length} colliders`),this.colliders.load(this.collidersArray),this.collidersArray.length=0),this.colliders.remove(this.head.getAABB()),this.calcHead(),this.head.aabb.idx=this.mIdx,this.colliders.insert(this.head.getAABB())}calcHead(){const t=ve(this.x,this.y,this.x+this.height,this.y-.5*this.width,this.vy,this.vx),e=ve(this.x,this.y,this.x+this.height,this.y+.5*this.width,this.vy,this.vx),i=ve(this.x,this.y,this.x,this.y+.5*this.width,this.vy,this.vx),n=ve(this.x,this.y,this.x,this.y-.5*this.width,this.vy,this.vx),s=ve(this.x,this.y,this.x+this.width,this.y,this.vy,this.vx);this.head.poly.l1X=t.x,this.head.poly.l1Y=t.y,this.head.poly.r1X=e.x,this.head.poly.r1Y=e.y,this.head.poly.r0X=i.x,this.head.poly.r0Y=i.y,this.head.poly.l0X=n.x,this.head.poly.l0Y=n.y,this.head.nextX=s.x,this.head.nextY=s.y,this.head.x=this.x,this.head.y=this.y,this.head.cX=.5*(this.head.x+this.head.nextX),this.head.cY=.5*(this.head.y+this.head.nextY),this.head.aabb.minX=Math.min(this.head.poly.l0X,this.head.poly.l1X,this.head.poly.r0X,this.head.poly.r1X),this.head.aabb.minY=Math.min(this.head.poly.l0Y,this.head.poly.l1Y,this.head.poly.r0Y,this.head.poly.r1Y),this.head.aabb.maxX=Math.max(this.head.poly.l0X,this.head.poly.l1X,this.head.poly.r0X,this.head.poly.r1X),this.head.aabb.maxY=Math.max(this.head.poly.l0Y,this.head.poly.l1Y,this.head.poly.r0Y,this.head.poly.r1Y)}}class ke{constructor(t,e,i){this.gameMap=t,this.margin=e,this.radius=i,this.image=document.createElement("canvas"),this.initImage()}initImage(){this.image.width=2*(this.radius+2),this.image.height=2*(this.radius+2),this.x=this.gameMap.view.width-2*(this.radius+2)-this.margin,this.y=this.gameMap.view.height-2*(this.radius+2)-this.margin,this.mapX=this.x+this.radius+2,this.mapY=this.y+this.radius+2;const t=this.image.getContext("2d");t.save(),t.beginPath(),t.arc(this.radius+2,this.radius+2,this.radius,0,2*Math.PI),t.fillStyle="#ccc",t.fill(),t.beginPath(),t.arc(this.radius+2,this.radius+2,this.radius+1,0,2*Math.PI),t.lineWidth=2,t.strokeStyle="#fff",t.stroke(),t.beginPath(),t.arc(this.radius+2,this.radius+2,this.radius+1,0,2*Math.PI),t.strokeStyle="#FF0000",t.setLineDash([5,5]),t.stroke(),t.restore()}render(){const t=this.radius/this.gameMap.paintRadius,e=this.radius/this.gameMap.radius,{ctx:i}=this.gameMap,n=this.gameMap.view.x*t+this.mapX,s=this.gameMap.view.y*t+this.mapY,r=this.gameMap.view.width*t,h=this.gameMap.view.height*t;i.save(),i.globalAlpha=.8,i.drawImage(this.image,this.x,this.y),i.strokeStyle="#fff",i.strokeRect(n,s,r,h);let a=-1;for(;++a<this.gameMap.units.length;){const t=this.gameMap.units[a],n=t.x*e+this.mapX,s=t.y*e+this.mapY;i.fillStyle=t.isPlayer?"#1E90FF":"#F00",i.fillRect(n-1,s-1,2,2)}i.restore()}}class Re{constructor(t,e,i,n=0,s=0){this.width=e,this.height=i,this.x=n,this.y=s,this.gameMap=t,this.aabb={}}trace(t){this.x=this.aabb.minX=t.x/this.gameMap.scale-.5*this.width,this.y=this.aabb.minY=t.y/this.gameMap.scale-.5*this.height,this.aabb.minX=this.absoluteW(this.x),this.aabb.minY=this.absoluteW(this.y),this.aabb.maxX=this.aabb.minX+this.absoluteW(this.width),this.aabb.maxY=this.aabb.minY+this.absoluteH(this.height)}absoluteX(t){return(t+this.x)*this.gameMap.scale}absoluteY(t){return(t+this.y)*this.gameMap.scale}absoluteW(t){return t*this.gameMap.scale}absoluteH(t){return t*this.gameMap.scale}relativeX(t){return t/this.gameMap.scale-this.x}relativeY(t){return t/this.gameMap.scale-this.y}relativeW(t){return t/this.gameMap.scale}relativeH(t){return t/this.gameMap.scale}}const{log:Ce}=console;var Te={BLUR:"blur",BOOT:"boot",DESTROY:"destroy",FOCUS:"focus",HIDDEN:"hidden",PAUSE:"pause",POST_RENDER:"postrender",POST_STEP:"poststep",PRE_RENDER:"prerender",PRE_STEP:"prestep",READY:"ready",RESUME:"resume",STEP:"step",VISIBLE:"visible"};const De=(t,e=!0)=>{let i;const n=t;if(void 0!==document.hidden)i="visibilitychange";else{["webkit","moz","ms"].forEach(t=>{void 0!==document[`${t}Hidden`]&&(document.hidden=()=>document[`${t}Hidden`],i=`${t}visibilitychange`)})}const s=t=>{document.hidden||"pause"===t.type?n.emit(Te.HIDDEN):n.emit(Te.VISIBLE)};i&&document.addEventListener(i,s,!1),window.onblur=()=>{n.emit(Te.BLUR)},window.onfocus=()=>{n.emit(Te.FOCUS)},window.focus&&e&&window.focus()},Ie=new i,{log:Fe}=console;Ie.showPanel(0),document.body.appendChild(Ie.dom);const Oe=document.getElementById("cas"),We=window.innerWidth,ze=window.innerHeight,He={SPACE:32};Fe("Создание игрового мира...");const Ne=new class extends ct{constructor(t="player",e=document.createElement("canvas"),i=window.innerWidth,n=window.innerHeight,s=1,r=0,h=0,a=J,o=lt){super(),this.canvas=e,this.radius=a,this.pow2R=a*a,this.x=r,this.y=h,this.vWidth=i,this.vHeight=n,this.canvas.width=i,this.canvas.height=n,this.ctx=this.canvas.getContext("2d"),this.drawDebug=o,this.view=new Re(this,i,n),this.smallMap=new ke(this,30,50),this.units=[],this.playerID=t,this.foods=new te,this.globalColliders=new te,this.setScale(s),this.toScale=this.scale}initUnits(t){let e=-1;for(;++e<t;){let i=me(0,0,J,2*Z*2);const n=e===t-1,s=new Pe(this,{x:i.x,y:i.y,size:Z,length:tt,angle:2*Math.random()*Math.PI,fillColor:"#00FF00",idx:e,isPlayer:n,key:n?this.playerID:`unit${e}`});for(;this.globalColliders.collides(s.head.getAABB());)i=me(0,0,J,2*Z*2),s.setXY(i.x,i.y);this.units.push(s),this.globalColliders.insert(s.head.getAABB())}this.player=this.units[this.units.length-1]}initFoods(t){for(let e=t;e;e-=1){const t=de(1,10),e=Math.floor(2*t+10),i=me(0,0,J,e);this.foods.insert(new Se(this,{size:e,point:t,x:i.x,y:i.y}))}}setScale(t){this.scale!==t&&(this.scale=t<1?1:t,this.paintRadius=this.view.relativeW(this.radius),this.emit("scale_changed"))}setToScale(t){this.toScale=t}clear(){this.ctx.clearRect(0,0,this.view.width,this.view.height)}update(t){this.checkCollisions(),this.scale!==this.toScale&&this.setScale(this.toScale);let e=-1;for(;++e<this.units.length;){const i=this.units[e];0!==i.distances.length&&(i.distances.length=0),i.update(t);const n=i.head.getPoly(),{cX:s,cY:r}=i.head,h=[n.l0X,n.l0Y,n.r0X,n.r0Y,n.r1X,n.r1Y,n.l1X,n.l1Y],a=Xe(n.l1X,n.l1Y,i.vx,i.vy,this.x,this.y,this.radius),o=Xe(n.r1X,n.r1Y,i.vx,i.vy,this.x,this.y,this.radius);if(2===a.type&&2===o.type){Math.min(xe(a.isec[0][0],a.isec[0][1],n.l1X,n.l1Y),xe(o.isec[0][0],o.isec[0][1],n.r1X,n.r1Y));const t=this.foods.search(i.head.getAABB());let l=-1;for(;++l<t.length;)if(Zt(h,t[l].x,t[l].y,.5*t[l].width)){this.foods.remove(t[l]),this.units[e].eat(t[l]);const i=Math.floor(30*Math.random()+50),n=Math.floor(i/3),s=me(0,0,J,n);this.foods.insert(new Se(this,{size:n,point:i,x:s.x,y:s.y}))}if(!i.isPlayer){const t=re(this.foods,s,r,1);t.length>0&&(i.toAngle=Math.atan2(t[0].y-i.y,t[0].x-i.x))}}else this.kill(i)}}kill(t){Ce(`${t.key} killed`)}render(){this.view.trace(this.player),this.clear(),this.drawbuckup(),this.drawFoods(),this.drawSnakes(),this.smallMap.render()}drawbuckup(){const{view:t,ctx:e}=this,{aabb:i}=t,n=i.minX-this.x,s=i.minY-this.y,r=i.maxX-this.x,h=i.maxY-this.y,a=n*n,o=s*s,l=r*r,c=h*h,u=a+o,f=l+o,d=a+c,p=l+c;Math.max(u,f,d,p)>this.pow2R?this.drawBounds():(e.save(),e.fillStyle="#FFFFE0",e.fillRect(0,0,t.width,t.height),e.restore()),e.restore()}checkCollisions(){let t=-1;for(;++t<this.units.length;){const e=this.units[t].head.getPoly(),i=this.globalColliders.search(this.units[t].head.getAABB());let n=-1;for(;++n<i.length;)if(i[n].snakeIdx!==this.units[t].idx){const t=i[n].parent.getPoly(i[n].parent.width);if(Gt([e.l0X,e.l0Y,e.r0X,e.r0Y,e.r1X,e.r1Y,e.l1X,e.l1Y],[t.l0X,t.l0Y,t.r0X,t.r0Y,t.r1X,t.r1Y,t.l1X,t.l1Y]))break}}}drawBounds(){const{ctx:t,view:e}=this,i=[],n=e.relativeX(this.x),s=e.relativeY(this.y),r=Ye(n,s,this.paintRadius,0,0,e.width,e.height);if(r.length>0){t.save(),t.beginPath(),t.moveTo(r[0].x,r[0].y);let h=-1;for(;++h<r.length;){const a=r[(h+1)%r.length];if(fe(r[h].x,a.x)&&fe(r[h].y,a.y))continue;const o=r[h].x,l=r[h].y,c=a.x,u=a.y;let f=be(Math.atan2(l-s,o-n)),d=be(Math.atan2(u-s,c-n));const p=.5*(o+c),v=.5*(l+u);if(ye(d,f)<0){const t=f;f=d,d=t}p>0&&p<e.width&&v>0&&v<e.height?(t.arc(n,s,this.paintRadius,f,d),i.push({angle1:f,angle2:d})):t.lineTo(c,u)}for(t.fillStyle="#FFFFE0",t.closePath(),t.fill(),t.restore(),h=-1,t.save(),t.lineCap="square",t.strokeStyle="#FFFFFF",t.lineWidth=e.relativeW(10),t.shadowOffsetY=e.relativeW(st),t.shadowOffsetX=e.relativeW(nt),t.shadowBlur=e.relativeW(rt),t.shadowColor="rgba(0, 0, 0, 0.5)",t.beginPath();++h<i.length;)t.beginPath(),t.arc(n,s,this.paintRadius+.5*e.relativeW(10),i[h].angle1,i[h].angle2),t.stroke();t.restore(),h=-1,t.save();const a=e.relativeW(15),o=e.relativeW(30);for(t.lineCap="square",t.strokeStyle="#FF0000",t.lineWidth=e.relativeW(10);++h<i.length;){t.beginPath(),t.arc(n,s,this.paintRadius+.5*e.relativeW(10),i[h].angle1,i[h].angle2);const r=this.paintRadius*i[h].angle1;t.setLineDash([a,o]),t.lineDashOffset=r,t.stroke()}t.restore()}}drawFoods(){const t=this.foods.search(this.view.aabb);let e=-1;for(;++e<t.length;)t[e].render()}drawSnakes(){const{view:t,ctx:e}=this,i=this.globalColliders.search(t.aabb);yt(i).asc(["snakeIdx","idx"]);let n=0,s=0;for(;n<i.length;){const r=i[n].parent.snake,h=r.idx,a=r.width,o=r.fillColor;e.save(),e.lineCap="butt",e.lineJoin="round",e.strokeStyle=o,e.lineWidth=t.relativeW(a),r.isSpeedUp?(e.shadowBlur=t.relativeW(de(ht-3,ht+3)),e.shadowColor="rgba(255, 0, 0, 0.5)"):e.shadowColor="rgba(0, 0, 0, 0)";let l=!1,c=i[s].idx;for(e.beginPath(),e.moveTo(t.relativeX(i[s].parent.x),t.relativeY(i[s].parent.y));s<i.length&&i[s].snakeIdx===h;){l=i[s].parent.isHead;const n=i[s].idx;l||(c!==n&&e.moveTo(t.relativeX(i[s].parent.x),t.relativeY(i[s].parent.y)),e.lineTo(t.relativeX(i[s].parent.nextX),t.relativeY(i[s].parent.nextY))),c=n+1,s+=1}e.stroke(),e.restore(),l&&this.drawHead(r),n=s}if(this.drawDebug){for(e.save(),e.lineWidth=1,n=-1;++n<i.length;){const s=i[n].parent.getPoly(i[n].parent.snake.width),r=i[n];e.strokeStyle="#000",e.beginPath(),e.moveTo(t.relativeX(s.l0X),t.relativeY(s.l0Y)),e.lineTo(t.relativeX(s.r0X),t.relativeY(s.r0Y)),e.lineTo(t.relativeX(s.r1X),t.relativeY(s.r1Y)),e.lineTo(t.relativeX(s.l1X),t.relativeY(s.l1Y)),e.closePath(),e.stroke(),e.strokeStyle="#FF1493",e.beginPath(),e.moveTo(t.relativeX(r.minX),t.relativeY(r.minY)),e.lineTo(t.relativeX(r.maxX),t.relativeY(r.minY)),e.lineTo(t.relativeX(r.maxX),t.relativeY(r.maxY)),e.lineTo(t.relativeX(r.minX),t.relativeY(r.maxY)),e.closePath(),e.stroke()}e.strokeStyle="FF0000",e.beginPath(),e.moveTo(t.relativeX(t.aabb.minX),t.relativeY(t.aabb.minY)),e.lineTo(t.relativeX(t.aabb.maxX),t.relativeY(t.aabb.minY)),e.lineTo(t.relativeX(t.aabb.maxX),t.relativeY(t.aabb.maxY)),e.lineTo(t.relativeX(t.aabb.minX),t.relativeY(t.aabb.maxY)),e.closePath(),e.stroke(),e.restore()}}drawHead(t){const{view:e,ctx:i}=this;i.save(),i.translate(e.relativeX(t.x),e.relativeY(t.y)),i.rotate(t.angle),i.fillStyle="blue",i.shadowOffsetY=e.relativeW(4),i.shadowBlur=e.relativeW(7),i.shadowColor="rgba(0, 0, 0, 0.5)",i.fillRect(0,-.5*e.relativeW(t.width),e.relativeH(t.height),e.relativeW(t.width)),i.setTransform(1,0,0,1,0,0),i.translate(e.relativeX(t.x),e.relativeY(t.y+it)),i.rotate(t.angle),i.fillStyle="blue",i.shadowOffsetY=0,i.shadowBlur=0,i.shadowColor="rgba(0, 0, 0, 0)",i.fillRect(0,-.5*e.relativeW(t.width),e.relativeH(t.height),e.relativeW(t.width)),i.fillStyle="white";const n=e.relativeW(t.width),s=e.relativeH(t.height);if(i.fillRect(.2*s,-.3*n,.6*s,.6*n),i.setTransform(1,0,0,1,0,0),i.restore(),this.drawDebug){i.save();const{head:n}=t,s=e.relativeH(100),r=e.relativeX(n.x),h=e.relativeY(n.y);i.strokeStyle="#8A2BE2",i.beginPath(),i.moveTo(r,h),i.lineTo(r+t.vx*s,h+t.vy*s),i.stroke(),i.lineWidth=1,i.strokeStyle="#DC143C",i.beginPath(),i.moveTo(r,h),i.lineTo(r+Math.cos(t.toAngle)*s,h+Math.sin(t.toAngle)*s),i.stroke(),i.restore()}}}("player",Oe,We,ze);let Ue=!1;const je={},qe=Q(t=>{Ie.begin(),Ue&&Ne.scale<2?Ne.setToScale(Ne.scale+.1):Ne.scale>1&&!Ue&&Ne.setToScale(Ne.scale-.1),Ne.update(t),Ne.render(),Ie.end()});Fe("Инициализация игры"),Fe("Инициализация слайзеров"),Ne.initUnits(ot),Fe(`Создано ${ot} слайзеров`),Fe("Инициализация еды"),Ne.initFoods(at),Fe(`Создано ${at} единиц еды`),Fe("Биндинг глобальных листенеров"),function(){function t(t){if(t.preventDefault(),t.touches)je.x=t.touches[0].pageX,je.y=t.touches[0].pageY;else{const e=t||window.event;je.x=e.clientX,je.y=e.clientY}Ne.player.toAngle=function(t,e,i,n){const s=i-t,r=n-e;return Math.atan2(r,s)}(Ne.player.x,Ne.player.y,Ne.view.absoluteX(je.x),Ne.view.absoluteY(je.y))}navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)?(window.addEventListener("touchstart",t),window.addEventListener("touchmove",t)):(window.addEventListener("mousemove",t),window.addEventListener("mousedown",()=>{Ne.player.speedUp(),Ue=!0}),window.addEventListener("mouseup",()=>{Ne.player.speedDown(),Ue=!1}),window.addEventListener("keyup",t=>{switch(t.keyCode){case He.SPACE:Ne.drawDebug=!Ne.drawDebug,Fe(`Draw debug: ${Ne.drawDebug}`)}})),De(Ne),Ne.on(Te.HIDDEN,function(){qe.stop(),Ne.emit(Te.PAUSE),Fe("Игра остановлена")}),Ne.on(Te.VISIBLE,function(){qe.start(),Ne.emit(Te.RESUME),Fe("Игра запущена")})}(),Fe("Старт игрового процесса"),Ne.emit(Te.VISIBLE)}();
+(function () {
+	'use strict';
+
+	var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+	function createCommonjsModule(fn, module) {
+		return module = { exports: {} }, fn(module, module.exports), module.exports;
+	}
+
+	var stats_min = createCommonjsModule(function (module, exports) {
+	!function(e,t){module.exports=t();}(commonjsGlobal,function(){var c=function(){var n=0,l=document.createElement("div");function e(e){return l.appendChild(e.dom),e}function t(e){for(var t=0;t<l.children.length;t++)l.children[t].style.display=t===e?"block":"none";n=e;}l.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000",l.addEventListener("click",function(e){e.preventDefault(),t(++n%l.children.length);},!1);var i=(performance||Date).now(),a=i,o=0,f=e(new c.Panel("FPS","#0ff","#002")),r=e(new c.Panel("MS","#0f0","#020"));if(self.performance&&self.performance.memory)var d=e(new c.Panel("MB","#f08","#201"));return t(0),{REVISION:16,dom:l,addPanel:e,showPanel:t,begin:function(){i=(performance||Date).now();},end:function(){o++;var e=(performance||Date).now();if(r.update(e-i,200),a+1e3<=e&&(f.update(1e3*o/(e-a),100),a=e,o=0,d)){var t=performance.memory;d.update(t.usedJSHeapSize/1048576,t.jsHeapSizeLimit/1048576);}return e},update:function(){i=this.end();},domElement:l,setMode:t}};return c.Panel=function(n,l,i){var a=1/0,o=0,f=Math.round,r=f(window.devicePixelRatio||1),d=80*r,e=48*r,c=3*r,p=2*r,u=3*r,s=15*r,m=74*r,h=30*r,y=document.createElement("canvas");y.width=d,y.height=e,y.style.cssText="width:80px;height:48px";var v=y.getContext("2d");return v.font="bold "+9*r+"px Helvetica,Arial,sans-serif",v.textBaseline="top",v.fillStyle=i,v.fillRect(0,0,d,e),v.fillStyle=l,v.fillText(n,c,p),v.fillRect(u,s,m,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u,s,m,h),{dom:y,update:function(e,t){a=Math.min(a,e),o=Math.max(o,e),v.fillStyle=i,v.globalAlpha=1,v.fillRect(0,0,d,s),v.fillStyle=l,v.fillText(f(e)+" "+n+" ("+f(a)+"-"+f(o)+")",c,p),v.drawImage(y,u+r,s,m-r,h,u,s,m-r,h),v.fillRect(u+m-r,s,r,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u+m-r,s,r,f((1-e/t)*h));}}},c});
+	});
+
+	const MAP_WIDTH = 5000; // map width
+	const MAP_HEIGHT = 5000; // map height
+
+	const SPEED = 300; // speed of snake
+	const BASE_ANGLE = 200 * Math.PI; // base angle of snake
+
+	const MAP_RECT_WIDTH = 200; // map small rect width
+	const MAP_RECT_HEIGHT = 200; // map small rect height
+
+	const SNAKE_IMG_SIZE = 40; // size of snake's image
+	const SNAKE_LENGTH = 1; // length of snake
+	const SNAKE_OFFSET = -6;
+
+	const INIT_FOOD_COUNT = 1000;
+	const FOOD_SIZE = 15;
+
+	const COLORS = new Map([
+	    ['purple-lavender', ['#911eb4', '#e6beff']],
+	    ['green-mint', ['#3cb44b', '#aaffc3']],
+	    ['blue-cian', ['#4363d8', '#42d4f4']],
+	    ['navi-teal', ['#000075', '#469990']],
+	    ['olive-lime', ['#808000', '#bfef45']],
+	    ['yellow-biege', ['#ffe119', '#fffac8']],
+	    ['orange-apricot', ['#f58231', '#ffd8b1']],
+	    ['red-pink', ['#e6194B', '#fabebe']],
+	    ['maroon-brown', ['#800000', '#9A6324']]
+	]);
+
+	var eventemitter3 = createCommonjsModule(function (module) {
+
+	var has = Object.prototype.hasOwnProperty
+	  , prefix = '~';
+
+	/**
+	 * Constructor to create a storage for our `EE` objects.
+	 * An `Events` instance is a plain object whose properties are event names.
+	 *
+	 * @constructor
+	 * @api private
+	 */
+	function Events() {}
+
+	//
+	// We try to not inherit from `Object.prototype`. In some engines creating an
+	// instance in this way is faster than calling `Object.create(null)` directly.
+	// If `Object.create(null)` is not supported we prefix the event names with a
+	// character to make sure that the built-in object properties are not
+	// overridden or used as an attack vector.
+	//
+	if (Object.create) {
+	  Events.prototype = Object.create(null);
+
+	  //
+	  // This hack is needed because the `__proto__` property is still inherited in
+	  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+	  //
+	  if (!new Events().__proto__) prefix = false;
+	}
+
+	/**
+	 * Representation of a single event listener.
+	 *
+	 * @param {Function} fn The listener function.
+	 * @param {Mixed} context The context to invoke the listener with.
+	 * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+	 * @constructor
+	 * @api private
+	 */
+	function EE(fn, context, once) {
+	  this.fn = fn;
+	  this.context = context;
+	  this.once = once || false;
+	}
+
+	/**
+	 * Minimal `EventEmitter` interface that is molded against the Node.js
+	 * `EventEmitter` interface.
+	 *
+	 * @constructor
+	 * @api public
+	 */
+	function EventEmitter() {
+	  this._events = new Events();
+	  this._eventsCount = 0;
+	}
+
+	/**
+	 * Return an array listing the events for which the emitter has registered
+	 * listeners.
+	 *
+	 * @returns {Array}
+	 * @api public
+	 */
+	EventEmitter.prototype.eventNames = function eventNames() {
+	  var names = []
+	    , events
+	    , name;
+
+	  if (this._eventsCount === 0) return names;
+
+	  for (name in (events = this._events)) {
+	    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+	  }
+
+	  if (Object.getOwnPropertySymbols) {
+	    return names.concat(Object.getOwnPropertySymbols(events));
+	  }
+
+	  return names;
+	};
+
+	/**
+	 * Return the listeners registered for a given event.
+	 *
+	 * @param {String|Symbol} event The event name.
+	 * @param {Boolean} exists Only check if there are listeners.
+	 * @returns {Array|Boolean}
+	 * @api public
+	 */
+	EventEmitter.prototype.listeners = function listeners(event, exists) {
+	  var evt = prefix ? prefix + event : event
+	    , available = this._events[evt];
+
+	  if (exists) return !!available;
+	  if (!available) return [];
+	  if (available.fn) return [available.fn];
+
+	  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+	    ee[i] = available[i].fn;
+	  }
+
+	  return ee;
+	};
+
+	/**
+	 * Calls each of the listeners registered for a given event.
+	 *
+	 * @param {String|Symbol} event The event name.
+	 * @returns {Boolean} `true` if the event had listeners, else `false`.
+	 * @api public
+	 */
+	EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+	  var evt = prefix ? prefix + event : event;
+
+	  if (!this._events[evt]) return false;
+
+	  var listeners = this._events[evt]
+	    , len = arguments.length
+	    , args
+	    , i;
+
+	  if (listeners.fn) {
+	    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+	    switch (len) {
+	      case 1: return listeners.fn.call(listeners.context), true;
+	      case 2: return listeners.fn.call(listeners.context, a1), true;
+	      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+	      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+	      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+	      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+	    }
+
+	    for (i = 1, args = new Array(len -1); i < len; i++) {
+	      args[i - 1] = arguments[i];
+	    }
+
+	    listeners.fn.apply(listeners.context, args);
+	  } else {
+	    var length = listeners.length
+	      , j;
+
+	    for (i = 0; i < length; i++) {
+	      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+	      switch (len) {
+	        case 1: listeners[i].fn.call(listeners[i].context); break;
+	        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+	        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+	        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+	        default:
+	          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+	            args[j - 1] = arguments[j];
+	          }
+
+	          listeners[i].fn.apply(listeners[i].context, args);
+	      }
+	    }
+	  }
+
+	  return true;
+	};
+
+	/**
+	 * Add a listener for a given event.
+	 *
+	 * @param {String|Symbol} event The event name.
+	 * @param {Function} fn The listener function.
+	 * @param {Mixed} [context=this] The context to invoke the listener with.
+	 * @returns {EventEmitter} `this`.
+	 * @api public
+	 */
+	EventEmitter.prototype.on = function on(event, fn, context) {
+	  var listener = new EE(fn, context || this)
+	    , evt = prefix ? prefix + event : event;
+
+	  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+	  else if (!this._events[evt].fn) this._events[evt].push(listener);
+	  else this._events[evt] = [this._events[evt], listener];
+
+	  return this;
+	};
+
+	/**
+	 * Add a one-time listener for a given event.
+	 *
+	 * @param {String|Symbol} event The event name.
+	 * @param {Function} fn The listener function.
+	 * @param {Mixed} [context=this] The context to invoke the listener with.
+	 * @returns {EventEmitter} `this`.
+	 * @api public
+	 */
+	EventEmitter.prototype.once = function once(event, fn, context) {
+	  var listener = new EE(fn, context || this, true)
+	    , evt = prefix ? prefix + event : event;
+
+	  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+	  else if (!this._events[evt].fn) this._events[evt].push(listener);
+	  else this._events[evt] = [this._events[evt], listener];
+
+	  return this;
+	};
+
+	/**
+	 * Remove the listeners of a given event.
+	 *
+	 * @param {String|Symbol} event The event name.
+	 * @param {Function} fn Only remove the listeners that match this function.
+	 * @param {Mixed} context Only remove the listeners that have this context.
+	 * @param {Boolean} once Only remove one-time listeners.
+	 * @returns {EventEmitter} `this`.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+	  var evt = prefix ? prefix + event : event;
+
+	  if (!this._events[evt]) return this;
+	  if (!fn) {
+	    if (--this._eventsCount === 0) this._events = new Events();
+	    else delete this._events[evt];
+	    return this;
+	  }
+
+	  var listeners = this._events[evt];
+
+	  if (listeners.fn) {
+	    if (
+	         listeners.fn === fn
+	      && (!once || listeners.once)
+	      && (!context || listeners.context === context)
+	    ) {
+	      if (--this._eventsCount === 0) this._events = new Events();
+	      else delete this._events[evt];
+	    }
+	  } else {
+	    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+	      if (
+	           listeners[i].fn !== fn
+	        || (once && !listeners[i].once)
+	        || (context && listeners[i].context !== context)
+	      ) {
+	        events.push(listeners[i]);
+	      }
+	    }
+
+	    //
+	    // Reset the array, or remove it completely if we have no more listeners.
+	    //
+	    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+	    else if (--this._eventsCount === 0) this._events = new Events();
+	    else delete this._events[evt];
+	  }
+
+	  return this;
+	};
+
+	/**
+	 * Remove all listeners, or those of the specified event.
+	 *
+	 * @param {String|Symbol} [event] The event name.
+	 * @returns {EventEmitter} `this`.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+	  var evt;
+
+	  if (event) {
+	    evt = prefix ? prefix + event : event;
+	    if (this._events[evt]) {
+	      if (--this._eventsCount === 0) this._events = new Events();
+	      else delete this._events[evt];
+	    }
+	  } else {
+	    this._events = new Events();
+	    this._eventsCount = 0;
+	  }
+
+	  return this;
+	};
+
+	//
+	// Alias methods names because people roll like that.
+	//
+	EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+	EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+	//
+	// This function doesn't apply anymore.
+	//
+	EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+	  return this;
+	};
+
+	//
+	// Expose the prefix.
+	//
+	EventEmitter.prefixed = prefix;
+
+	//
+	// Allow `EventEmitter` to be imported as module namespace.
+	//
+	EventEmitter.EventEmitter = EventEmitter;
+
+	//
+	// Expose the module.
+	//
+	{
+	  module.exports = EventEmitter;
+	}
+	});
+
+	/**
+	 * circle-point collision
+	 * @param {number} x1 center of circle
+	 * @param {number} y1 center of circle
+	 * @param {radius} r1 radius of circle
+	 * @param {number} x2 point
+	 * @param {number} y2 point
+	 * @return {boolean}
+	 */
+	var circlePoint = function circlePoint(x1, y1, r1, x2, y2)
+	{
+	    var x = x2 - x1;
+	    var y = y2 - y1;
+	    return x * x + y * y <= r1 * r1
+	};
+
+	/**
+	 * circle-circle collision
+	 * @param {number} x1 center of circle 1
+	 * @param {number} y1 center of circle 1
+	 * @param {number} r1 radius of circle 1
+	 * @param {number} x2 center of circle 2
+	 * @param {number} y2 center of circle 2
+	 * @param {number} r2 radius of circle 2
+	 * @return {boolean}
+	 */
+	var circleCircle = function circleCircle(x1, y1, r1, x2, y2, r2)
+	{
+	    var x = x1 - x2;
+	    var y = y2 - y1;
+	    var radii = r1 + r2;
+	    return x * x + y * y <= radii * radii
+	};
+
+	/**
+	 * line-circle collision
+	 number @param {number} x1 point 1 of line
+	 number @param {number} y1 point 1 of line
+	 number @param {number} x2 point 2 of line
+	 number @param {number} y2 point 2 of line
+	 number @param {number} xc center of circle
+	 number @param {number} yc center of circle
+	 number @param {number} rc radius of circle
+	 */
+	var lineCircle = function lineCircle(x1, y1, x2, y2, xc, yc, rc)
+	{
+	    var ac = [xc - x1, yc - y1];
+	    var ab = [x2 - x1, y2 - y1];
+	    var ab2 = dot(ab, ab);
+	    var acab = dot(ac, ab);
+	    var t = acab / ab2;
+	    t = (t < 0) ? 0 : t;
+	    t = (t > 1) ? 1 : t;
+	    var h = [(ab[0] * t + x1) - xc, (ab[1] * t + y1) - yc];
+	    var h2 = dot(h, h);
+	    return h2 <= rc * rc
+	};
+
+	function dot(v1, v2)
+	{
+	    return (v1[0] * v2[0]) + (v1[1] * v2[1])
+	}
+
+	/**
+	 * circle-line collision
+	 * from http://stackoverflow.com/a/10392860/1955997
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {radius} rc radius of circle
+	 * @param {number} x1 first point of line
+	 * @param {number} y1 first point of line
+	 * @param {number} x2 second point of line
+	 * @param {number} y2 second point of line
+	 * @return {boolean}
+	 */
+	var circleLine = function circleLine(xc, yc, rc, x1, y1, x2, y2)
+	{
+	    return lineCircle(x1, y1, x2, y2, xc, yc, rc)
+	};
+
+	/**
+	 * box-circle collision
+	 * @param {number} xb top-left corner of box
+	 * @param {number} yb top-left corner of box
+	 * @param {number} wb width of box
+	 * @param {number} hb height of box
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {number} rc radius of circle
+	 */
+	var boxCircle = function boxCircle(xb, yb, wb, hb, xc, yc, rc)
+	{
+	    var hw = wb / 2;
+	    var hh = hb / 2;
+	    var distX = Math.abs(xc - (xb + wb / 2));
+	    var distY = Math.abs(yc - (yb + hb / 2));
+
+	    if (distX > hw + rc || distY > hh + rc)
+	    {
+	        return false
+	    }
+
+	    if (distX <= hw || distY <= hh)
+	    {
+	        return true
+	    }
+
+	    var x = distX - hw;
+	    var y = distY - hh;
+	    return x * x + y * y <= rc * rc
+	};
+
+	/**
+	 * circle-box (axis-oriented rectangle) collision
+	 * from http://stackoverflow.com/a/402010/1955997
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {radius} rc radius of circle
+	 * @param {number} xb top-left corner of rectangle
+	 * @param {number} yb top-left corner of rectangle
+	 * @param {number} wb width of rectangle
+	 * @param {number} hb height of rectangle
+	 */
+	var circleBox = function circleBox(xc, yc, rc, xb, yb, wb, hb)
+	{
+	    return boxCircle(xb, yb, wb, hb, xc, yc, rc)
+	};
+
+	function distanceSquared(x1, y1, x2, y2)
+	{
+	    return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
+	}
+
+	/**
+	 * line-point collision
+	 * from https://stackoverflow.com/a/17693146/1955997
+	 * @param {number} x1 first point in line
+	 * @param {number} y1 first point in line
+	 * @param {number} x2 second point in line
+	 * @param {number} y2 second point in line
+	 * @param {number} xp point
+	 * @param {number} yp point
+	 * @param {number} [tolerance=1]
+	 * @return {boolean}
+	 */
+	var linePoint = function linePoint(x1, y1, x2, y2, xp, yp, tolerance)
+	{
+	    tolerance = tolerance || 1;
+	    return Math.abs(distanceSquared(x1, y1, x2, y2) - (distanceSquared(x1, y1, xp, yp) + distanceSquared(x2, y2, xp, yp))) <= tolerance
+	};
+
+	/**
+	 * polygon-point collision
+	 * based on https://stackoverflow.com/a/17490923/1955997
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 * @param {number} x of point
+	 * @param {number} y of point
+	 * @param {number} [tolerance=1] maximum distance of point to polygon's edges that triggers collision (see pointLine)
+	 */
+	var polygonPoint = function polygonPoint(points, x, y, tolerance)
+	{
+	    var length = points.length;
+	    var c = false;
+	    var i, j;
+	    for (i = 0, j = length - 2; i < length; i += 2)
+	    {
+	        if (((points[i + 1] > y) !== (points[j + 1] > y)) && (x < (points[j] - points[i]) * (y - points[i + 1]) / (points[j + 1] - points[i + 1]) + points[i]))
+	        {
+	            c = !c;
+	        }
+	        j = i;
+	    }
+	    if (c)
+	    {
+	        return true
+	    }
+	    for (i = 0; i < length; i += 2)
+	    {
+	        var p1x = points[i];
+	        var p1y = points[i + 1];
+	        var p2x, p2y;
+	        if (i === length - 2)
+	        {
+	            p2x = points[0];
+	            p2y = points[1];
+	        }
+	        else
+	        {
+	            p2x = points[i + 2];
+	            p2y = points[i + 3];
+	        }
+	        if (linePoint(p1x, p1y, p2x, p2y, x, y, tolerance))
+	        {
+	            return true
+	        }
+	    }
+	    return false
+	};
+
+	/**
+	 * polygon-circle collision
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {number} rc radius of circle
+	 */
+	var polygonCircle = function polygonCircle(points, xc, yc, rc)
+	{
+	    if (polygonPoint(points, xc, yc))
+	    {
+	        return true
+	    }
+	    var count = points.length;
+	    for (var i = 0; i < count - 2; i += 2)
+	    {
+	        if (lineCircle(points[i], points[i + 1], points[i + 2], points[i + 3], xc, yc, rc))
+	        {
+	            return true
+	        }
+	    }
+	    return lineCircle(points[0], points[1], points[count - 2], points[count - 1], xc, yc, rc)
+	};
+
+	/**
+	 * circle-polygon collision
+	 * from http://stackoverflow.com/a/402019/1955997
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {radius} rc radius of circle
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 */
+	var circlePolygon = function circlePolygon(xc, yc, rc, points)
+	{
+	    return polygonCircle(points, xc, yc, rc)
+	};
+
+	// from http://yehar.com/blog/?p=2926
+
+	var MAX_ITERATIONS = 10;
+	var innerPolygonCoef, outerPolygonCoef, initialized;
+
+	function initialize()
+	{
+	    innerPolygonCoef = [];
+	    outerPolygonCoef = [];
+	    for (var t = 0; t <= MAX_ITERATIONS; t++)
+	    {
+	        var numNodes = 4 << t;
+	        innerPolygonCoef[t] = 0.5 / Math.cos(4 * Math.acos(0) / numNodes);
+	        outerPolygonCoef[t] = 0.5 / (Math.cos(2 * Math.acos(0) / numNodes) * Math.cos(2 * Math.acos(0) / numNodes));
+	    }
+	    initialized = true;
+	}
+
+	function iterate(x, y, c0x, c0y, c2x, c2y, rr)
+	{
+	    for (var t = 1; t <= MAX_ITERATIONS; t++)
+	    {
+	        var c1x = (c0x + c2x) * innerPolygonCoef[t];
+	        var c1y = (c0y + c2y) * innerPolygonCoef[t];
+	        var tx = x - c1x;
+	        var ty = y - c1y;
+	        if (tx * tx + ty * ty <= rr)
+	        {
+	            return true
+	        }
+	        var t2x = c2x - c1x;
+	        var t2y = c2y - c1y;
+	        if (tx * t2x + ty * t2y >= 0 && tx * t2x + ty * t2y <= t2x * t2x + t2y * t2y &&
+	            (ty * t2x - tx * t2y >= 0 || rr * (t2x * t2x + t2y * t2y) >= (ty * t2x - tx * t2y) * (ty * t2x - tx * t2y)))
+	        {
+	            return true
+	        }
+	        var t0x = c0x - c1x;
+	        var t0y = c0y - c1y;
+	        if (tx * t0x + ty * t0y >= 0 && tx * t0x + ty * t0y <= t0x * t0x + t0y * t0y &&
+	            (ty * t0x - tx * t0y <= 0 || rr * (t0x * t0x + t0y * t0y) >= (ty * t0x - tx * t0y) * (ty * t0x - tx * t0y)))
+	        {
+	            return true
+	        }
+	        var c3x = (c0x + c1x) * outerPolygonCoef[t];
+	        var c3y = (c0y + c1y) * outerPolygonCoef[t];
+	        if ((c3x - x) * (c3x - x) + (c3y - y) * (c3y - y) < rr)
+	        {
+	            c2x = c1x;
+	            c2y = c1y;
+	            continue
+	        }
+	        var c4x = c1x - c3x + c1x;
+	        var c4y = c1y - c3y + c1y;
+	        if ((c4x - x) * (c4x - x) + (c4y - y) * (c4y - y) < rr)
+	        {
+	            c0x = c1x;
+	            c0y = c1y;
+	            continue
+	        }
+	        var t3x = c3x - c1x;
+	        var t3y = c3y - c1y;
+	        if (ty * t3x - tx * t3y <= 0 || rr * (t3x * t3x + t3y * t3y) > (ty * t3x - tx * t3y) * (ty * t3x - tx * t3y))
+	        {
+	            if (tx * t3x + ty * t3y > 0)
+	            {
+	                if (Math.abs(tx * t3x + ty * t3y) <= t3x * t3x + t3y * t3y || (x - c3x) * (c0x - c3x) + (y - c3y) * (c0y - c3y) >= 0)
+	                {
+	                    c2x = c1x;
+	                    c2y = c1y;
+	                    continue
+	                }
+	            } else if (-(tx * t3x + ty * t3y) <= t3x * t3x + t3y * t3y || (x - c4x) * (c2x - c4x) + (y - c4y) * (c2y - c4y) >= 0)
+	            {
+	                c0x = c1x;
+	                c0y = c1y;
+	                continue
+	            }
+	        }
+	        return false
+	    }
+	    return false // Out of iterations so it is unsure if there was a collision. But have to return something.
+	}
+
+	// Test for collision between an ellipse of horizontal radius w0 and vertical radius h0 at (x0, y0) and
+	// an ellipse of horizontal radius w1 and vertical radius h1 at (x1, y1)
+	function ellipseEllipse(x0, y0, w0, h0, x1, y1, w1, h1)
+	{
+	    if (!initialized)
+	    {
+	        initialize();
+	    }
+
+	    var x = Math.abs(x1 - x0) * h1;
+	    var y = Math.abs(y1 - y0) * w1;
+	    w0 *= h1;
+	    h0 *= w1;
+	    var r = w1 * h1;
+
+	    if (x * x + (h0 - y) * (h0 - y) <= r * r || (w0 - x) * (w0 - x) + y * y <= r * r || x * h0 + y * w0 <= w0 * h0
+	        || ((x * h0 + y * w0 - w0 * h0) * (x * h0 + y * w0 - w0 * h0) <= r * r * (w0 * w0 + h0 * h0) && x * w0 - y * h0 >= -h0 * h0 && x * w0 - y * h0 <= w0 * w0))
+	    {
+	        return true
+	    }
+	    else
+	    {
+	        if ((x - w0) * (x - w0) + (y - h0) * (y - h0) <= r * r || (x <= w0 && y - r <= h0) || (y <= h0 && x - r <= w0))
+	        {
+	            return iterate(x, y, w0, 0, 0, h0, r * r)
+	        }
+	        return false
+	    }
+	}
+
+	// Test for collision between an ellipse of horizontal radius w and vertical radius h at (x0, y0) and
+	// a circle of radius r at (x1, y1)
+	function ellipseCircle(x0, y0, w, h, x1, y1, r)
+	{
+	    if (!initialized)
+	    {
+	        initialize();
+	    }
+	    var x = Math.abs(x1 - x0);
+	    var y = Math.abs(y1 - y0);
+
+	    if (x * x + (h - y) * (h - y) <= r * r || (w - x) * (w - x) + y * y <= r * r || x * h + y * w <= w * h
+	        || ((x * h + y * w - w * h) * (x * h + y * w - w * h) <= r * r * (w * w + h * h) && x * w - y * h >= -h * h && x * w - y * h <= w * w))
+	    {
+	        return true
+	    }
+	    else
+	    {
+	        if ((x - w) * (x - w) + (y - h) * (y - h) <= r * r || (x <= w && y - r <= h) || (y <= h && x - r <= w))
+	        {
+	            return iterate(x, y, w, 0, 0, h, r * r)
+	        }
+	        return false
+	    }
+	}
+
+	var ellipseHelper = {
+	    ellipseCircle: ellipseCircle,
+	    ellipseEllipse: ellipseEllipse
+	};
+
+	/**
+	 * ellipse-circle collision
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rex radius-x of ellipse
+	 * @param {number} rey radius-y of ellipse
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {number} rc radius of circle
+	 * @return {boolean}
+	 */
+	var ellipseCircle$1 = function ellipseCircle(xe, ye, rex, rey, xc, yc, rc)
+	{
+	    return ellipseHelper.ellipseCircle(xe, ye, rex, rey, xc, yc, rc)
+	};
+
+	/**
+	 * circle-ellipse collision
+	 * @param {number} xc center of circle
+	 * @param {number} yc center of circle
+	 * @param {number} rc radius of circle
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rex radius-x of ellipse
+	 * @param {number} rey radius-y of ellipse
+	 * @return {boolean}
+	 */
+	var circleEllipse = function circleEllipse(xc, yc, rc, xe, ye, rex, rey)
+	{
+	    return ellipseCircle$1(xe, ye, rex, rey, xc, yc, rc)
+	};
+
+	/**
+	 * line-line collision
+	 * from http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+	 * @param {number} x1 first point in line 1
+	 * @param {number} y1 first point in line 1
+	 * @param {number} x2 second point in line 1
+	 * @param {number} y2 second point in line 1
+	 * @param {number} x3 first point in line 2
+	 * @param {number} y3 first point in line 2
+	 * @param {number} x4 second point in line 2
+	 * @param {number} y4 second point in line 2
+	 * @return {boolean}
+	 */
+	var lineLine = function lineLine(x1, y1, x2, y2, x3, y3, x4, y4)
+	{
+	    var s1_x = x2 - x1;
+	    var s1_y = y2 - y1;
+	    var s2_x = x4 - x3;
+	    var s2_y = y4 - y3;
+	    var s = (-s1_y * (x1 - x3) + s1_x * (y1 - y3)) / (-s2_x * s1_y + s1_x * s2_y);
+	    var t = (s2_x * (y1 - y3) - s2_y * (x1 - x3)) / (-s2_x * s1_y + s1_x * s2_y);
+	    return s >= 0 && s <= 1 && t >= 0 && t <= 1
+	};
+
+	/**
+	 * line-polygon collision
+	 @param {number} x1 point 1 of line
+	 @param {number} y1 point 1 of line
+	 @param {number} x2 point 2 of line
+	 @param {number} y2 point 2 of line
+	 @param {number[]} points of polygon
+	 @param {tolerance=1} maximum distance of point to polygon's edges that triggers collision (see pointLine)
+	 */
+	var linePolygon = function linePolygon(x1, y1, x2, y2, points, tolerance)
+	{
+	    var length = points.length;
+
+	    // check if first point is inside the shape (this covers if the line is completely enclosed by the shape)
+	    if (polygonPoint(points, x1, y1, tolerance))
+	    {
+	        return true
+	    }
+
+	    // check for intersections for all of the sides
+	    for (var i = 0; i < length; i += 2)
+	    {
+	        var j = (i + 2) % length;
+	        if (lineLine(x1, y1, x2, y2, points[i], points[i + 1], points[j], points[j + 1]))
+	        {
+	            return true
+	        }
+	    }
+	    return false
+	};
+
+	/**
+	 * polygon-line collisions
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 * @param {number} x1 first point in line
+	 * @param {number} y1 first point in line
+	 * @param {number} x2 second point in line
+	 * @param {number} y2 second point in line
+	 * @param {tolerance=1} maximum distance of point to polygon's edges that triggers collision (see pointLine)
+	 * @return {boolean}
+	 */
+	var polygonLine = function polygonLine(points, x1, y1, x2, y2, tolerance)
+	{
+	    return linePolygon(x1, y1, x2, y2, points, tolerance)
+	};
+
+	/**
+	 * polygon-polygon collision
+	 * based on http://stackoverflow.com/questions/10962379/how-to-check-intersection-between-2-rotated-rectangles
+	 * @param {number[]} points1 [x1, y1, x2, y2, ... xn, yn] of first polygon
+	 * @param {number[]} points2 [x1, y1, x2, y2, ... xn, yn] of second polygon
+	 * @return {boolean}
+	 */
+	var polygonPolygon = function polygonPolygon(points1, points2)
+	{
+	    var a = points1;
+	    var b = points2;
+	    var polygons = [a, b];
+	    var minA, maxA, projected, minB, maxB, j;
+	    for (var i = 0; i < polygons.length; i++)
+	    {
+	        var polygon = polygons[i];
+	        for (var i1 = 0; i1 < polygon.length; i1 += 2)
+	        {
+	            var i2 = (i1 + 2) % polygon.length;
+	            var normal = { x: polygon[i2 + 1] - polygon[i1 + 1], y: polygon[i1] - polygon[i2] };
+	            minA = maxA = null;
+	            for (j = 0; j < a.length; j += 2)
+	            {
+	                projected = normal.x * a[j] + normal.y * a[j + 1];
+	                if (minA === null || projected < minA)
+	                {
+	                    minA = projected;
+	                }
+	                if (maxA === null || projected > maxA)
+	                {
+	                    maxA = projected;
+	                }
+	            }
+	            minB = maxB = null;
+	            for (j = 0; j < b.length; j += 2)
+	            {
+	                projected = normal.x * b[j] + normal.y * b[j + 1];
+	                if (minB === null || projected < minB)
+	                {
+	                    minB = projected;
+	                }
+	                if (maxB === null || projected > maxB)
+	                {
+	                    maxB = projected;
+	                }
+	            }
+	            if (maxA < minB || maxB < minA)
+	            {
+	                return false
+	            }
+	        }
+	    }
+	    return true
+	};
+
+	/**
+	 * polygon-box collision
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 * @param {number} x of box
+	 * @param {number} y of box
+	 * @param {number} w of box
+	 * @param {number} h of box
+	 */
+	var polygonBox = function polygonBox(points, x, y, w, h)
+	{
+	    var points2 = [x, y, x + w, y, x + w, y + h, x, y + h];
+	    return polygonPolygon(points, points2)
+	};
+
+	/**
+	 * ellipse-line collision
+	 * adapted from http://csharphelper.com/blog/2017/08/calculate-where-a-line-segment-and-an-ellipse-intersect-in-c/
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rex radius-x of ellipse
+	 * @param {number} rey radius-y of ellipse
+	 * @param {number} x1 first point of line
+	 * @param {number} y1 first point of line
+	 * @param {number} x2 second point of line
+	 * @param {number} y2 second point of line
+	 */
+	var ellipseLine = function ellipseLine(xe, ye, rex, rey, x1, y1, x2, y2)
+	{
+	    x1 -= xe;
+	    x2 -= xe;
+	    y1 -= ye;
+	    y2 -= ye;
+
+	    var A = Math.pow(x2 - x1, 2) / rex / rex + Math.pow(y2 - y1, 2) / rey / rey;
+	    var B = 2 * x1 * (x2 - x1) / rex / rex + 2 * y1 * (y2 - y1) / rey / rey;
+	    var C = x1 * x1 / rex / rex + y1 * y1 / rey / rey - 1;
+	    var D = B * B - 4 * A * C;
+	    if (D === 0)
+	    {
+	        var t = -B / 2 / A;
+	        return t >= 0 && t <= 1
+	    }
+	    else if (D > 0)
+	    {
+	        var sqrt = Math.sqrt(D);
+	        var t1 = (-B + sqrt) / 2 / A;
+	        var t2 = (-B - sqrt) / 2 / A;
+	        return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1)
+	    }
+	    else
+	    {
+	        return false
+	    }
+	};
+
+	/**
+	 * line-ellipse collision
+	 * @param {number} x1 first point of line
+	 * @param {number} y1 first point of line
+	 * @param {number} x2 second point of line
+	 * @param {number} y2 second point of line
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rx radius-x of ellipse
+	 * @param {number} ry radius-y of ellipse
+	 */
+	var lineEllipse = function lineEllipse(x1, y1, x2, y2, xe, ye, rex, rey)
+	{
+	    return ellipseLine(xe, ye, rex, rey, x1, y1, x2, y2)
+	};
+
+	/**
+	 * polygon-ellipse collision
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rex radius-x of ellipse
+	 * @param {number} rey radius-y of ellipse
+	 */
+	var polygonEllipse = function polygonEllipse(points, xe, ye, rex, rey)
+	{
+	    if (polygonPoint(points, xe, ye))
+	    {
+	        return true
+	    }
+	    var count = points.length;
+	    for (var i = 0; i < count - 2; i += 2)
+	    {
+	        if (lineEllipse(points[i], points[i + 1], points[i + 2], points[i + 3], xe, ye, rex, rey))
+	        {
+	            return true
+	        }
+	    }
+	    return lineEllipse(points[0], points[1], points[count - 2], points[count - 1], xe, ye, rex, rey)
+	};
+
+	/**
+	 * box-point collision
+	 * @param {number} x1 top-left corner of box
+	 * @param {number} y1 top-left corner of box
+	 * @param {number} w1 width of box
+	 * @param {number} h1 height of box
+	 * @param {number} x2 of point
+	 * @param {number} y2 of point
+	 * @return {boolean}
+	 */
+	var boxPoint = function boxPoint(x1, y1, w1, h1, x2, y2)
+	{
+	    return x2 >= x1 && x2 <= x1 + w1 && y2 >= y1 && y2 <= y1 + h1
+	};
+
+	/**
+	 * box-box collision
+	 * @param {number} x1 top-left corner of first box
+	 * @param {number} y1 top-left corner of first box
+	 * @param {number} w1 width of first box
+	 * @param {number} h1 height of first box
+	 * @param {number} x2 top-left corner of second box
+	 * @param {number} y2 top-left corner of second box
+	 * @param {number} w2 width of second box
+	 * @param {number} h2 height of second box
+	 */
+	var boxBox = function boxBox(x1, y1, w1, h1, x2, y2, w2, h2)
+	{
+	    return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2
+	};
+
+	/**
+	 * line-box collision
+	 number @param {number} x1 point 1 of line
+	 number @param {number} y1 point 1 of line
+	 number @param {number} x2 point 2 of line
+	 number @param {number} y2 point 2 of line
+	 number @param {number} xb top-left of box
+	 number @param {number} yb top-left of box
+	 number @param {number} wb width of box
+	 number @param {number} hb height of box
+	 */
+	var lineBox = function lineBox(x1, y1, x2, y2, xb, yb, wb, hb)
+	{
+	    if (boxPoint(xb, yb, wb, hb, x1, y1) || boxPoint(xb, yb, wb, hb, x2, y2))
+	    {
+	        return true
+	    }
+	    return lineLine(x1, y1, x2, y2, xb, yb, xb + wb, yb) ||
+	        lineLine(x1, y1, x2, y2, xb + wb, yb, xb + wb, yb + hb) ||
+	        lineLine(x1, y1, x2, y2, xb, yb + hb, xb + wb, yb + hb) ||
+	        lineLine(x1, y1, x2, y2, xb, yb, xb, yb + hb)
+	};
+
+	/**
+	 * box-line collision
+	 * @param {number} xb top-left corner of box
+	 * @param {number} yb top-left corner of box
+	 * @param {number} wb width of box
+	 * @param {number} hb height of box
+	 * @param {number} x1 first point of line
+	 * @param {number} y1 first point of line
+	 * @param {number} x2 second point of line
+	 * @param {number} y2 second point of line
+	 */
+	var boxLine = function boxLine(xb, yb, wb, hb, x1, y1, x2, y2)
+	{
+	    return lineBox(x1, y1, x2, y2, xb, yb, wb, hb)
+	};
+
+	/**
+	 * box-polygon collision
+	 * @param {number} xb top-left corner of box
+	 * @param {number} yb top-left corner of box
+	 * @param {number} wb width of box
+	 * @param {number} hb height of box
+	 * @param {number[]} points of polygon
+	 */
+	var boxPolygon = function boxPolygon(xb, yb, wb, hb, points)
+	{
+	    return polygonBox(points, xb, yb, wb, hb)
+	};
+
+	/**
+	 * ellipse-box (axis-oriented rectangle) collision
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {radius} rex radius-x of ellipse
+	 * @param {radius} rey radius-y of ellipse
+	 * @param {number} xb top-left corner of box
+	 * @param {number} yb top-left corner of box
+	 * @param {number} wb width of box
+	 * @param {number} hb height of box
+	 */
+	var ellipseBox = function ellipseBox(xe, ye, rex, rey, xb, yb, wb, hb)
+	{
+	    return boxPoint(xb, yb, wb, hb, xe, ye) ||
+	        ellipseLine(xe, ye, rex, rey, xb, yb, xb + wb, yb) ||
+	        ellipseLine(xe, ye, rex, rey, xb, yb + hb, xb + wb, yb + hb) ||
+	        ellipseLine(xe, ye, rex, rey, xb, yb, xb, yb + hb) ||
+	        ellipseLine(xe, ye, rex, rey, xb + wb, yb, xb + wb, yb + hb)
+	};
+
+	/**
+	 * box-ellipse (axis-oriented rectangle) collision
+	 * @param {number} xb top-left corner of rectangle
+	 * @param {number} yb top-left corner of rectangle
+	 * @param {number} wb width of rectangle
+	 * @param {number} hb height of rectangle
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {radius} rex radius-x of ellipse
+	 * @param {radius} rey radius-y of ellipse
+	 */
+	var boxEllipse = function boxEllipse(xb, yb, wb, hb, xe, ye, rex, rey)
+	{
+	    return ellipseBox(xe, ye, rex, rey, xb, yb, wb, hb)
+	};
+
+	/**
+	 * point-box collision
+	 * @param {number} x1 point
+	 * @param {number} y1 point
+	 * @param {number} xb top-left corner of box
+	 * @param {number} yb top-left corner of box
+	 * @param {number} wb width of box
+	 * @param {number} hb height of box
+	 * @return {boolean}
+	 */
+	var pointBox = function pointBox(x1, y1, xb, yb, wb, hb)
+	{
+	    return boxPoint(xb, yb, wb, hb, x1, y1)
+	};
+
+	/**
+	 * polygon-point collision
+	 * based on https://stackoverflow.com/a/17490923/1955997
+	 * @param {number} x1
+	 * @param {number} y1
+	 * @param {number[]} points
+	 * @param {number} [tolerance=1] maximum distance of point to polygon's edges that triggers collision (see pointLine)
+	 * @return {boolean}
+	 */
+	var pointPolygon = function pointPolygon(x1, y1, points, tolerance)
+	{
+	    return polygonPoint(points, x1, y1, tolerance)
+	};
+
+	var pointCircle = function pointCircle(x1, y1, xc, yc, rc)
+	{
+	    return circlePoint(xc, yc, rc, x1, y1)
+	};
+
+	/**
+	 * point-line collision
+	 * @param {number} xp point
+	 * @param {number} yp point
+	 * @param {number} x1 first point in line
+	 * @param {number} y1 first point in line
+	 * @param {number} x2 second point in line
+	 * @param {number} y2 second point in line
+	 * @return {boolean}
+	 */
+	var pointLine = function pointLine(xp, yp, x1, y1, x2, y2)
+	{
+	    return linePoint(x1, y1, x2, y2, xp, yp)
+	};
+
+	/**
+	 * ellipse-point collision
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {radius} rex radius-x of ellipse
+	 * @param {radius} rey radius-y of ellipse
+	 * @param {number} x1 point
+	 * @param {number} y1 point
+	 * @return {boolean}
+	 */
+	var ellipsePoint = function ellipsePoint(xe, ye, rex, rey, x1, y1)
+	{
+	    var x = Math.pow(x1 - xe, 2) / (rex * rex);
+	    var y = Math.pow(y1 - ye, 2) / (rey * rey);
+	    return x + y <= 1
+	};
+
+	/**
+	 * point-ellipse collision
+	 * @param {number} x1 point
+	 * @param {number} y1 point
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {radius} rex radius-x of ellipse
+	 * @param {radius} rey radius-y of ellipse
+	 * @return {boolean}
+	 */
+	var pointEllipse = function pointEllipse(x1, y1, xe, ye, rex, rey)
+	{
+	    return ellipsePoint(xe, ye, rex, rey, x1, y1)
+	};
+
+	/**
+	 * ellipse-ellipse collision
+	 * @param {number} x1 center of ellipse 1
+	 * @param {number} y1 center of ellipse 1
+	 * @param {number} r1x radius-x of ellipse 1
+	 * @param {number} r1y radius-y of ellipse 1
+	 * @param {number} x2 center of ellipse 2
+	 * @param {number} y2 center of ellipse 2
+	 * @param {number} r2x radius of ellipse 2
+	 * @param {number} r2y radius of ellipse 2
+	 * @return {boolean}
+	 */
+	var ellipseEllipse$1 = function ellipseEllipse(x1, y1, r1x, r1y, x2, y2, r2x, r2y)
+	{
+	    return ellipseHelper.ellipseEllipse(x1, y1, r1x, r1y, x2, y2, r2x, r2y)
+	};
+
+	/**
+	 * ellipse-polygon collision
+	 * @param {number} xe center of ellipse
+	 * @param {number} ye center of ellipse
+	 * @param {number} rex radius-x of ellipse
+	 * @param {number} rey radius-y of ellipse
+	 * @param {number[]} points [x1, y1, x2, y2, ... xn, yn] of polygon
+	 */
+	var ellipsePolygon = function ellipsePolygon(xe, ye, rex, rey, points)
+	{
+	    return polygonEllipse(points, xe, ye, rex, rey)
+	};
+
+	var intersects = {
+	    circlePoint: circlePoint,
+	    circleCircle: circleCircle,
+	    circleLine: circleLine,
+	    circleBox: circleBox,
+	    circlePolygon: circlePolygon,
+	    circleEllipse: circleEllipse,
+
+	    polygonPoint: polygonPoint,
+	    polygonLine: polygonLine,
+	    polygonPolygon: polygonPolygon,
+	    polygonBox: polygonBox,
+	    polygonCircle: polygonCircle,
+	    polygonEllipse: polygonEllipse,
+
+	    boxPoint: boxPoint,
+	    boxBox: boxBox,
+	    boxLine: boxLine,
+	    boxPolygon: boxPolygon,
+	    boxCircle: boxCircle,
+	    boxEllipse: boxEllipse,
+
+	    pointBox: pointBox,
+	    pointPolygon: pointPolygon,
+	    pointCircle: pointCircle,
+	    pointLine: pointLine,
+	    pointEllipse: pointEllipse,
+
+	    lineLine: lineLine,
+	    lineBox: lineBox,
+	    linePolygon: linePolygon,
+	    lineCircle: lineCircle,
+	    linePoint: linePoint,
+	    lineEllipse: lineEllipse,
+
+	    ellipsePoint: ellipsePoint,
+	    ellipseLine: ellipseLine,
+	    ellipseBox: ellipseBox,
+	    ellipseCircle: ellipseCircle$1,
+	    ellipseEllipse: ellipseEllipse$1,
+	    ellipsePolygon: ellipsePolygon
+	};
+	var intersects_9 = intersects.polygonPolygon;
+	var intersects_11 = intersects.polygonCircle;
+
+	const randomInteger = (min, max) => {
+	    let rand = min + Math.random() * (max + 1 - min);
+	    rand = Math.floor(rand);
+	    return rand;
+	};
+
+	const getAngle = (x, y) => {
+	    let angle = Math.atan(Math.abs(x / y));
+
+	    // calculate angle, value is 0-360
+	    if (x > 0 && y < 0) {
+	        angle = Math.PI - angle;
+	    } else if (x < 0 && y < 0) {
+	        angle = Math.PI + angle;
+	    } else if (x < 0 && y > 0) {
+	        angle = Math.PI * 2 - angle;
+	    }
+
+	    return angle;
+	};
+
+	const rotatePoint = (pivotX, pivotY, pointX, pointY, angle) => {
+	    // Rotate clockwise, angle in radians
+	    const x = Math.cos(angle) * (pointX - pivotX) - Math.sin(angle) * (pointY - pivotY) + pivotX;
+
+	    const y = Math.sin(angle) * (pointX - pivotX) + Math.cos(angle) * (pointY - pivotY) + pivotY;
+
+	    return {
+	        x,
+	        y
+	    };
+	};
+
+	const velocityFromAngle = (angle, speed) => {
+	    let vx = Math.abs(speed * Math.sin(angle));
+	    let vy = Math.abs(speed * Math.cos(angle));
+
+	    if (angle < Math.PI / 2) {
+	        vy *= -1;
+	    } else if (angle < Math.PI) {
+	        vx *= 1;
+	        vy *= 1;
+	    } else if (angle < (Math.PI * 3) / 2) {
+	        vx *= -1;
+	    } else {
+	        vx *= -1;
+	        vy *= -1;
+	    }
+	    return {
+	        vx,
+	        vy
+	    };
+	};
+
+	class Base {
+	    constructor(gameMap, options) {
+	        this.gameMap = gameMap;
+	        this.x = +(options.x || 0);
+	        this.y = +(options.y || 0);
+	        this.width = options.size || options.width || 0;
+	        this.height = options.size || options.height || 0;
+	        this.id = options.id || '';
+	        if (!this.width || !this.height) {
+	            throw new Error('element size can not be undefined');
+	        }
+	    }
+
+	    prepare() {
+	        this.paintX = this.gameMap.view.relativeX(this.x);
+	        this.paintY = this.gameMap.view.relativeY(this.y);
+	        this.paintWidth = this.gameMap.view.relativeW(this.width);
+	        this.paintHeight = this.gameMap.view.relativeH(this.height);
+	        const halfWidth = this.paintWidth / 2;
+	        const halfHeight = this.paintHeight / 2;
+	        this.visible =
+	            this.paintX + halfWidth > 0 &&
+	            this.paintX - halfWidth < this.gameMap.view.width &&
+	            this.paintY + halfHeight > 0 &&
+	            this.paintY - halfHeight < this.gameMap.view.height;
+	    }
+	}
+
+	class Food extends Base {
+	    constructor(gameMap, options) {
+	        super(gameMap, options);
+	        this.lightDirection = true;
+	        this.point = options.point;
+	        this.lightSize = this.width / 2;
+	        this.onField = options.onField;
+	    }
+
+	    update() {
+	        this.action();
+	    }
+
+	    action() {
+	        if (!this.visible) {
+	            return;
+	        }
+	        const lightSpeed = 1;
+	        this.lightSize += this.lightDirection ? lightSpeed : -lightSpeed;
+	        // light animate
+	        if (this.lightSize > this.width || this.lightSize < this.width / 2) {
+	            this.lightDirection = !this.lightDirection;
+	        }
+	    }
+
+	    render() {
+	        this.prepare();
+	        if (!this.visible) {
+	            return;
+	        }
+	        this.gameMap.ctx.save();
+	        this.gameMap.ctx.fillStyle = '#f032e6';
+	        // draw light
+	        this.gameMap.ctx.globalAlpha = 0.2;
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.arc(
+	            this.paintX,
+	            this.paintY,
+	            (this.lightSize * this.paintWidth) / this.width,
+	            0,
+	            Math.PI * 2
+	        );
+	        this.gameMap.ctx.fill();
+
+	        this.gameMap.ctx.globalAlpha = 1;
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.arc(
+	            this.paintX,
+	            this.paintY,
+	            Math.floor(this.paintWidth / 2),
+	            0,
+	            Math.PI * 2
+	        );
+	        this.gameMap.ctx.fill();
+	        this.gameMap.ctx.restore();
+	    }
+	}
+
+	class Movement {
+	    constructor(x, y, speed, dt, angle) {
+	        this.x = x;
+	        this.y = y;
+	        this.speed = speed;
+	        this.angle = angle;
+	        this.dt = dt;
+	        // return this;
+	    }
+	}
+
+	class Collider {
+	    constructor(cX, cY, lX, lY, rX, rY) {
+	        this.cX = cX;
+	        this.cY = cY;
+	        this.lX = lX;
+	        this.lY = lY;
+	        this.rX = rX;
+	        this.rY = rY;
+	    }
+
+	    set(cX, cY, lX, lY, rX, rY) {
+	        this.cX = cX;
+	        this.cY = cY;
+	        this.lX = lX;
+	        this.lY = lY;
+	        this.rX = rX;
+	        this.rY = rY;
+	    }
+	}
+
+	class Snake extends Base {
+	    constructor(gameMap, options) {
+	        super(gameMap, options);
+
+	        this.point = 0;
+	        this.isSpeedUp = false;
+	        this.status = 'idle';
+	        this.color = options.color;
+	        this.stopped = false;
+	        this.head = [];
+	        // Угол зрения червяка
+	        this.visionAngle = 170;
+	        this.closestSnakeDistance = 5000;
+	        this.closestFoodDistance = 5000;
+	        this.closestSnakeID = '';
+	        this.foodID = '';
+	        this.closestSnake = {};
+	        this.closestFood = {};
+	        this.seeSnake = false;
+	        this.collidedV = false;
+	        this.collidedH = false;
+	        // save snake's movement
+	        this.movementQueue = [];
+	        this.colliderIdx = 0;
+	        this.colliders = [];
+
+	        // max length of queue
+	        this.speed = SPEED;
+	        this.oldSpeed = SPEED;
+	        this.turnSpeed = 0.2;
+	        this.vx = 0;
+	        this.vy = 0;
+	        this.toAngle = (options.angle || 0) + BASE_ANGLE;
+	        this.angle = (options.angle || 0) + BASE_ANGLE;
+	        this.length = options.length || 0;
+	        this.isPlayer = options.isPlayer || false;
+	        this.updateSize();
+	        this.velocity();
+	        this.calcHead();
+	    }
+
+	    resetSnake() {
+	        this.point = 0;
+	        this.isSpeedUp = false;
+	        this.status = 'idle';
+	        this.stopped = false;
+	        this.foodsEated = new Map();
+	        this.head = [];
+	        // Угол зрения червяка
+	        this.visionAngle = 170;
+	        this.closestSnakeDistance = 5000;
+	        this.closestFoodDistance = 5000;
+	        this.closestSnakeID = '';
+	        this.foodID = '';
+	        this.closestSnake = {};
+	        this.closestFood = {};
+	        this.seeSnake = false;
+	        this.collidedV = false;
+	        this.collidedH = false;
+	        // save snake's movement
+	        this.movementQueue = [];
+	        this.colliderIdx = 0;
+
+	        // max length of queue
+	        this.speed = SPEED;
+	        this.oldSpeed = SPEED;
+	        this.turnSpeed = 1;
+	        this.vx = 0;
+	        this.vy = 0;
+	    }
+
+	    setStatus(status) {
+	        this.status = status;
+	    }
+
+	    zeroFood() {
+	        this.closestFoodDistance = 50000;
+	        if (this.status === 'eating' || this.status === 'seefood') this.status = 'idle';
+	    }
+
+	    zeroSnake() {
+	        this.closestSnakeDistance = 50000;
+	        this.closestSnakeID = '';
+	    }
+
+	    setFood(distance, foodX, foodY, id) {
+	        this.closestFoodDistance = distance;
+	        this.closestFood.x = foodX;
+	        this.closestFood.y = foodY;
+	        this.foodID = id;
+	        this.status = 'seefood';
+	    }
+
+	    setSnake(distance, snakeX, snakeY, snakeID) {
+	        this.closestSnakeDistance = distance;
+	        this.closestSnake.x = snakeX;
+	        this.closestSnake.y = snakeY;
+	        this.closestSnakeID = snakeID;
+	    }
+
+	    updateSize(added = 0) {
+	        this.width += added;
+	        this.height += added;
+	        this.length += added * 100;
+	        this.speed += added;
+	        // this.turnSpeed -= added / 100;
+	        this.movementQueueLen = Math.ceil(this.length / (this.oldSpeed * this.dt));
+	    }
+
+	    directionTo(angle) {
+	        const oldAngle = Math.abs(this.toAngle % (Math.PI * 2));
+
+	        // number of turns
+	        let rounds = Math.floor(this.toAngle / (Math.PI * 2));
+
+	        this.toAngle = angle;
+
+	        if (oldAngle >= (Math.PI * 3) / 2 && this.toAngle <= Math.PI / 2) {
+	            // move from fourth quadrant to first quadrant
+	            rounds += 1;
+	        } else if (oldAngle <= Math.PI / 2 && this.toAngle >= (Math.PI * 3) / 2) {
+	            // move from first quadrant to fourth quadrant
+	            rounds -= 1;
+	        }
+
+	        // calculate the real angle by rounds
+	        this.toAngle += rounds * Math.PI * 2;
+	    }
+
+	    // move to new position
+	    moveTo(nx, ny, fromPlayer = false) {
+	        if (fromPlayer && (this.collidedV || this.collidedH)) return;
+	        const x = nx - this.x;
+	        const y = this.y - ny;
+	        const angle = getAngle(x, y);
+
+	        this.directionTo(angle);
+	    }
+
+	    // calculate horizontal speed and vertical speed by angle of snake header
+	    velocity() {
+	        const angle = this.angle % (Math.PI * 2);
+	        const vx = Math.abs(this.speed * Math.sin(angle));
+	        const vy = Math.abs(this.speed * Math.cos(angle));
+
+	        if (angle < Math.PI / 2) {
+	            this.vx = vx;
+	            this.vy = -vy;
+	        } else if (angle < Math.PI) {
+	            this.vx = vx;
+	            this.vy = vy;
+	        } else if (angle < (Math.PI * 3) / 2) {
+	            this.vx = -vx;
+	            this.vy = vy;
+	        } else {
+	            this.vx = -vx;
+	            this.vy = -vy;
+	        }
+	    }
+
+	    // turn around
+	    turnAround(dt) {
+	        const angleDistance = this.toAngle - this.angle;
+
+	        if (Math.abs(angleDistance) <= this.turnSpeed * this.gameMap.scale) {
+	            // reset angle
+	            const {
+	                toAngle
+	            } = this;
+	            this.toAngle = BASE_ANGLE + (toAngle % (Math.PI * 2));
+	            this.angle = BASE_ANGLE + (toAngle % (Math.PI * 2));
+	        } else {
+	            this.angle += Math.sign(angleDistance) * this.turnSpeed * this.gameMap.scale;
+	        }
+	    }
+
+	    speedUp() {
+	        if (this.isSpeedUp) {
+	            return;
+	        }
+
+	        this.isSpeedUp = true;
+	        this.oldSpeed = this.speed;
+	        this.speed *= 2;
+	    }
+
+	    speedDown() {
+	        if (!this.isSpeedUp) {
+	            return;
+	        }
+
+	        this.isSpeedUp = false;
+	        this.speed = this.oldSpeed;
+	    }
+
+	    // eat food
+	    eat(idx, food) {
+	        this.point += food.point;
+
+	        // add points
+	        const added = food.point / 15;
+	        this.updateSize(added);
+	    }
+
+	    // snake action
+	    action() {
+	        this.colliderIdx = 0;
+	        if (this.stopped) {
+	            return;
+	        }
+
+	        // save movement
+	        this.movementQueue.push(new Movement(this.x, this.y, this.speed, this.dt, this.angle));
+
+	        if (this.movementQueue.length > this.movementQueueLen) {
+	            this.movementQueue.shift();
+	        }
+
+	        this.turnAround();
+	        this.velocity();
+	        this.x += this.vx * this.dt;
+	        this.y += this.vy * this.dt;
+	        this.calcHead();
+
+	        let wholeLength = this.length;
+	        if (this.movementQueue.length) {
+	            let i = this.movementQueue.length - 1;
+	            while (i) {
+	                const movement = this.movementQueue[i];
+	                let {
+	                    x,
+	                    y,
+	                    angle,
+	                    dt,
+	                    speed
+	                } = movement;
+	                if (wholeLength > 0 && wholeLength < speed * dt) {
+	                    const lm = this.movementQueue[i + 1] || this;
+	                    const ratio = wholeLength / (speed * dt);
+	                    x = lm.x - (lm.x - x) * ratio;
+	                    y = lm.y - (lm.y - y) * ratio;
+	                    // speed = lm.speed - (lm.speed - speed) * ratio;
+	                    // dt = lm.dt - (lm.dt - dt) * ratio;
+	                    // angle = lm.angle - (lm.angle - angle) * ratio;
+	                } else if (wholeLength < 0) {
+	                    break;
+	                }
+
+	                i -= 1;
+	                wholeLength -= speed * dt;
+	                const rotateRight = rotatePoint(x, y, x + 0.5 * this.width, y, angle);
+	                const rotateLeft = rotatePoint(x, y, x - 0.5 * this.width, y, angle);
+	                this.addCollider(x, y, rotateLeft.x, rotateLeft.y, rotateRight.x, rotateRight.y);
+	            }
+	        }
+
+	        // this.gameMap.view.trace(this);
+	        if (this.x > 2 * this.width && this.x < this.gameMap.width - 2 * this.width)
+	            this.collidedH = false;
+	        if (this.y > 2 * this.height && this.y < this.gameMap.height - 2 * this.height)
+	            this.collidedV = false;
+
+	        this.gameMap.bounds.forEach((bound, id) => {
+	            if (intersects_9(this.head, bound)) {
+	                const vec = velocityFromAngle(this.angle % (Math.PI * 2), this.speed);
+	                switch (id) {
+	                    case 'UP':
+	                        if (!this.collideV) {
+	                            this.moveTo(this.x + vec.vx, this.y - vec.vy);
+	                            this.collidedV = true;
+	                        }
+	                        break;
+	                    case 'LEFT':
+	                        if (!this.collideH) {
+	                            this.moveTo(this.x - vec.vx, this.y + vec.vy);
+	                            this.collidedH = true;
+	                        }
+	                        break;
+	                    case 'RIGHT':
+	                        if (!this.collideH) {
+	                            this.moveTo(this.x - vec.vx, this.y + vec.vy);
+	                            this.collidedH = true;
+	                        }
+	                        break;
+	                    default:
+	                        if (!this.collideV) {
+	                            this.moveTo(this.x + vec.vx, this.y - vec.vy);
+	                            this.collidedV = true;
+	                        }
+	                }
+	            }
+	        });
+
+	        // avoid moving to outside
+	        // this.gameMap.limit(this);
+	    }
+
+	    // render snake
+	    render() {
+	        this.prepare();
+	        const offset = SNAKE_OFFSET / this.gameMap.scale;
+	        this.gameMap.ctx.save();
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.moveTo(this.paintX, this.paintY);
+
+	        for (let i = 2; i < this.colliderIdx; i += 1) {
+	            this.gameMap.ctx.lineTo(
+	                this.gameMap.view.relativeX(this.colliders[i].cX),
+	                this.gameMap.view.relativeY(this.colliders[i].cY)
+	            );
+	        }
+
+	        this.gameMap.ctx.lineCap = 'butt';
+	        this.gameMap.ctx.lineJoin = 'round';
+	        [, this.gameMap.ctx.strokeStyle] = this.color;
+	        this.gameMap.ctx.lineWidth = this.paintWidth;
+	        // this.gameMap.ctx.shadowOffsetX = Math.round(0.4 * 10);
+	        this.gameMap.ctx.shadowOffsetY = Math.round(0.4 * 10) / this.gameMap.scale;
+	        this.gameMap.ctx.shadowBlur = Math.round(0.7 * 10) / this.gameMap.scale;
+	        this.gameMap.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+	        this.gameMap.ctx.stroke();
+	        this.gameMap.ctx.restore();
+
+	        /* while (this.collisionPointsX.length) {
+	            const x = this.collisionPointsX.pop();
+	            const y = this.collisionPointsY.pop();
+	            const angle = this.collisionAngle.pop();
+	            const rotateRight = rotatePoint(x, y, x + 0.5 * this.width, y, angle);
+	            const rotateLeft = rotatePoint(x, y, x - 0.5 * this.width, y, angle);
+	            this.gameMap.ctx.save();
+	            this.gameMap.ctx.beginPath();
+	            this.gameMap.ctx.moveTo(
+	                this.gameMap.view.relativeX(rotateLeft.x),
+	                this.gameMap.view.relativeY(rotateLeft.y)
+	            );
+	            this.gameMap.ctx.lineTo(
+	                this.gameMap.view.relativeX(rotateRight.x),
+	                this.gameMap.view.relativeY(rotateRight.y)
+	            );
+
+	            this.gameMap.ctx.strokeStyle = '#000';
+	            this.gameMap.ctx.lineWidth = 2;
+	            this.gameMap.ctx.stroke();
+	            this.gameMap.ctx.restore();
+	        } */
+
+	        // draw header
+	        let rotateLeftTop = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX - 0.5 * this.paintWidth,
+	            this.paintY - this.paintHeight,
+	            this.angle
+	        );
+	        let rotateRightTop = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX + 0.5 * this.paintWidth,
+	            this.paintY - this.paintHeight,
+	            this.angle
+	        );
+	        let rotateRightBottom = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX + 0.5 * this.paintWidth,
+	            this.paintY,
+	            this.angle
+	        );
+	        let rotateLeftBottom = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX - 0.5 * this.paintWidth,
+	            this.paintY,
+	            this.angle
+	        );
+	        this.gameMap.ctx.save();
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.moveTo(rotateLeftTop.x, rotateLeftTop.y);
+	        this.gameMap.ctx.lineTo(rotateRightTop.x, rotateRightTop.y);
+	        this.gameMap.ctx.lineTo(rotateRightBottom.x, rotateRightBottom.y);
+	        this.gameMap.ctx.lineTo(rotateLeftBottom.x, rotateLeftBottom.y);
+	        this.gameMap.ctx.closePath();
+	        [this.gameMap.ctx.fillStyle] = this.color;
+	        this.gameMap.ctx.shadowOffsetY = Math.round(0.4 * 10) / this.gameMap.scale;
+	        this.gameMap.ctx.shadowBlur = Math.round(0.7 * 10) / this.gameMap.scale;
+	        this.gameMap.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+	        this.gameMap.ctx.fill();
+	        this.gameMap.ctx.restore();
+	        this.gameMap.ctx.save();
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.moveTo(rotateLeftTop.x, rotateLeftTop.y + offset);
+	        this.gameMap.ctx.lineTo(rotateRightTop.x, rotateRightTop.y + offset);
+	        this.gameMap.ctx.lineTo(rotateRightBottom.x, rotateRightBottom.y + offset);
+	        this.gameMap.ctx.lineTo(rotateLeftBottom.x, rotateLeftBottom.y + offset);
+	        this.gameMap.ctx.closePath();
+	        [this.gameMap.ctx.fillStyle] = this.color;
+	        this.gameMap.ctx.fill();
+
+	        this.gameMap.ctx.restore();
+	        rotateLeftTop = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX - 0.3 * this.paintWidth,
+	            this.paintY - 0.8 * this.paintHeight,
+	            this.angle
+	        );
+	        rotateRightTop = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX + 0.3 * this.paintWidth,
+	            this.paintY - 0.8 * this.paintHeight,
+	            this.angle
+	        );
+	        rotateRightBottom = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX + 0.3 * this.paintWidth,
+	            this.paintY - 0.2 * this.paintHeight,
+	            this.angle
+	        );
+	        rotateLeftBottom = rotatePoint(
+	            this.paintX,
+	            this.paintY,
+	            this.paintX - 0.3 * this.paintWidth,
+	            this.paintY - 0.2 * this.paintHeight,
+	            this.angle
+	        );
+
+	        this.gameMap.ctx.save();
+	        this.gameMap.ctx.beginPath();
+	        this.gameMap.ctx.moveTo(rotateLeftTop.x, rotateLeftTop.y + offset);
+	        this.gameMap.ctx.lineTo(rotateRightTop.x, rotateRightTop.y + offset);
+	        this.gameMap.ctx.lineTo(rotateRightBottom.x, rotateRightBottom.y + offset);
+	        this.gameMap.ctx.lineTo(rotateLeftBottom.x, rotateLeftBottom.y + offset);
+	        this.gameMap.ctx.closePath();
+	        [, this.gameMap.ctx.fillStyle] = this.color;
+	        this.gameMap.ctx.fill();
+	        this.gameMap.ctx.restore();
+	    }
+
+	    update(dt) {
+	        this.dt = dt;
+	        this.action();
+	    }
+
+	    calcHead() {
+	        const rotateLeftTop = rotatePoint(
+	            this.x,
+	            this.y,
+	            this.x - 0.5 * this.width,
+	            this.y - this.height,
+	            this.angle
+	        );
+	        const rotateRightTop = rotatePoint(
+	            this.x,
+	            this.y,
+	            this.x + 0.5 * this.width,
+	            this.y - this.height,
+	            this.angle
+	        );
+	        const rotateRightBottom = rotatePoint(
+	            this.x,
+	            this.y,
+	            this.x + 0.5 * this.width,
+	            this.y,
+	            this.angle
+	        );
+	        const rotateLeftBottom = rotatePoint(
+	            this.x,
+	            this.y,
+	            this.x - 0.5 * this.width,
+	            this.y,
+	            this.angle
+	        );
+
+	        this.head[0] = rotateLeftTop.x;
+	        this.head[1] = rotateLeftTop.y;
+	        this.head[2] = rotateRightTop.x;
+	        this.head[3] = rotateRightTop.y;
+	        this.head[4] = rotateRightBottom.x;
+	        this.head[5] = rotateRightBottom.y;
+	        this.head[6] = rotateLeftBottom.x;
+	        this.head[7] = rotateLeftBottom.y;
+	        this.addCollider(
+	            0.5 * (rotateLeftTop.x + rotateRightTop.x),
+	            0.5 * (rotateLeftTop.y + rotateRightTop.y),
+	            rotateLeftTop.x,
+	            rotateLeftTop.y,
+	            rotateRightTop.x,
+	            rotateRightTop.y
+	        );
+	        this.addCollider(
+	            this.x,
+	            this.y,
+	            rotateLeftBottom.x,
+	            rotateLeftBottom.y,
+	            rotateRightBottom.x,
+	            rotateRightBottom.y
+	        );
+	    }
+
+	    addCollider(cX, cY, lX, lY, rX, rY) {
+	        if (this.colliderIdx === this.colliders.length) {
+	            this.colliders.push(new Collider(cX, cY, lX, lY, rX, rY));
+	        } else {
+	            this.colliders[this.colliderIdx].set(cX, cY, lX, lY, rX, rY);
+	        }
+	        this.colliderIdx += 1;
+	    }
+	}
+
+	const drawPattern = (width, height, ratio = 1) => {
+	    const tileImage = document.createElement('canvas');
+	    tileImage.width = width * ratio;
+	    tileImage.height = height * ratio;
+	    const ctx = tileImage.getContext('2d');
+	    const colors = ['#eee', '#aaa'];
+	    const mrw = MAP_RECT_WIDTH / ratio;
+	    const mrh = MAP_RECT_HEIGHT / ratio;
+	    for (let x = 0, i = 0; x <= width; x += mrw, i += 1) {
+	        for (let y = 0, j = 0; y <= height; y += mrh, j += 1) {
+	            const cx = width * ratio - x;
+	            const cy = height * ratio - y;
+	            const w = cx < mrw ? cx : mrw;
+	            const h = cy < mrh ? cy : mrh;
+	            ctx.fillStyle = colors[(i + j) % colors.length];
+	            ctx.fillRect(x, y, w, h);
+	        }
+	    }
+	    ctx.lineWidth = 3;
+	    ctx.strokeRect(0, 0, width * ratio, height * ratio);
+	    return tileImage;
+	};
+
+	class SmallMap {
+	    constructor(gameMap, margin, radius) {
+	        this.gameMap = gameMap;
+	        this.margin = margin;
+	        this.radius = radius;
+	        this.image = document.createElement('canvas');
+
+	        this.initImage();
+	    }
+
+	    initImage() {
+	        this.image.width = this.radius * 2;
+	        this.image.height = this.radius * 2;
+	        this.x = this.gameMap.view.width - this.radius * 2 - this.margin;
+	        this.y = this.gameMap.view.height - this.radius * 2 - this.margin;
+	        this.mapX = this.x + this.radius / 2;
+	        this.mapY = this.y + this.radius / 2;
+	        const ctx = this.image.getContext('2d');
+
+	        this.smallMapWidth =
+	            this.gameMap.width > this.gameMap.height
+	                ? this.radius
+	                : (this.gameMap.width * this.radius) / this.gameMap.height;
+	        this.smallMapHeight =
+	            this.gameMap.width > this.gameMap.height
+	                ? (this.gameMap.height * this.radius) / this.gameMap.width
+	                : this.radius;
+
+	        const smallRectX = this.radius - this.smallMapWidth / 2;
+	        const smallRectY = this.radius - this.smallMapHeight / 2;
+
+	        // draw background
+	        ctx.save();
+	        ctx.beginPath();
+	        ctx.arc(this.radius, this.radius, this.radius - 1, 0, Math.PI * 2);
+	        ctx.fillStyle = '#000';
+	        ctx.fill();
+
+	        ctx.lineWidth = 2;
+	        ctx.strokeStyle = '#fff';
+	        ctx.stroke();
+
+	        // draw map
+	        ctx.fillStyle = '#ccc';
+	        ctx.fillRect(smallRectX, smallRectY, this.smallMapWidth, this.smallMapHeight);
+	        ctx.restore();
+	    }
+
+	    resize() {
+	        this.x = this.gameMap.view.width - this.radius * 2 - this.margin;
+	        this.y = this.gameMap.view.height - this.radius * 2 - this.margin;
+	        this.mapX = this.x + this.radius / 2;
+	        this.mapY = this.y + this.radius / 2;
+	    }
+
+	    render() {
+	        // relative ratio
+	        const radio = this.smallMapWidth / this.gameMap.paintWidth;
+	        const globalRadio = this.smallMapWidth / this.gameMap.width;
+	        const { ctx } = this.gameMap;
+
+	        // area and position of window
+	        const smallViewX = this.gameMap.view.x * radio + this.mapX;
+	        const smallViewY = this.gameMap.view.y * radio + this.mapY;
+	        const smallViewW = this.gameMap.view.width * radio;
+	        const smallViewH = this.gameMap.view.height * radio;
+
+	        ctx.save();
+	        ctx.globalAlpha = 0.8;
+	        ctx.drawImage(this.image, this.x, this.y);
+
+	        // draw window
+	        ctx.strokeStyle = '#fff';
+	        ctx.strokeRect(smallViewX, smallViewY, smallViewW, smallViewH);
+
+	        this.gameMap.units.forEach(unit => {
+	            const smallX = unit.x * globalRadio + this.mapX;
+	            const smallY = unit.y * globalRadio + this.mapY;
+	            ctx.fillStyle = '#f00';
+	            ctx.fillRect(smallX - 2, smallY - 2, 4, 4);
+	        });
+
+	        /* ctx.fillStyle = '#f00';
+	        ctx.fillRect(smallViewX + smallViewW / 2 - 2, smallViewY + smallViewH / 2 - 2, 4, 4);
+	        */
+
+	        ctx.restore();
+	    }
+	}
+
+	class View {
+	    constructor(gameMap, width, height, x = 0, y = 0) {
+	        this.width = width;
+	        this.height = height;
+	        this.x = x;
+	        this.y = y;
+	        this.gameMap = gameMap;
+	    }
+
+	    trace(x, y) {
+	        this.x = x / this.gameMap.scale - this.width / 2;
+	        this.y = y / this.gameMap.scale - this.height / 2;
+	    }
+
+	    absoluteX(x) {
+	        return (x + this.x) * this.gameMap.scale;
+	    }
+
+	    absoluteY(y) {
+	        return (y + this.y) * this.gameMap.scale;
+	    }
+
+	    relativeX(x) {
+	        return x / this.gameMap.scale - this.x;
+	    }
+
+	    relativeY(y) {
+	        return y / this.gameMap.scale - this.y;
+	    }
+
+	    relativeW(width) {
+	        return width / this.gameMap.scale;
+	    }
+
+	    relativeH(height) {
+	        return height / this.gameMap.scale;
+	    }
+	}
+
+	// Map class
+	class GameMap extends eventemitter3 {
+	    constructor(
+	        canvas = document.createElement('canvas'),
+	        vWidth = MAP_WIDTH,
+	        vHeight = MAP_HEIGHT,
+	        scale = 1
+	    ) {
+	        super();
+	        this.canvas = canvas;
+	        this.width = MAP_WIDTH;
+	        this.height = MAP_HEIGHT;
+	        this.bounds = new Map([
+	            ['UP', [-50, 0, MAP_WIDTH + 50, 0, MAP_WIDTH + 50, -50, -50, -50]],
+	            ['LEFT', [0, 0, 0, MAP_HEIGHT, -50, MAP_HEIGHT, -50, 0]],
+	            [
+	                'RIGHT',
+	                [MAP_WIDTH, 0, MAP_WIDTH + 50, 0, MAP_WIDTH + 50, MAP_HEIGHT, MAP_WIDTH, MAP_HEIGHT]
+	            ],
+	            [
+	                'DOWN',
+	                [
+	                    -50,
+	                    MAP_HEIGHT,
+	                    -50,
+	                    MAP_HEIGHT + 50,
+	                    MAP_WIDTH + 50,
+	                    MAP_HEIGHT + 50,
+	                    MAP_WIDTH + 50,
+	                    MAP_HEIGHT
+	                ]
+	            ]
+	        ]);
+	        this.aviableColors = [];
+	        COLORS.forEach(color => this.aviableColors.push(color));
+	        this.vWidth = vWidth;
+	        this.vHeight = vHeight;
+	        this.scale = scale;
+	        this.scaled = false;
+	        this.canvas.width = vWidth;
+	        this.canvas.height = vHeight;
+	        this.ctx = this.canvas.getContext('2d');
+	        this.paintSizeReset();
+	        this.tileImage = drawPattern(MAP_RECT_WIDTH * 8, MAP_RECT_HEIGHT * 8);
+	        this.view = new View(this, vWidth, vHeight);
+	        this.smallMap = new SmallMap(this, 30, 50);
+	        this.units = [];
+	        this.foods = [];
+	        this.foodEatedPool = [];
+	    }
+
+	    resize(width, height) {
+	        this.vWidth = width;
+	        this.vHeight = height;
+	        this.canvas.width = width;
+	        this.canvas.height = height;
+	        this.view.width = width;
+	        this.view.height = height;
+	        this.smallMap.resize();
+	    }
+
+	    initUnits(numUnits, playerID) {
+	        // Инициируем игрока
+	        this.player = new Snake(this, {
+	            x: randomInteger(0.5 * 100, MAP_WIDTH - 0.5 * 100),
+	            y: randomInteger(0.5 * 100, MAP_HEIGHT - 0.5 * 100),
+	            size: SNAKE_IMG_SIZE,
+	            length: SNAKE_LENGTH,
+	            angle: Math.random() * 2 * Math.PI,
+	            id: playerID,
+	            color: this.aviableColors.splice(randomInteger(0, this.aviableColors.length - 1), 1)[0],
+	            isPlayer: true
+	        });
+	        this.units.push(this.player);
+	        // Инициируем остальных червяков
+	        for (let i = numUnits - 1; i; i -= 1) {
+	            this.units.push(
+	                new Snake(this, {
+	                    x: randomInteger(0.5 * 100, MAP_WIDTH - 0.5 * 100),
+	                    y: randomInteger(0.5 * 100, MAP_HEIGHT - 0.5 * 100),
+	                    size: SNAKE_IMG_SIZE,
+	                    length: SNAKE_LENGTH,
+	                    angle: Math.random() * 2 * Math.PI,
+	                    color: this.aviableColors.splice(
+	                        randomInteger(0, this.aviableColors.length - 1),
+	                        1
+	                    )[0],
+	                    id: `unit${i}`
+	                })
+	            );
+	        }
+	    }
+
+	    // Инициируем еду
+	    initFoods(numFoods) {
+	        this.foodsOnFields = numFoods;
+	        for (let i = 0; i < numFoods; i += 1) {
+	            this.foods.push(
+	                new Food(this, {
+	                    size: FOOD_SIZE,
+	                    point: 1,
+	                    x: randomInteger(FOOD_SIZE, MAP_WIDTH - FOOD_SIZE),
+	                    y: randomInteger(FOOD_SIZE, MAP_HEIGHT - FOOD_SIZE),
+	                    id: i,
+	                    onField: true
+	                })
+	            );
+	        }
+	    }
+
+	    // set scale
+	    setScale(scale) {
+	        if (this.scale === scale) {
+	            return;
+	        }
+
+	        this.scale = scale < 1 ? 1 : scale;
+	        this.paintSizeReset();
+	        this.emit('scale_changed');
+	    }
+
+	    // set toScale for creating animate
+	    setToScale(scale) {
+	        this.toScale = scale;
+	    }
+
+	    // relative to scale
+	    relative(val) {
+	        return val / this.scale;
+	    }
+
+	    clear() {
+	        this.ctx.clearRect(0, 0, this.view.width, this.view.height);
+	    }
+
+	    update(dt) {
+	        if (this.scaled && this.scale < 2.0) {
+	            this.setToScale(this.scale + 0.1);
+	        } else if (this.scale > 1.0 && !this.scaled) {
+	            this.setToScale(this.scale - 0.1);
+	        }
+	        if (this.toScale && this.scale !== this.toScale) {
+	            this.setScale(this.toScale);
+	        }
+	        this.updateFood();
+	        this.updateUnits(dt);
+	        this.view.trace(this.player.x, this.player.y);
+	        this.clear();
+	        this.render();
+	        this.renderFood();
+	        this.renderUnits();
+	        this.addFood();
+	        this.units.forEach(unit => {
+	            const i = window.devicePixelRatio;
+	            const s = Math.floor((0.8 * unit.width) / (i * this.scale));
+	            this.ctx.save();
+	            this.ctx.translate(unit.paintX, unit.paintY);
+	            this.ctx.font = 'bold '.concat(s, 'px Quicksand');
+	            this.ctx.textAlign = 'center';
+	            this.ctx.textBaseline = 'bottom';
+	            [this.ctx.fillStyle] = unit.color;
+	            this.ctx.fillText(unit.id, 0, -Math.floor((unit.width + 10) / (i * this.scale)));
+	            this.ctx.restore();
+	        });
+	        this.smallMap.render();
+
+	        this.ctx.save();
+	        this.ctx.translate(100, 100);
+	        /// this.ctx.moveTo(-12, -12);
+	        this.ctx.beginPath();
+	        this.ctx.lineTo(10, -12);
+	        this.ctx.lineTo(14, -6);
+	        this.ctx.lineTo(12, 4);
+	        this.ctx.lineTo(8, 6);
+	        this.ctx.lineTo(6, 12);
+	        this.ctx.lineTo(0, 14);
+	        this.ctx.lineTo(-6, 12);
+	        this.ctx.lineTo(-8, 6);
+	        this.ctx.lineTo(-12, 4);
+	        this.ctx.lineTo(-14, -6);
+	        this.ctx.lineTo(-10, -12);
+	        this.ctx.closePath();
+	        this.ctx.arc(-6, -2, 4, 0, 2 * Math.PI, !0);
+	        this.ctx.closePath();
+	        this.ctx.arc(6, -2, 4, 0, 2 * Math.PI, !0);
+	        this.ctx.closePath();
+	        this.ctx.moveTo(0, 2);
+	        this.ctx.lineTo(-4, 6);
+	        this.ctx.lineTo(0, 8);
+	        this.ctx.lineTo(4, 6);
+	        this.ctx.closePath();
+	        this.ctx.fillStyle = 'red';
+	        // this.ctx.lineWidth = 1;
+	        this.ctx.fill();
+	        this.ctx.restore();
+	        this.checkCollisions();
+	    }
+
+	    // render map
+	    render() {
+	        const { view } = this;
+	        const tileWid = this.relative(this.tileImage.width);
+	        const tileHei = this.relative(this.tileImage.height);
+	        const beginX = view.x < 0 ? -view.x : -view.x % tileWid;
+	        const beginY = view.y < 0 ? -view.y : -view.y % tileHei;
+	        const endX =
+	            view.x + view.width > this.paintWidth
+	                ? this.paintWidth - view.x
+	                : beginX + view.width + tileWid;
+	        const endY =
+	            view.y + view.height > this.paintHeight
+	                ? this.paintHeight - view.y
+	                : beginY + view.height + tileHei;
+
+	        for (let x = beginX; x <= endX; x += tileWid) {
+	            for (let y = beginY; y <= endY; y += tileHei) {
+	                const cx = endX - x;
+	                const cy = endY - y;
+	                const w = cx < tileWid ? cx : tileWid;
+	                const h = cy < tileHei ? cy : tileHei;
+	                this.ctx.drawImage(
+	                    this.tileImage,
+	                    0,
+	                    0,
+	                    w * this.scale,
+	                    h * this.scale,
+	                    x,
+	                    y,
+	                    w,
+	                    h
+	                );
+	            }
+	        }
+	    }
+
+	    paintSizeReset() {
+	        this.paintWidth = this.relative(this.width);
+	        this.paintHeight = this.relative(this.height);
+	    }
+
+	    checkCollisions() {
+	        this.units.forEach(unit0 => {
+	            unit0.zeroSnake();
+	            this.units.forEach(unit => {
+	                if (unit0.id !== unit.id) {
+	                    for (let i = 1; i < unit.colliderIdx; i += 1) {
+	                        if (
+	                            intersects_9(unit0.head, [
+	                                unit.colliders[i].lX,
+	                                unit.colliders[i].lY,
+	                                unit.colliders[i].rX,
+	                                unit.colliders[i].rY,
+	                                unit.colliders[i - 1].rX,
+	                                unit.colliders[i - 1].rY,
+	                                unit.colliders[i - 1].lX,
+	                                unit.colliders[i - 1].lY
+	                            ])
+	                        ) {
+	                            console.log('BAAM!!!');
+	                            break;
+	                        } else if (unit0.id !== this.player.id) {
+	                            const distanceX = Math.round(unit.colliders[i].cX - unit0.x);
+	                            const distanceY = Math.round(unit.colliders[i].cY - unit0.y);
+	                            const distance = Math.abs(distanceX) + Math.abs(distanceY);
+	                            const angle = getAngle(
+	                                unit0.x - unit.colliders[i].cX,
+	                                unit.colliders[i].cY - unit0.y
+	                            );
+	                            const unitAngle = getAngle(unit0.vx, unit0.vy);
+	                            if (
+	                                angle <= unit.angle + (Math.PI * unit0.visionAngle) / 360 &&
+	                                angle >= unit.angle - (Math.PI * unit0.visionAngle) / 360
+	                            ) {
+	                                if (distance < unit0.closestSnakeDistance) {
+	                                    unit0.setSnake(
+	                                        distance,
+	                                        unit.colliders[i].cX,
+	                                        unit.colliders[i].cY,
+	                                        unit.id
+	                                    );
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            });
+	        });
+	    }
+
+	    updateUnits(dt) {
+	        this.units.forEach(unit => {
+	            if (unit.id !== this.player.id) {
+	                if (unit.closestSnakeDistance < 3 * unit.width) {
+	                    unit.zeroFood();
+	                    const angleSnake = getAngle(
+	                        unit.x - unit.closestSnake.x,
+	                        unit.y - unit.closestSnake.y
+	                    );
+	                    unit.moveTo(unit.x - unit.closestSnake.x, unit.y - unit.closestSnake.y);
+	                }
+	                if (
+	                    (unit.status === 'eating' || unit.status === 'seefood') &&
+	                    !this.foods[unit.foodID].onField
+	                )
+	                    unit.zeroFood();
+	                if (unit.status === 'seefood') {
+	                    unit.setStatus('eating');
+	                    unit.moveTo(unit.closestFood.x, unit.closestFood.y);
+	                }
+	            }
+	            unit.update(dt);
+	        });
+	    }
+
+	    updateFood() {
+	        for (let i = this.foods.length - 1; i > 0; i -= 1) {
+	            const food = this.foods[i];
+	            if (this.foods[i].onField) {
+	                food.update();
+	                this.units.forEach(unit => {
+	                    if (intersects_11(unit.head, food.x, food.y, food.width * 0.5)) {
+	                        unit.eat(food.id, food);
+	                        // eslint-disable-next-line no-param-reassign
+	                        food.onField = false;
+	                        this.foodsOnFields -= 1;
+	                        this.foodEatedPool.push(i);
+	                        unit.zeroFood();
+	                    } else if (unit.status === 'idle' || unit.status === 'seefood') {
+	                        // Ищем наименьшее расстояние от червяка до еды
+	                        const distanceX = Math.round(food.x - unit.x);
+	                        const distanceY = Math.round(food.y - unit.y);
+	                        const distance = Math.abs(distanceX) + Math.abs(distanceY);
+	                        const angle = getAngle(food.x - unit.x, food.y - unit.y);
+	                        const unitAngle = getAngle(unit.vx, unit.vy);
+	                        if (
+	                            angle <= unitAngle + (Math.PI * unit.visionAngle) / 360 &&
+	                            angle >= unitAngle - (Math.PI * unit.visionAngle) / 360
+	                        ) {
+	                            if (distance < unit.closestFoodDistance) {
+	                                unit.setFood(distance, food.x, food.y, i);
+	                            }
+	                        }
+	                    }
+	                });
+	            }
+	        }
+	    }
+
+	    addFood() {
+	        if (this.foodsOnFields < 500) {
+	            const food = this.foodEatedPool.pop();
+	            if (food) {
+	                this.foodsOnFields += 1;
+	                this.foods[food].onField = true;
+	                this.foods[food].x = randomInteger(FOOD_SIZE, MAP_WIDTH - FOOD_SIZE);
+	                this.foods[food].y = randomInteger(FOOD_SIZE, MAP_HEIGHT - FOOD_SIZE);
+	            }
+	        }
+	    }
+
+	    renderFood() {
+	        for (let i = 0; i < this.foods.length; i += 1) {
+	            if (this.foods[i].onField) {
+	                this.foods[i].render();
+	            }
+	        }
+	    }
+
+	    renderUnits() {
+	        for (let i = 0; i < this.units.length; i += 1) {
+	            this.units[i].render();
+	        }
+	    }
+	}
+
+	const stats = new stats_min();
+	stats.showPanel(0);
+	document.body.appendChild(stats.dom);
+	const raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+	const timestamp = () => {
+	    return window.performance && window.performance.now
+	        ? window.performance.now()
+	        : new Date().getTime();
+	};
+	const canvas = document.getElementById('cas');
+
+	// window's width and height
+	const vWidth = window.innerWidth;
+	const vHeight = window.innerHeight;
+
+	// game map
+	const gameMap = new GameMap(canvas, vWidth, vHeight);
+
+	const mouseCoords = {};
+
+	// animation loop
+	let now;
+	let dt = 0;
+	let last = timestamp();
+	const step = 1 / 60;
+
+	let player;
+
+	initGame();
+
+	/**
+	 * game init
+	 */
+	function initGame() {
+	    gameMap.initUnits(6, 'player');
+	    [player] = gameMap.units.filter(unit => unit.id === 'player');
+	    gameMap.initFoods(INIT_FOOD_COUNT);
+	    binding();
+	    animate();
+	}
+
+	function animate() {
+	    stats.begin();
+	    now = timestamp();
+	    dt = Math.min(step, (now - last) / 1000);
+	    gameMap.update(dt);
+	    stats.end();
+	    last = now;
+	    raf(animate);
+	}
+
+	/**
+	 * event binding
+	 */
+	function binding() {
+	    window.addEventListener('resize', () => {
+	        const width = window.innerWidth;
+	        const height = window.innerHeight;
+	        gameMap.resize(width, height);
+	    });
+	    // finger|mouse move event
+	    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+	        window.addEventListener('touchstart', mousemove);
+	        window.addEventListener('touchmove', mousemove);
+	    } else {
+	        // change snake's direction when mouse moving
+	        window.addEventListener('mousemove', mousemove);
+
+	        // speed up
+	        window.addEventListener('mousedown', () => {
+	            player.speedUp();
+	            gameMap.scaled = true;
+	        });
+
+	        // speed down
+	        window.addEventListener('mouseup', () => {
+	            player.speedDown();
+	            gameMap.scaled = false;
+	        });
+	    }
+
+	    function mousemove(e) {
+	        e.preventDefault();
+	        if (e.touches) {
+	            mouseCoords.x = e.touches[0].pageX;
+	            mouseCoords.y = e.touches[0].pageY;
+	        } else {
+	            const evt = e || window.event;
+	            mouseCoords.x = evt.clientX;
+	            mouseCoords.y = evt.clientY;
+	        }
+	        const nx = (mouseCoords.x + gameMap.view.x) * gameMap.scale;
+	        const ny = (mouseCoords.y + gameMap.view.y) * gameMap.scale;
+
+	        player.moveTo(nx, ny, true);
+	    }
+	}
+
+}());
 //# sourceMappingURL=bundle.js.map
