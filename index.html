@@ -2,51 +2,84 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name="format-detection" content="telephone=no, email=no" />
-  <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="HandheldFriendly" content="true">
-  <meta name="MobileOptimized" content="320">
-  <meta name="screen-orientation" content="portrait">
-  <meta name="x5-orientation" content="portrait">
-  <meta name="msapplication-tap-highlight" content="no">
-  <title>slither</title>
-  <link rel="stylesheet" href="normalize.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      -webkit-user-select: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <title>BallShift</title>
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="stylesheet" href="micromodal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+        }
 
-    html,
-    body,
-    #cas {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #000;
-    }
-    #log {
-      position: absolute;
-      width: 100px;
-      right: 100px;
-      top: 100px;
-      color: #fff;
-    }
-  </style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #aaa;
+        }
+
+        .game_container {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+        }
+
+        canvas {
+            height: 100%;
+        }
+
+        #log {
+            position: absolute;
+            width: 100px;
+            right: 100px;
+            top: 100px;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
-  <div id="log"></div>
-  <canvas id="cas">
-    Your browser do not support canvas!
-  </canvas>
-  <script src="bundle.js?v20"></script>
+    <div id="log"></div>
+    <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+                <header class="modal__header">
+                    <h2 class="modal__title" id="modal-1-title">
+                        Micromodal
+                    </h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content" id="modal-1-content">
+                    <p></p>
+                </main>
+                <footer class="modal__footer">
+                    <button class="modal__btn modal__btn-primary">Continue</button>
+                    <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <div class="game_container"></div>
+    <script src="bundle.js?v1.02" type="module"></script>
 </body>
-
 </html>
