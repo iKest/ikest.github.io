@@ -40270,7 +40270,6 @@ const app = new Application({
     preserveDrawingBuffer: false
 });
 
-const orientation = getScreenOrientation(app.screen.width, app.screen.height);
 
 gameContainer.appendChild(app.view);
 
@@ -40363,7 +40362,7 @@ app.ticker.add(delta => {
 app.ticker.start();
 
 function resize(obj, appl) {
-    alert(orientation);
+    const orientation = getScreenOrientation(app.screen.width, app.screen.height);
     // eslint-disable-next-line no-bitwise
     let cS = ~~(appl.screen.height * 0.2);
     if (orientation === PORTRAIT) {
