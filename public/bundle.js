@@ -40214,7 +40214,7 @@ Application.registerPlugin(AppLoaderPlugin);
 
 var vs = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nuniform vec2 angle;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nvec2 filterTextureCoord( void )\n{\n    return vec2(2.0) * aVertexPosition - vec2(1.0);\n}\n\nmat3 rotationXY( vec2 angle ) {\n    vec2 c = cos( angle );\n    vec2 s = sin( angle );\n\n    return mat3(\n        c.y      ,  0.0, -s.y,\n        s.y * s.x,  c.x,  c.y * s.x,\n        s.y * c.x, -s.x,  c.y * c.x\n    );\n}\n\nvoid main(void) {\n\n    rot = rotationXY(angle);\n\tvTextureCoord = filterTextureCoord();\n    gl_Position = filterVertexPosition();\n}\n";
 
-var fs = "uniform vec4 inputPixel;\n\nuniform samplerCube diffMap;\n//uniform samplerCube normalMap;\n//uniform samplerCube specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nuniform float resolution;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n\n    return abs(dfdx) + abs(dfdy);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D(noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nvec3 random3(vec3 c) {\n\n    float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));\n    vec3 r;\n    r.z = fract(512.0*j);\n    j *= .125;\n    r.x = fract(512.0*j);\n    j *= .125;\n    r.y = fract(512.0*j);\n    return r-0.5;\n}\n\nconst float F3 =  0.3333333;\nconst float G3 =  0.1666667;\n\nfloat simplex3d(vec3 p) {\n\n    vec3 s = floor(p + dot(p, vec3(F3)));\n    vec3 x = p - s + dot(s, vec3(G3));\n    vec3 e = step(vec3(0.0), x - x.yzx);\n    vec3 i1 = e*(1.0 - e.zxy);\n    vec3 i2 = 1.0 - e.zxy*(1.0 - e);\n    vec3 x1 = x - i1 + G3;\n    vec3 x2 = x - i2 + 2.0*G3;\n    vec3 x3 = x - 1.0 + 3.0*G3;\n\n    vec4 w, d;\n\n    w.x = dot(x, x);\n    w.y = dot(x1, x1);\n    w.z = dot(x2, x2);\n    w.w = dot(x3, x3);\n\n    w = max(0.6 - w, 0.0);\n\n    d.x = dot(random3(s), x);\n    d.y = dot(random3(s + i1), x1);\n    d.z = dot(random3(s + i2), x2);\n    d.w = dot(random3(s + 1.0), x3);\n\n    w *= w;\n    w *= w;\n    d *= w;\n\n    return dot(d, vec4(52.0));\n}\n\nconst mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);\nconst mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);\nconst mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);\n\nconst mat3 mat = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\n\nfloat simplex3d_fractal(vec3 m) {\n    return   0.5333333*simplex3d(m*rot1)\n            +0.2666667*simplex3d(2.0*m*rot2)\n            +0.1333333*simplex3d(4.0*m*rot3)\n            +0.0666667*simplex3d(8.0*m);\n}\n\nvec3 getNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nmat3 calcTBN (vec3 pos) {\n    vec3 p = normalize(vec3(pos.x, 0.0, pos.z));\n    vec3 n = normalize(pos);\n    vec3 t = vec3(-p.y, 0.0, p.x);\n    vec3 b = cross(n, t);\n    return mat3(t, b, n);\n}\n\nvec3 phongContribForLight(vec3 k_d, float k_s, vec3 k_n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, vec3 lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, k_n));\n\n    float dotLN = dot(L, k_n);\n    float dotRV = dot(R, V);\n\n    if (dotLN < 0.0) {\n        return vec3(0.0, 0.0, 0.0);\n    }\n\n    if (dotRV < 0.0) {\n        return lightIntensity * (k_d * dotLN);\n    }\n\n    return lightIntensity * (k_d * dotLN );\n}\n\nvec3 phongIllumination(vec3 k_a, vec3 k_d, float k_s, vec3 k_n, float alpha, vec3 p, vec3 eye) {\n\n    const vec3 ambientLight = 0.5 * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * k_a;\n    vec3 lightPos = vec3(0.0, 0.0, 5.0);\n    vec3 lightIntensity = vec3(0.4, 0.4, 0.4);\n    color = phongContribForLight(k_d, k_s, k_n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvoid main(void) {\n\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n        return;\n    };\n\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n\n    mat3 tbn1 = calcTBN(pos1);\n    mat3 tbn2 = calcTBN(pos2);\n\n    //float n1 = simplex3d_fractal(tpos1+1.0);\n    //float n2 = simplex3d_fractal(tpos2+1.0);\n\n    //n1 = 0.5 + 0.5 * n1;\n    //n2 = 0.5 + 0.5 * n2;\n    float n1 = 0.0;\n    float n2 = 0.0;\n    vec3 q1 = vec3(1.0 / resolution) * tpos1;\n    n1  = 0.5000*noise( q1 );\n    q1 = mat*q1*2.01;\n    n1 += 0.2500*noise( q1 );\n    q1 = mat*q1*2.02;\n    n1 += 0.1250*noise( q1 );\n    q1 = mat*q1*2.03;\n    n1 += 0.0625*noise( q1 );\n    n1 = sqrt (n1 * .6);\n\n    vec3 q2 = vec3(1.0 / resolution) * tpos2;\n    n2  = 0.5000*noise( q2 );\n    q2 = mat*q2*2.01;\n    n2 += 0.2500*noise( q2 );\n    q2 = mat*q2*2.02;\n    n2 += 0.1250*noise( q2 );\n    q2 = mat*q2*2.03;\n    n2 += 0.0625*noise( q2 );\n    n2 = sqrt(n2 * .6);\n\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(n1, edgeSize) * dissolveUsage;\n    float edge2 = step(n2, edgeSize) * dissolveUsage;\n\n    vec4 bg = vec4(0.0);\n\n    vec4 col1 = textureCube(diffMap, tpos1);\n    vec4 col2 = textureCube(diffMap, tpos2);\n    col2.rgb *= vec3(0.7);\n    //vec3 k1_n = tbn1 * getNorm(textureCube(normalMap, tpos1).rgb);\n    //vec3 k1_a = vec3(0.4, 0.4, 0.4);\n    //float k1_s = textureCube(specMap, tpos1).r;\n    //vec3 k2_n = tbn2 * textureCube(normalMap, tpos2).rgb;\n    //vec3 k2_a = vec3(0.4, 0.4, 0.4);\n    //float k2_s = textureCube(specMap, tpos2).r;\n    float shininess = 10.0;\n    //col1  = vec4(phongIllumination(k1_a, col1.rgb, k1_s, k1_n, shininess, pos1, ro), col1.a);\n    //col2  = vec4(phongIllumination(k2_a, col2.rgb, k2_s, k2_n, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec4 coloredEdge1 = edge1 * uEdgeColor;\n    dissolvedTexture1 = dissolvedTexture1 + coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec4 coloredEdge2 = edge2 * uEdgeColor;\n    dissolvedTexture2.rgb *= 0.5;\n    dissolvedTexture2 = dissolvedTexture2 + coloredEdge2;\n    dissolvedTexture1 = mix( dissolvedTexture1, vec4(0.0, 0.0, 0.0, 0.0), step(n1, uDissolveSettings.x));\n    dissolvedTexture2 = mix( dissolvedTexture2, vec4(0.0, 0.0, 0.0, 0.0), step(n2, uDissolveSettings.x));\n    //if(n1 <= uDissolveSettings.x) {\n    //    dissolvedTexture1 = vec4(0.0, 0.0, 0.0, 0.0);\n    //}\n    //if(n2 <= uDissolveSettings.x) {\n    //        dissolvedTexture2 = vec4(0.0, 0.0, 0.0, 0.0);\n    //}\n    float alph = (dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a));\n    gl_FragColor = vec4(dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3((1.0 - dissolvedTexture1.a)), alph);\n    //gl_FragColor = vec4(n1, n1, n1, 1.0);\n    // vec3 gamma = vec3(1.0/2.2);\n    //gl_FragColor = col1;\n    //col = vec4(pow(col.rgb, gamma), col.a);\n}\n";
+var fs = "uniform vec4 inputPixel;\n\nuniform samplerCube diffMap;\nuniform samplerCube normalMap;\nuniform samplerCube specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nuniform float resolution;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n\n    return abs(dfdx) + abs(dfdy);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D(noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nvec3 random3(vec3 c) {\n\n    float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));\n    vec3 r;\n    r.z = fract(512.0*j);\n    j *= .125;\n    r.x = fract(512.0*j);\n    j *= .125;\n    r.y = fract(512.0*j);\n    return r-0.5;\n}\n\nconst float F3 =  0.3333333;\nconst float G3 =  0.1666667;\n\nfloat simplex3d(vec3 p) {\n\n    vec3 s = floor(p + dot(p, vec3(F3)));\n    vec3 x = p - s + dot(s, vec3(G3));\n    vec3 e = step(vec3(0.0), x - x.yzx);\n    vec3 i1 = e*(1.0 - e.zxy);\n    vec3 i2 = 1.0 - e.zxy*(1.0 - e);\n    vec3 x1 = x - i1 + G3;\n    vec3 x2 = x - i2 + 2.0*G3;\n    vec3 x3 = x - 1.0 + 3.0*G3;\n\n    vec4 w, d;\n\n    w.x = dot(x, x);\n    w.y = dot(x1, x1);\n    w.z = dot(x2, x2);\n    w.w = dot(x3, x3);\n\n    w = max(0.6 - w, 0.0);\n\n    d.x = dot(random3(s), x);\n    d.y = dot(random3(s + i1), x1);\n    d.z = dot(random3(s + i2), x2);\n    d.w = dot(random3(s + 1.0), x3);\n\n    w *= w;\n    w *= w;\n    d *= w;\n\n    return dot(d, vec4(52.0));\n}\n\nconst mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);\nconst mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);\nconst mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);\n\nconst mat3 mat = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\n\nfloat simplex3d_fractal(vec3 m) {\n    return   0.5333333*simplex3d(m*rot1)\n            +0.2666667*simplex3d(2.0*m*rot2)\n            +0.1333333*simplex3d(4.0*m*rot3)\n            +0.0666667*simplex3d(8.0*m);\n}\n\nvec3 getNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nmat3 calcTBN (vec3 pos) {\n    vec3 p = normalize(vec3(pos.x, 0.0, pos.z));\n    vec3 n = normalize(pos);\n    vec3 t = vec3(-p.y, 0.0, p.x);\n    vec3 b = cross(n, t);\n    return mat3(t, b, n);\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, float lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 color =   d * vec3(dotLN) + vec3(s * pow(dotRV, alpha));\n\n    if (dotRV < 0.0) {\n        // Light reflection in opposite direction as viewer, apply only diffuse\n        // component\n        color = d * vec3(dotLN);\n    }\n    if (dotLN < 0.0) {\n        // Light not visible from this point on the surface\n        color = vec3(0.0);\n    }\n\n    return vec3(lightIntensity) * color;\n\n    color = mix(d * vec3(dotLN), color, step(0.0, dotRV));\n    color = mix(vec3(0.0), color, step(0.0, dotLN));\n\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n\n    vec3 ambientLight = vec3(1.0) * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * vec3(0.2, 0.2, 0.2);\n    vec3 lightPos = vec3(0.0, 0.0, -5.0);\n    float lightIntensity = 0.6;\n    color += phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\n\nvoid main(void) {\n\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n        return;\n    };\n\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n    vec3 ro = vec3(vTextureCoord, - 2.0*z);\n\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n\n    mat3 tbn1 = calcTBN(pos1);\n    mat3 tbn2 = calcTBN(pos2);\n\n    //float n1 = simplex3d_fractal(tpos1+1.0);\n    //float n2 = simplex3d_fractal(tpos2+1.0);\n\n    //n1 = 0.5 + 0.5 * n1;\n    //n2 = 0.5 + 0.5 * n2;\n    float no1 = 0.0;\n    float no2 = 0.0;\n    vec3 q1 = vec3(1.0 / resolution) * tpos1;\n    no1  = 0.5000*noise( q1 );\n    q1 = mat*q1*2.01;\n    no1 += 0.2500*noise( q1 );\n    q1 = mat*q1*2.02;\n    no1 += 0.1250*noise( q1 );\n    q1 = mat*q1*2.03;\n    no1 += 0.0625*noise( q1 );\n    no1 = sqrt (no1 * .6);\n\n    vec3 q2 = vec3(1.0 / resolution) * tpos2;\n    no2  = 0.5000*noise( q2 );\n    q2 = mat*q2*2.01;\n    no2 += 0.2500*noise( q2 );\n    q2 = mat*q2*2.02;\n    no2 += 0.1250*noise( q2 );\n    q2 = mat*q2*2.03;\n    no2 += 0.0625*noise( q2 );\n    no2 = sqrt(no2 * .6);\n\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n\n    vec4 bg = vec4(0.0);\n\n    vec4 col1 = textureCube(diffMap, tpos1);\n    vec4 col2 = textureCube(diffMap, tpos2);\n    col2.rgb *= vec3(0.7);\n    vec3 n1 = RNMBlendUnpacked(pos1, getNorm(textureCube(normalMap, tpos1).rgb)); //tbn1 * getNorm(textureCube(normalMap, tpos1).rgb);\n    float s1 = textureCube(specMap, tpos1).r;\n    vec3 n2 = RNMBlendUnpacked(pos2, -1.0 * getNorm(textureCube(normalMap, tpos2).rgb)); //tbn2 * getNorm(textureCube(normalMap, tpos2).rgb);\n    float s2 = textureCube(specMap, tpos2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec4 coloredEdge1 = edge1 * uEdgeColor;\n    dissolvedTexture1 = dissolvedTexture1 + coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec4 coloredEdge2 = edge2 * uEdgeColor;\n    dissolvedTexture2.rgb *= 0.5;\n    dissolvedTexture2 = dissolvedTexture2 + coloredEdge2;\n    dissolvedTexture1 = mix( dissolvedTexture1, vec4(0.0, 0.0, 0.0, 0.0), step(no1, uDissolveSettings.x));\n    dissolvedTexture2 = mix( dissolvedTexture2, vec4(0.0, 0.0, 0.0, 0.0), step(no2, uDissolveSettings.x));\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3(1.0 - dissolvedTexture1.a);\n    //gl_FragColor = vec4(vec3()normalMap, tpos1).rgb, 1.0);\n    // vec3 gamma = vec3(1.0/2.2);\n    // gl_FragColor = vec4(pow(col.rgb, gamma), alpha);\n    gl_FragColor = vec4(col.rgb, alpha);\n}\n";
 
 const PORTRAIT = 'portrait-primary';
 const LANDSCAPE = 'landscape-primary';
@@ -40262,7 +40262,7 @@ const app = new Application({
     resolution: window.devicePixelRatio || 1.0,
     autoDensity: true,
     resizeTo: gameContainer,
-    backgroundColor: 0xaaaaaa,
+    backgroundColor: 0x000000,
     forceFXAA: false,
     antialias: false,
     powerPreference: 'high-performance',
@@ -40279,43 +40279,52 @@ document.body.appendChild(stats.dom);
 app.loader.baseUrl = './assets';
 
 const diffMap = CubeTexture.from([
-    'assets/r_dragon_d.png',
-    'assets/l_dragon_d.png',
-    'assets/t_dragon_d.png',
-    'assets/bo_dragon_d.png',
-    'assets/f_dragon_d.png',
-    'assets/b_dragon_d.png'
+    'assets/r_dragon_diff.png',
+    'assets/l_dragon_diff.png',
+    'assets/t_dragon_diff.png',
+    'assets/bo_dragon_diff.png',
+    'assets/f_dragon_diff.png',
+    'assets/b_dragon_diff.png'
 ]);
-/* const normalMap = PIXI.CubeTexture.from([
-    'assets/r_dragon_n.png',
-    'assets/l_dragon_n.png',
-    'assets/t_dragon_n.png',
-    'assets/bo_dragon_n.png',
-    'assets/f_dragon_n.png',
-    'assets/b_dragon_n.png'
-]);
-const specMap = PIXI.CubeTexture.from([
-    'assets/r_dragon_s.png',
-    'assets/l_dragon_s.png',
-    'assets/t_dragon_s.png',
-    'assets/bo_dragon_s.png',
-    'assets/f_dragon_s.png',
-    'assets/b_dragon_s.png'
-]); */
-const noiseTex = BaseTexture.from('assets/rgba_noise256.png');
+diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+diffMap.update();
 
-diffMap.mipmap = MIPMAP_MODES.ON;
-diffMap.scaleMode = SCALE_MODES.LINEAR;
+const normalMap = CubeTexture.from(
+    [
+        'assets/r_dragon_norm.png',
+        'assets/l_dragon_norm.png',
+        'assets/t_dragon_norm.png',
+        'assets/bo_dragon_norm.png',
+        'assets/f_dragon_norm.png',
+        'assets/b_dragon_norm.png'
+    ],
+    { autoLoad: false }
+);
+normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+normalMap.premultiplyAlpha = false;
+normalMap.resource.items.forEach(item => {
+    item.resource.premultiplyAlpha = false;
+});
+normalMap.resource.load();
+console.log(normalMap);
+
+const specMap = CubeTexture.from([
+    'assets/r_dragon_spec.png',
+    'assets/l_dragon_spec.png',
+    'assets/t_dragon_spec.png',
+    'assets/bo_dragon_spec.png',
+    'assets/f_dragon_spec.png',
+    'assets/b_dragon_spec.png'
+]);
+specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+specMap.premultiplyAlpha = false;
+specMap.update();
+
+const noiseTex = BaseTexture.from('assets/rgba_noise256.png');
 noiseTex.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
 noiseTex.wrapMode = WRAP_MODES.REPEAT;
 noiseTex.premultiplyAlpha = false;
-
-// normalMap.mipmap = PIXI.MIPMAP_MODES.ON;
-// normalMap.scaleMode = PIXI.SCALE_MODES.LINEAR;
-// normalMap.premultiplyAlpha = false;
-// specMap.mipmap = PIXI.MIPMAP_MODES.ON;
-// specMap.scaleMode = PIXI.SCALE_MODES.LINEAR;
-// specMap.premultiplyAlpha = false;
+noiseTex.update();
 
 const container = new Container();
 
@@ -40327,8 +40336,8 @@ app.stage.addChild(container);
 
 const filter = new Filter(vs, fs, {
     diffMap,
-    // normalMap,
-    // specMap,
+    normalMap,
+    specMap,
     noiseTex,
     angle: [0.0, 0.0],
     uDissolveSettings: [0.0, 0.01],
@@ -40345,7 +40354,7 @@ const startY = container.filterArea.y;
 
 app.ticker.add(delta => {
     stats.begin();
-    // filter.uniforms.angle[1] -= 0.005;
+    // filter.uniforms.angle[1] -= 0.0005;
     container.filterArea.y += b;
     if (
         container.filterArea.y + b > app.screen.height - container.filterArea.height ||
@@ -40358,7 +40367,7 @@ app.ticker.add(delta => {
     filter.uniforms.uDissolveSettings[0] += a;
     if (
         filter.uniforms.uDissolveSettings[0] + a < 0.0 ||
-        filter.uniforms.uDissolveSettings[0] + a > 0.65
+        filter.uniforms.uDissolveSettings[0] + a > 0.6
     )
         a *= -1.0;
     stats.end();
