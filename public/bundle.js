@@ -12,6 +12,446 @@ var stats_min = createCommonjsModule(function (module, exports) {
 !function(e,t){module.exports=t();}(commonjsGlobal,function(){var c=function(){var n=0,l=document.createElement("div");function e(e){return l.appendChild(e.dom),e}function t(e){for(var t=0;t<l.children.length;t++)l.children[t].style.display=t===e?"block":"none";n=e;}l.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000",l.addEventListener("click",function(e){e.preventDefault(),t(++n%l.children.length);},!1);var i=(performance||Date).now(),a=i,o=0,f=e(new c.Panel("FPS","#0ff","#002")),r=e(new c.Panel("MS","#0f0","#020"));if(self.performance&&self.performance.memory)var d=e(new c.Panel("MB","#f08","#201"));return t(0),{REVISION:16,dom:l,addPanel:e,showPanel:t,begin:function(){i=(performance||Date).now();},end:function(){o++;var e=(performance||Date).now();if(r.update(e-i,200),a+1e3<=e&&(f.update(1e3*o/(e-a),100),a=e,o=0,d)){var t=performance.memory;d.update(t.usedJSHeapSize/1048576,t.jsHeapSizeLimit/1048576);}return e},update:function(){i=this.end();},domElement:l,setMode:t}};return c.Panel=function(n,l,i){var a=1/0,o=0,f=Math.round,r=f(window.devicePixelRatio||1),d=80*r,e=48*r,c=3*r,p=2*r,u=3*r,s=15*r,m=74*r,h=30*r,y=document.createElement("canvas");y.width=d,y.height=e,y.style.cssText="width:80px;height:48px";var v=y.getContext("2d");return v.font="bold "+9*r+"px Helvetica,Arial,sans-serif",v.textBaseline="top",v.fillStyle=i,v.fillRect(0,0,d,e),v.fillStyle=l,v.fillText(n,c,p),v.fillRect(u,s,m,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u,s,m,h),{dom:y,update:function(e,t){a=Math.min(a,e),o=Math.max(o,e),v.fillStyle=i,v.globalAlpha=1,v.fillRect(0,0,d,s),v.fillStyle=l,v.fillText(f(e)+" "+n+" ("+f(a)+"-"+f(o)+")",c,p),v.drawImage(y,u+r,s,m-r,h,u,s,m-r,h),v.fillRect(u+m-r,s,r,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u+m-r,s,r,f((1-e/t)*h));}}},c});
 });
 
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** `Object#toString` result references. */
+var symbolTag = '[object Symbol]';
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max,
+    nativeMin = Math.min;
+
+/**
+ * Gets the timestamp of the number of milliseconds that have elapsed since
+ * the Unix epoch (1 January 1970 00:00:00 UTC).
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Date
+ * @returns {number} Returns the timestamp.
+ * @example
+ *
+ * _.defer(function(stamp) {
+ *   console.log(_.now() - stamp);
+ * }, _.now());
+ * // => Logs the number of milliseconds it took for the deferred invocation.
+ */
+var now = function() {
+  return root.Date.now();
+};
+
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked. The debounced function comes with a `cancel` method to cancel
+ * delayed `func` invocations and a `flush` method to immediately invoke them.
+ * Provide `options` to indicate whether `func` should be invoked on the
+ * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+ * with the last arguments provided to the debounced function. Subsequent
+ * calls to the debounced function return the result of the last `func`
+ * invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is
+ * invoked on the trailing edge of the timeout only if the debounced function
+ * is invoked more than once during the `wait` timeout.
+ *
+ * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+ * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.debounce` and `_.throttle`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to debounce.
+ * @param {number} [wait=0] The number of milliseconds to delay.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=false]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {number} [options.maxWait]
+ *  The maximum time `func` is allowed to be delayed before it's invoked.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new debounced function.
+ * @example
+ *
+ * // Avoid costly calculations while the window size is in flux.
+ * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+ *
+ * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+ * jQuery(element).on('click', _.debounce(sendMail, 300, {
+ *   'leading': true,
+ *   'trailing': false
+ * }));
+ *
+ * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+ * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+ * var source = new EventSource('/stream');
+ * jQuery(source).on('message', debounced);
+ *
+ * // Cancel the trailing debounced invocation.
+ * jQuery(window).on('popstate', debounced.cancel);
+ */
+function debounce(func, wait, options) {
+  var lastArgs,
+      lastThis,
+      maxWait,
+      result,
+      timerId,
+      lastCallTime,
+      lastInvokeTime = 0,
+      leading = false,
+      maxing = false,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  wait = toNumber(wait) || 0;
+  if (isObject(options)) {
+    leading = !!options.leading;
+    maxing = 'maxWait' in options;
+    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+
+  function invokeFunc(time) {
+    var args = lastArgs,
+        thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the trailing edge.
+    timerId = setTimeout(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  function remainingWait(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime,
+        result = wait - timeSinceLastCall;
+
+    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+  }
+
+  function shouldInvoke(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+  }
+
+  function timerExpired() {
+    var time = now();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    // Restart the timer.
+    timerId = setTimeout(timerExpired, remainingWait(time));
+  }
+
+  function trailingEdge(time) {
+    timerId = undefined;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = undefined;
+    return result;
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = undefined;
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(now());
+  }
+
+  function debounced() {
+    var time = now(),
+        isInvoking = shouldInvoke(time);
+
+    lastArgs = arguments;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = setTimeout(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === undefined) {
+      timerId = setTimeout(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  return debounced;
+}
+
+/**
+ * Creates a throttled function that only invokes `func` at most once per
+ * every `wait` milliseconds. The throttled function comes with a `cancel`
+ * method to cancel delayed `func` invocations and a `flush` method to
+ * immediately invoke them. Provide `options` to indicate whether `func`
+ * should be invoked on the leading and/or trailing edge of the `wait`
+ * timeout. The `func` is invoked with the last arguments provided to the
+ * throttled function. Subsequent calls to the throttled function return the
+ * result of the last `func` invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is
+ * invoked on the trailing edge of the timeout only if the throttled function
+ * is invoked more than once during the `wait` timeout.
+ *
+ * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+ * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.throttle` and `_.debounce`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to throttle.
+ * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=true]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new throttled function.
+ * @example
+ *
+ * // Avoid excessively updating the position while scrolling.
+ * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+ *
+ * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+ * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+ * jQuery(element).on('click', throttled);
+ *
+ * // Cancel the trailing throttled invocation.
+ * jQuery(window).on('popstate', throttled.cancel);
+ */
+function throttle(func, wait, options) {
+  var leading = true,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  if (isObject(options)) {
+    leading = 'leading' in options ? !!options.leading : leading;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+  return debounce(func, wait, {
+    'leading': leading,
+    'maxWait': wait,
+    'trailing': trailing
+  });
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3.2);
+ * // => 3.2
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
+ */
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject(value)) {
+    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+    value = isObject(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
+}
+
+var lodash_throttle = throttle;
+
 var global$1 = (typeof global !== "undefined" ? global :
             typeof self !== "undefined" ? self :
             typeof window !== "undefined" ? window : {});
@@ -607,8 +1047,8 @@ var isMobile_min = createCommonjsModule(function (module) {
 var isMobile_min_1 = isMobile_min.isMobile;
 
 /*!
- * @pixi/settings - v5.1.1
- * Compiled Fri, 02 Aug 2019 23:20:23 UTC
+ * @pixi/settings - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/settings is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -689,7 +1129,7 @@ function canUploadSameBuffer()
  * @example
  * // Use the native window resolution as the default resolution
  * // will support high-density displays when rendering
- * PIXI.settings.RESOLUTION = window.devicePixelRatio.
+ * PIXI.settings.RESOLUTION = window.devicePixelRatio;
  *
  * // Disable interpolation when scaling, will make texture be pixelated
  * PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
@@ -4182,7 +4622,7 @@ function isString(arg) {
   return typeof arg === 'string';
 }
 
-function isObject(arg) {
+function isObject$1(arg) {
   return typeof arg === 'object' && arg !== null;
 }
 
@@ -4402,7 +4842,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
   };
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
-  if (url && isObject(url) && url instanceof Url) return url;
+  if (url && isObject$1(url) && url instanceof Url) return url;
 
   var u = new Url;
   u.parse(url, parseQueryString, slashesDenoteHost);
@@ -4709,7 +5149,7 @@ function format(self) {
   }
 
   if (self.query &&
-    isObject(self.query) &&
+    isObject$1(self.query) &&
     Object.keys(self.query).length) {
     query = stringify(self.query);
   }
@@ -5375,8 +5815,8 @@ var PRECISION = {
 //# sourceMappingURL=constants.es.js.map
 
 /*!
- * @pixi/utils - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/utils - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/utils is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5408,7 +5848,7 @@ settings.RETINA_PREFIX = /@([0-9\.]+)x/;
 settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true;
 
 var saidHello = false;
-var VERSION = '5.1.2';
+var VERSION = '5.1.3';
 
 /**
  * Logs out the version and renderer information for this running instance of PIXI.
@@ -8312,8 +8752,8 @@ RoundedRectangle.prototype.contains = function contains (x, y)
 //# sourceMappingURL=math.es.js.map
 
 /*!
- * @pixi/display - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/display - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/display is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -10108,8 +10548,8 @@ Container.prototype.containerUpdateTransform = Container.prototype.updateTransfo
 //# sourceMappingURL=display.es.js.map
 
 /*!
- * @pixi/accessibility - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/accessibility - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/accessibility is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -10954,8 +11394,8 @@ Runner.prototype.run = Runner.prototype.emit;
 //# sourceMappingURL=runner.es.js.map
 
 /*!
- * @pixi/ticker - v5.1.1
- * Compiled Fri, 02 Aug 2019 23:20:23 UTC
+ * @pixi/ticker - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/ticker is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -11907,8 +12347,8 @@ TickerPlugin.destroy = function destroy ()
 //# sourceMappingURL=ticker.es.js.map
 
 /*!
- * @pixi/core - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/core - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -12019,6 +12459,8 @@ Resource.prototype.unbind = function unbind (baseTexture)
 
 /**
  * Trigger a resize event
+ * @param {number} width X dimension
+ * @param {number} height Y dimension
  */
 Resource.prototype.resize = function resize (width, height)
 {
@@ -18085,12 +18527,12 @@ var FramebufferSystem = /*@__PURE__*/(function (System) {
 
             gl.bindRenderbuffer(gl.RENDERBUFFER, fbo.stencil);
 
+            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, framebuffer.width, framebuffer.height);
             // TODO.. this is depth AND stencil?
             if (!framebuffer.depthTexture)
             { // you can't have both, so one should take priority if enabled
                 gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, fbo.stencil);
             }
-            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, framebuffer.width, framebuffer.height);
             // fbo.enableStencil();
         }
     };
@@ -22783,8 +23225,14 @@ var Renderer = /*@__PURE__*/(function (AbstractRenderer) {
          */
         this.type = RENDERER_TYPE.WEBGL;
 
-        // this will be set by the contextSystem (this.context)
+        /**
+         * WebGL context, set by the contextSystem (this.context)
+         *
+         * @readonly
+         * @member {WebGLRenderingContext}
+         */
         this.gl = null;
+
         this.CONTEXT_UID = 0;
 
         // TODO legacy!
@@ -24239,8 +24687,8 @@ var BatchRenderer = BatchPluginFactory.create();
 //# sourceMappingURL=core.es.js.map
 
 /*!
- * @pixi/extract - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/extract - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/extract is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -24511,8 +24959,8 @@ Extract.arrayPostDivide = function arrayPostDivide (pixels, out)
 //# sourceMappingURL=extract.es.js.map
 
 /*!
- * @pixi/interaction - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/interaction - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/interaction is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -24725,11 +25173,32 @@ Object.defineProperties( InteractionData.prototype, prototypeAccessors$6 );
 var InteractionEvent = function InteractionEvent()
 {
     /**
-     * Whether this event will continue propagating in the tree
+     * Whether this event will continue propagating in the tree.
+     *
+     * Remaining events for the {@link stopsPropagatingAt} object
+     * will still be dispatched.
      *
      * @member {boolean}
      */
     this.stopped = false;
+
+    /**
+     * At which object this event stops propagating.
+     *
+     * @private
+     * @member {PIXI.DisplayObject}
+     */
+    this.stopsPropagatingAt = null;
+
+    /**
+     * Whether we already reached the element we want to
+     * stop propagating at. This is important for delayed events,
+     * where we start over deeper in the tree again.
+     *
+     * @private
+     * @member {boolean}
+     */
+    this.stopPropagationHint = false;
 
     /**
      * The object which caused this event to be dispatched.
@@ -24768,6 +25237,8 @@ var InteractionEvent = function InteractionEvent()
 InteractionEvent.prototype.stopPropagation = function stopPropagation ()
 {
     this.stopped = true;
+    this.stopPropagationHint = true;
+    this.stopsPropagatingAt = this.currentTarget;
 };
 
 /**
@@ -24776,6 +25247,8 @@ InteractionEvent.prototype.stopPropagation = function stopPropagation ()
 InteractionEvent.prototype.reset = function reset ()
 {
     this.stopped = false;
+    this.stopsPropagatingAt = null;
+    this.stopPropagationHint = false;
     this.currentTarget = null;
     this.target = null;
 };
@@ -25984,7 +26457,9 @@ var InteractionManager = /*@__PURE__*/(function (EventEmitter) {
      */
     InteractionManager.prototype.dispatchEvent = function dispatchEvent (displayObject, eventString, eventData)
     {
-        if (!eventData.stopped)
+        // Even if the event was stopped, at least dispatch any remaining events
+        // for the same display object.
+        if (!eventData.stopPropagationHint || displayObject === eventData.stopsPropagatingAt)
         {
             eventData.currentTarget = displayObject;
             eventData.type = eventString;
@@ -26203,15 +26678,28 @@ var InteractionManager = /*@__PURE__*/(function (EventEmitter) {
 
         if (delayedEvents.length && !skipDelayed)
         {
+            // Reset the propagation hint, because we start deeper in the tree again.
+            interactionEvent.stopPropagationHint = false;
+
             var delayedLen = delayedEvents.length;
 
             this.delayedEvents = [];
 
             for (var i$1 = 0; i$1 < delayedLen; i$1++)
             {
-                var delayed = delayedEvents[i$1];
+                var ref = delayedEvents[i$1];
+                var displayObject$1 = ref.displayObject;
+                var eventString = ref.eventString;
+                var eventData = ref.eventData;
 
-                this.dispatchEvent(delayed.displayObject, delayed.eventString, delayed.eventData);
+                // When we reach the object we wanted to stop propagating at,
+                // set the propagation hint.
+                if (eventData.stopsPropagatingAt === displayObject$1)
+                {
+                    eventData.stopPropagationHint = true;
+                }
+
+                this.dispatchEvent(displayObject$1, eventString, eventData);
             }
         }
 
@@ -26926,8 +27414,8 @@ var InteractionManager = /*@__PURE__*/(function (EventEmitter) {
 //# sourceMappingURL=interaction.es.js.map
 
 /*!
- * @pixi/graphics - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/graphics - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/graphics is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -29197,8 +29685,8 @@ var Star = /*@__PURE__*/(function (Polygon) {
 
 var temp = new Float32Array(3);
 
-// a default shader used by graphics..
-var defaultShader = null;
+// a default shaders map used by graphics..
+var DEFAULT_SHADERS = {};
 
 /**
  * The Graphics class contains methods used to draw primitive shapes such as lines, circles and
@@ -30036,143 +30524,198 @@ var Graphics = /*@__PURE__*/(function (Container) {
         {
             if (this.batchDirty !== geometry.batchDirty)
             {
-                this.batches = [];
-                this.batchTint = -1;
-                this._transformID = -1;
-                this.batchDirty = geometry.batchDirty;
-
-                this.vertexData = new Float32Array(geometry.points);
-
-                var blendMode = this.blendMode;
-
-                for (var i = 0; i < geometry.batches.length; i++)
-                {
-                    var gI = geometry.batches[i];
-
-                    var color = gI.style.color;
-
-                    //        + (alpha * 255 << 24);
-
-                    var vertexData = new Float32Array(this.vertexData.buffer,
-                        gI.attribStart * 4 * 2,
-                        gI.attribSize * 2);
-
-                    var uvs = new Float32Array(geometry.uvsFloat32.buffer,
-                        gI.attribStart * 4 * 2,
-                        gI.attribSize * 2);
-
-                    var indices = new Uint16Array(geometry.indicesUint16.buffer,
-                        gI.start * 2,
-                        gI.size);
-
-                    var batch = {
-                        vertexData: vertexData,
-                        blendMode: blendMode,
-                        indices: indices,
-                        uvs: uvs,
-                        _batchRGB: hex2rgb(color),
-                        _tintRGB: color,
-                        _texture: gI.style.texture,
-                        alpha: gI.style.alpha,
-                        worldAlpha: 1 };
-
-                    this.batches[i] = batch;
-                }
+                this._populateBatches();
             }
 
-            if (this.batches.length)
-            {
-                renderer.batch.setObjectRenderer(renderer.plugins[this.pluginName]);
-
-                this.calculateVertices();
-                this.calculateTints();
-
-                for (var i$1 = 0; i$1 < this.batches.length; i$1++)
-                {
-                    var batch$1 = this.batches[i$1];
-
-                    batch$1.worldAlpha = this.worldAlpha * batch$1.alpha;
-
-                    renderer.plugins[this.pluginName].render(batch$1);
-                }
-            }
+            this._renderBatched(renderer);
         }
         else
         {
             // no batching...
             renderer.batch.flush();
 
-            if (!this.shader)
-            {
-                // if there is no shader here, we can use the default shader.
-                // and that only gets created if we actually need it..
-                if (!defaultShader)
-                {
-                    var sampleValues = new Int32Array(16);
-
-                    for (var i$2 = 0; i$2 < 16; i$2++)
-                    {
-                        sampleValues[i$2] = i$2;
-                    }
-
-                    var uniforms = {
-                        tint: new Float32Array([1, 1, 1, 1]),
-                        translationMatrix: new Matrix(),
-                        default: UniformGroup.from({ uSamplers: sampleValues }, true),
-                    };
-
-                    // we can bbase default shader of the batch renderers program
-                    var program =  renderer.plugins.batch._shader.program;
-
-                    defaultShader = new Shader(program, uniforms);
-                }
-
-                this.shader = defaultShader;
-            }
-
-            var uniforms$1 = this.shader.uniforms;
-
-            // lets set the transfomr
-            uniforms$1.translationMatrix = this.transform.worldTransform;
-
-            var tint = this.tint;
-            var wa = this.worldAlpha;
-
-            // and then lets set the tint..
-            uniforms$1.tint[0] = (((tint >> 16) & 0xFF) / 255) * wa;
-            uniforms$1.tint[1] = (((tint >> 8) & 0xFF) / 255) * wa;
-            uniforms$1.tint[2] = ((tint & 0xFF) / 255) * wa;
-            uniforms$1.tint[3] = wa;
-
-            // the first draw call, we can set the uniforms of the shader directly here.
-
-            // this means that we can tack advantage of the sync function of pixi!
-            // bind and sync uniforms..
-            // there is a way to optimise this..
-            renderer.shader.bind(this.shader);
-
-            // then render it
-            renderer.geometry.bind(geometry, this.shader);
-
-            // set state..
-            renderer.state.set(this.state);
-
-            // then render the rest of them...
-            for (var i$3 = 0; i$3 < geometry.drawCalls.length; i$3++)
-            {
-                var drawCall = geometry.drawCalls[i$3];
-
-                var groupTextureCount = drawCall.textureCount;
-
-                for (var j = 0; j < groupTextureCount; j++)
-                {
-                    renderer.texture.bind(drawCall.textures[j], j);
-                }
-
-                // bind the geometry...
-                renderer.geometry.draw(drawCall.type, drawCall.size, drawCall.start);
-            }
+            this._renderDirect(renderer);
         }
+    };
+
+    /**
+     * Populating batches for rendering
+     *
+     * @protected
+     */
+    Graphics.prototype._populateBatches = function _populateBatches ()
+    {
+        var geometry = this.geometry;
+        var blendMode = this.blendMode;
+
+        this.batches = [];
+        this.batchTint = -1;
+        this._transformID = -1;
+        this.batchDirty = geometry.batchDirty;
+
+        this.vertexData = new Float32Array(geometry.points);
+
+        for (var i = 0, l = geometry.batches.length; i < l; i++)
+        {
+            var gI = geometry.batches[i];
+            var color = gI.style.color;
+            var vertexData = new Float32Array(this.vertexData.buffer,
+                gI.attribStart * 4 * 2,
+                gI.attribSize * 2);
+
+            var uvs = new Float32Array(geometry.uvsFloat32.buffer,
+                gI.attribStart * 4 * 2,
+                gI.attribSize * 2);
+
+            var indices = new Uint16Array(geometry.indicesUint16.buffer,
+                gI.start * 2,
+                gI.size);
+
+            var batch = {
+                vertexData: vertexData,
+                blendMode: blendMode,
+                indices: indices,
+                uvs: uvs,
+                _batchRGB: hex2rgb(color),
+                _tintRGB: color,
+                _texture: gI.style.texture,
+                alpha: gI.style.alpha,
+                worldAlpha: 1 };
+
+            this.batches[i] = batch;
+        }
+    };
+
+    /**
+     * Renders the batches using the BathedRenderer plugin
+     *
+     * @protected
+     * @param {PIXI.Renderer} renderer - The renderer
+     */
+    Graphics.prototype._renderBatched = function _renderBatched (renderer)
+    {
+        if (!this.batches.length)
+        {
+            return;
+        }
+
+        renderer.batch.setObjectRenderer(renderer.plugins[this.pluginName]);
+
+        this.calculateVertices();
+        this.calculateTints();
+
+        for (var i = 0, l = this.batches.length; i < l; i++)
+        {
+            var batch = this.batches[i];
+
+            batch.worldAlpha = this.worldAlpha * batch.alpha;
+
+            renderer.plugins[this.pluginName].render(batch);
+        }
+    };
+
+    /**
+     * Renders the graphics direct
+     *
+     * @protected
+     * @param {PIXI.Renderer} renderer - The renderer
+     */
+    Graphics.prototype._renderDirect = function _renderDirect (renderer)
+    {
+        var shader = this._resolveDirectShader(renderer);
+
+        var geometry = this.geometry;
+        var tint = this.tint;
+        var worldAlpha = this.worldAlpha;
+        var uniforms = shader.uniforms;
+        var drawCalls = geometry.drawCalls;
+
+        // lets set the transfomr
+        uniforms.translationMatrix = this.transform.worldTransform;
+
+        // and then lets set the tint..
+        uniforms.tint[0] = (((tint >> 16) & 0xFF) / 255) * worldAlpha;
+        uniforms.tint[1] = (((tint >> 8) & 0xFF) / 255) * worldAlpha;
+        uniforms.tint[2] = ((tint & 0xFF) / 255) * worldAlpha;
+        uniforms.tint[3] = worldAlpha;
+
+        // the first draw call, we can set the uniforms of the shader directly here.
+
+        // this means that we can tack advantage of the sync function of pixi!
+        // bind and sync uniforms..
+        // there is a way to optimise this..
+        renderer.shader.bind(shader);
+        renderer.geometry.bind(geometry, shader);
+
+        // set state..
+        renderer.state.set(this.state);
+
+        // then render the rest of them...
+        for (var i = 0, l = drawCalls.length; i < l; i++)
+        {
+            this._renderDrawCallDirect(renderer, geometry.drawCalls[i]);
+        }
+    };
+
+    /**
+     * Renders specific DrawCall
+     *
+     * @param {PIXI.Renderer} renderer
+     * @param {PIXI.BatchDrawCall} drawCall
+     */
+    Graphics.prototype._renderDrawCallDirect = function _renderDrawCallDirect (renderer, drawCall)
+    {
+        var groupTextureCount = drawCall.textureCount;
+
+        for (var j = 0; j < groupTextureCount; j++)
+        {
+            renderer.texture.bind(drawCall.textures[j], j);
+        }
+
+        renderer.geometry.draw(drawCall.type, drawCall.size, drawCall.start);
+    };
+
+    /**
+     * Resolves shader for direct rendering
+     *
+     * @protected
+     * @param {PIXI.Renderer} renderer - The renderer
+     */
+    Graphics.prototype._resolveDirectShader = function _resolveDirectShader (renderer)
+    {
+        var shader = this.shader;
+
+        var pluginName = this.pluginName;
+
+        if (!shader)
+        {
+            // if there is no shader here, we can use the default shader.
+            // and that only gets created if we actually need it..
+            // but may be more than one plugins for graphics
+            if (!DEFAULT_SHADERS[pluginName])
+            {
+                var sampleValues = new Int32Array(16);
+
+                for (var i = 0; i < 16; i++)
+                {
+                    sampleValues[i] = i;
+                }
+
+                var uniforms = {
+                    tint: new Float32Array([1, 1, 1, 1]),
+                    translationMatrix: new Matrix(),
+                    default: UniformGroup.from({ uSamplers: sampleValues }, true),
+                };
+
+                var program = renderer.plugins[pluginName]._shader.program;
+
+                DEFAULT_SHADERS[pluginName] = new Shader(program, uniforms);
+            }
+
+            shader = DEFAULT_SHADERS[pluginName];
+        }
+
+        return shader;
     };
 
     /**
@@ -30382,8 +30925,8 @@ Graphics._TEMP_POINT = new Point();
 //# sourceMappingURL=graphics.es.js.map
 
 /*!
- * @pixi/sprite - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/sprite - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/sprite is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -30509,6 +31052,13 @@ var Sprite = /*@__PURE__*/(function (Container) {
          */
         this._cachedTint = 0xFFFFFF;
 
+        /**
+         * this is used to store the uvs data of the sprite, assigned at the same time
+         * as the vertexData in calculateVertices()
+         *
+         * @private
+         * @member {Float32Array}
+         */
         this.uvs = null;
 
         // call texture setter
@@ -30583,7 +31133,6 @@ var Sprite = /*@__PURE__*/(function (Container) {
         this._textureTrimmedID = -1;
         this._cachedTint = 0xFFFFFF;
 
-        this.uvs = this._texture._uvs.uvsFloat32;
         // so if _width is 0 then width was not set..
         if (this._width)
         {
@@ -30617,6 +31166,12 @@ var Sprite = /*@__PURE__*/(function (Container) {
         if (this._transformID === this.transform._worldID && this._textureID === texture._updateID)
         {
             return;
+        }
+
+        // update texture UV here, because base texture can be changed without calling `_onTextureUpdate`
+        if (this._textureID !== texture._updateID)
+        {
+            this.uvs = this._texture._uvs.uvsFloat32;
         }
 
         this._transformID = this.transform._worldID;
@@ -31041,8 +31596,8 @@ var Sprite = /*@__PURE__*/(function (Container) {
 //# sourceMappingURL=sprite.es.js.map
 
 /*!
- * @pixi/text - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/text - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/text is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -33309,8 +33864,8 @@ var Text = /*@__PURE__*/(function (Sprite) {
 //# sourceMappingURL=text.es.js.map
 
 /*!
- * @pixi/prepare - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/prepare - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/prepare is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -33954,8 +34509,8 @@ function findGraphics(item, queue)
 //# sourceMappingURL=prepare.es.js.map
 
 /*!
- * @pixi/app - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/app - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/app is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -36709,8 +37264,8 @@ Loader.use = function LoaderUseStatic(fn) {
 //# sourceMappingURL=resource-loader.esm.js.map
 
 /*!
- * @pixi/loaders - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/loaders - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/loaders is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -37011,8 +37566,8 @@ var LoaderResource = Resource$1;
 //# sourceMappingURL=loaders.es.js.map
 
 /*!
- * @pixi/particles - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/particles - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/particles is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -37696,8 +38251,8 @@ var ParticleRenderer = /*@__PURE__*/(function (ObjectRenderer) {
 //# sourceMappingURL=particles.es.js.map
 
 /*!
- * @pixi/spritesheet - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/spritesheet - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/spritesheet is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -38105,8 +38660,8 @@ SpritesheetLoader.getResourcePath = function getResourcePath (resource, baseUrl)
 //# sourceMappingURL=spritesheet.es.js.map
 
 /*!
- * @pixi/sprite-tiling - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/sprite-tiling - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/sprite-tiling is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -38250,8 +38805,8 @@ var TilingSpriteRenderer = /*@__PURE__*/(function (ObjectRenderer) {
 //# sourceMappingURL=sprite-tiling.es.js.map
 
 /*!
- * @pixi/text-bitmap - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/text-bitmap - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/text-bitmap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -39076,8 +39631,8 @@ BitmapFontLoader.use = function use (resource, next)
 //# sourceMappingURL=text-bitmap.es.js.map
 
 /*!
- * @pixi/filter-color-matrix - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/filter-color-matrix - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/filter-color-matrix is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -39675,8 +40230,8 @@ ColorMatrixFilter.prototype.grayscale = ColorMatrixFilter.prototype.greyscale;
 //# sourceMappingURL=filter-color-matrix.es.js.map
 
 /*!
- * @pixi/mixin-cache-as-bitmap - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/mixin-cache-as-bitmap - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/mixin-cache-as-bitmap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -40101,8 +40656,8 @@ DisplayObject.prototype._cacheAsBitmapDestroy = function _cacheAsBitmapDestroy(o
 //# sourceMappingURL=mixin-cache-as-bitmap.es.js.map
 
 /*!
- * @pixi/mixin-get-child-by-name - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/mixin-get-child-by-name - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/mixin-get-child-by-name is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -40139,8 +40694,8 @@ Container.prototype.getChildByName = function getChildByName(name)
 //# sourceMappingURL=mixin-get-child-by-name.es.js.map
 
 /*!
- * @pixi/mixin-get-global-position - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/mixin-get-global-position - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/mixin-get-global-position is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -40177,8 +40732,8 @@ DisplayObject.prototype.getGlobalPosition = function getGlobalPosition(point, sk
 //# sourceMappingURL=mixin-get-global-position.es.js.map
 
 /*!
- * @pixi/mesh - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * @pixi/mesh - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * @pixi/mesh is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -40189,8 +40744,8 @@ var tempPolygon = new Polygon();
 //# sourceMappingURL=mesh.es.js.map
 
 /*!
- * pixi.js - v5.1.2
- * Compiled Sat, 24 Aug 2019 01:06:18 UTC
+ * pixi.js - v5.1.3
+ * Compiled Mon, 09 Sep 2019 04:51:53 UTC
  *
  * pixi.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -40214,7 +40769,7 @@ Application.registerPlugin(AppLoaderPlugin);
 
 var vs = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nuniform vec2 angle;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nvec2 filterTextureCoord( void )\n{\n    return vec2(2.0) * aVertexPosition - vec2(1.0);\n}\n\nmat3 rotationXY( vec2 angle ) {\n    vec2 c = cos( angle );\n    vec2 s = sin( angle );\n\n    return mat3(\n        c.y      ,  0.0, -s.y,\n        s.y * s.x,  c.x,  c.y * s.x,\n        s.y * c.x, -s.x,  c.y * c.x\n    );\n}\n\nvoid main(void) {\n\n    rot = rotationXY(angle);\n\tvTextureCoord = filterTextureCoord();\n    gl_Position = filterVertexPosition();\n}\n";
 
-var fs = "uniform vec4 inputPixel;\n\nuniform samplerCube diffMap;\nuniform samplerCube normalMap;\nuniform samplerCube specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nuniform float resolution;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n\n    return abs(dfdx) + abs(dfdy);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D(noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nvec3 random3(vec3 c) {\n\n    float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));\n    vec3 r;\n    r.z = fract(512.0*j);\n    j *= .125;\n    r.x = fract(512.0*j);\n    j *= .125;\n    r.y = fract(512.0*j);\n    return r-0.5;\n}\n\nconst float F3 =  0.3333333;\nconst float G3 =  0.1666667;\n\nfloat simplex3d(vec3 p) {\n\n    vec3 s = floor(p + dot(p, vec3(F3)));\n    vec3 x = p - s + dot(s, vec3(G3));\n    vec3 e = step(vec3(0.0), x - x.yzx);\n    vec3 i1 = e*(1.0 - e.zxy);\n    vec3 i2 = 1.0 - e.zxy*(1.0 - e);\n    vec3 x1 = x - i1 + G3;\n    vec3 x2 = x - i2 + 2.0*G3;\n    vec3 x3 = x - 1.0 + 3.0*G3;\n\n    vec4 w, d;\n\n    w.x = dot(x, x);\n    w.y = dot(x1, x1);\n    w.z = dot(x2, x2);\n    w.w = dot(x3, x3);\n\n    w = max(0.6 - w, 0.0);\n\n    d.x = dot(random3(s), x);\n    d.y = dot(random3(s + i1), x1);\n    d.z = dot(random3(s + i2), x2);\n    d.w = dot(random3(s + 1.0), x3);\n\n    w *= w;\n    w *= w;\n    d *= w;\n\n    return dot(d, vec4(52.0));\n}\n\nconst mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);\nconst mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);\nconst mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);\n\nconst mat3 mat = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\n\nfloat simplex3d_fractal(vec3 m) {\n    return   0.5333333*simplex3d(m*rot1)\n            +0.2666667*simplex3d(2.0*m*rot2)\n            +0.1333333*simplex3d(4.0*m*rot3)\n            +0.0666667*simplex3d(8.0*m);\n}\n\nvec3 getNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nmat3 calcTBN (vec3 pos) {\n    vec3 p = normalize(vec3(pos.x, 0.0, pos.z));\n    vec3 n = normalize(pos);\n    vec3 t = vec3(-p.y, 0.0, p.x);\n    vec3 b = cross(n, t);\n    return mat3(t, b, n);\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, float lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 color =   d * vec3(dotLN) + vec3(s * pow(dotRV, alpha));\n\n    if (dotRV < 0.0) {\n        // Light reflection in opposite direction as viewer, apply only diffuse\n        // component\n        color = d * vec3(dotLN);\n    }\n    if (dotLN < 0.0) {\n        // Light not visible from this point on the surface\n        color = vec3(0.0);\n    }\n\n    return vec3(lightIntensity) * color;\n\n    color = mix(d * vec3(dotLN), color, step(0.0, dotRV));\n    color = mix(vec3(0.0), color, step(0.0, dotLN));\n\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n\n    vec3 ambientLight = vec3(1.0) * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * vec3(0.2, 0.2, 0.2);\n    vec3 lightPos = vec3(0.0, 0.0, -5.0);\n    float lightIntensity = 0.6;\n    color += phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\n\nvoid main(void) {\n\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n        return;\n    };\n\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n    vec3 ro = vec3(vTextureCoord, - 2.0*z);\n\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n\n    mat3 tbn1 = calcTBN(pos1);\n    mat3 tbn2 = calcTBN(pos2);\n\n    //float n1 = simplex3d_fractal(tpos1+1.0);\n    //float n2 = simplex3d_fractal(tpos2+1.0);\n\n    //n1 = 0.5 + 0.5 * n1;\n    //n2 = 0.5 + 0.5 * n2;\n    float no1 = 0.0;\n    float no2 = 0.0;\n    vec3 q1 = vec3(1.0 / resolution) * tpos1;\n    no1  = 0.5000*noise( q1 );\n    q1 = mat*q1*2.01;\n    no1 += 0.2500*noise( q1 );\n    q1 = mat*q1*2.02;\n    no1 += 0.1250*noise( q1 );\n    q1 = mat*q1*2.03;\n    no1 += 0.0625*noise( q1 );\n    no1 = sqrt (no1 * .6);\n\n    vec3 q2 = vec3(1.0 / resolution) * tpos2;\n    no2  = 0.5000*noise( q2 );\n    q2 = mat*q2*2.01;\n    no2 += 0.2500*noise( q2 );\n    q2 = mat*q2*2.02;\n    no2 += 0.1250*noise( q2 );\n    q2 = mat*q2*2.03;\n    no2 += 0.0625*noise( q2 );\n    no2 = sqrt(no2 * .6);\n\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n\n    vec4 bg = vec4(0.0);\n\n    vec4 col1 = textureCube(diffMap, tpos1);\n    vec4 col2 = textureCube(diffMap, tpos2);\n    col2.rgb *= vec3(0.7);\n    vec3 n1 = RNMBlendUnpacked(pos1, getNorm(textureCube(normalMap, tpos1).rgb)); //tbn1 * getNorm(textureCube(normalMap, tpos1).rgb);\n    float s1 = textureCube(specMap, tpos1).r;\n    vec3 n2 = RNMBlendUnpacked(pos2, -1.0 * getNorm(textureCube(normalMap, tpos2).rgb)); //tbn2 * getNorm(textureCube(normalMap, tpos2).rgb);\n    float s2 = textureCube(specMap, tpos2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec4 coloredEdge1 = edge1 * uEdgeColor;\n    dissolvedTexture1 = dissolvedTexture1 + coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec4 coloredEdge2 = edge2 * uEdgeColor;\n    dissolvedTexture2.rgb *= 0.5;\n    dissolvedTexture2 = dissolvedTexture2 + coloredEdge2;\n    dissolvedTexture1 = mix( dissolvedTexture1, vec4(0.0, 0.0, 0.0, 0.0), step(no1, uDissolveSettings.x));\n    dissolvedTexture2 = mix( dissolvedTexture2, vec4(0.0, 0.0, 0.0, 0.0), step(no2, uDissolveSettings.x));\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3(1.0 - dissolvedTexture1.a);\n    //gl_FragColor = vec4(vec3()normalMap, tpos1).rgb, 1.0);\n    // vec3 gamma = vec3(1.0/2.2);\n    // gl_FragColor = vec4(pow(col.rgb, gamma), alpha);\n    gl_FragColor = vec4(col.rgb, alpha);\n}\n";
+var fs = "uniform vec4 inputPixel;\n\nuniform samplerCube diffMap;\nuniform samplerCube normalMap;\nuniform samplerCube specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nuniform float resolution;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n\n    return abs(dfdx) + abs(dfdy);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D(noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nlowp vec4 permute(in lowp vec4 x){return mod(x*x*34.+x,289.);}\nlowp float snoise(in mediump vec3 v){\n    const lowp vec2 C = vec2(0.16666666666,0.33333333333);\n    const lowp vec4 D = vec4(0,.5,1,2);\n    lowp vec3 i  = floor(C.y*(v.x+v.y+v.z) + v);\n    lowp vec3 x0 = C.x*(i.x+i.y+i.z) + (v - i);\n    lowp vec3 g = step(x0.yzx, x0);\n    lowp vec3 l = (1. - g).zxy;\n    lowp vec3 i1 = min( g, l );\n    lowp vec3 i2 = max( g, l );\n    lowp vec3 x1 = x0 - i1 + C.x;\n    lowp vec3 x2 = x0 - i2 + C.y;\n    lowp vec3 x3 = x0 - D.yyy;\n    i = mod(i,289.);\n    lowp vec4 p = permute( permute( permute(\n\t    i.z + vec4(0., i1.z, i2.z, 1.))\n\t    + i.y + vec4(0., i1.y, i2.y, 1.))\n\t    + i.x + vec4(0., i1.x, i2.x, 1.));\n    lowp vec3 ns = .142857142857 * D.wyz - D.xzx;\n    lowp vec4 j = -49. * floor(p * ns.z * ns.z) + p;\n    lowp vec4 x_ = floor(j * ns.z);\n    lowp vec4 x = x_ * ns.x + ns.yyyy;\n    lowp vec4 y = floor(j - 7. * x_ ) * ns.x + ns.yyyy;\n    lowp vec4 h = 1. - abs(x) - abs(y);\n    lowp vec4 b0 = vec4( x.xy, y.xy );\n    lowp vec4 b1 = vec4( x.zw, y.zw );\n    lowp vec4 sh = -step(h, vec4(0));\n    lowp vec4 a0 = b0.xzyw + (floor(b0)*2.+ 1.).xzyw*sh.xxyy;\n    lowp vec4 a1 = b1.xzyw + (floor(b1)*2.+ 1.).xzyw*sh.zzww;\n    lowp vec3 p0 = vec3(a0.xy,h.x);\n    lowp vec3 p1 = vec3(a0.zw,h.y);\n    lowp vec3 p2 = vec3(a1.xy,h.z);\n    lowp vec3 p3 = vec3(a1.zw,h.w);\n    lowp vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n    p0 *= norm.x;\n    p1 *= norm.y;\n    p2 *= norm.z;\n    p3 *= norm.w;\n    lowp vec4 m = max(.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.);\n    return .5 + 10. * dot( m * m * m, vec4( dot(p0,x0), dot(p1,x1),dot(p2,x2), dot(p3,x3) ) );\n}\n\nconst mat3 mat = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\nvec3 getNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, float lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 po = d * vec3(dotLN);\n    vec3 color =   po + vec3(s * pow(dotRV, alpha));\n\n    if (dotRV < 0.0) {\n        color = po;\n    }\n\n    if (dotLN < 0.0) {\n\n        color = vec3(0.0);\n    }\n\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n\n    vec3 ambientLight = vec3(1.0) * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * vec3(0.2, 0.2, 0.2);\n    vec3 lightPos = vec3(0.0, 0.0, -5.0);\n    float lightIntensity = 0.6;\n    color += phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\nfloat getAlpha(vec3 p, float r, float t) {\n float n = 0.0;\n vec3 q = vec3(1.0 / r) * p;\n    n  = 0.5000*noise( q );\n    q = mat*q*2.01;\n    n += 0.2500*noise( q );\n    q = mat*q*2.02;\n    n += 0.1250*noise( q );\n    q = mat*q*2.03;\n    n += 0.0625*noise( q );\n    n = sqrt (n * t);\n    return n;\n}\n\n\nvoid main(void) {\n\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n        return;\n    };\n\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n    vec3 ro = vec3(vTextureCoord, - 2.0*z);\n\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n\n    //float no1 = getAlpha(tpos1, resolution, 0.6);\n    //float no2 = getAlpha(tpos2, resolution, 0.6);\n    float no1 = snoise(tpos1* vec3(resolution)*2.0) * .5;\n    float no2 = snoise(tpos2* vec3(resolution)*2.0) * .5;\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n\n    vec4 bg = vec4(0.0);\n\n    vec4 col1 = textureCube(diffMap, tpos1);\n    float s1 = textureCube(specMap, tpos1).r;\n    //col1.rgb += col1.rgb * vec3(0.5, 0.75, 1.0) * s1 * 2.0;\n    vec4 col2 = textureCube(diffMap, tpos2);\n    //col2.rgb *= vec3(0.6);\n    vec3 n1 = RNMBlendUnpacked(pos1, getNorm(textureCube(normalMap, tpos1).rgb));\n    vec3 n2 = RNMBlendUnpacked(pos2, -1.0 * getNorm(textureCube(normalMap, tpos2).rgb));\n    float s2 = textureCube(specMap, tpos2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec3 coloredEdge1 = vec3(edge1) * uEdgeColor.rgb;\n    dissolvedTexture1.rgb +=  coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec3 coloredEdge2 = vec3(edge2) * uEdgeColor.rgb;\n    dissolvedTexture2.rgb += coloredEdge2;\n    dissolvedTexture1 = mix( dissolvedTexture1, vec4(0.0), step(no1, uDissolveSettings.x));\n    dissolvedTexture2 = mix( dissolvedTexture2, vec4(0.0), step(no2, uDissolveSettings.x));\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3(1.0 - dissolvedTexture1.a);\n    col.rgb *= alpha;\n    //gl_FragColor = vec4(vec3()normalMap, tpos1).rgb, 1.0);\n    // vec3 gamma = vec3(1.0/2.2);\n    // gl_FragColor = vec4(pow(col.rgb, gamma), alpha);\n    gl_FragColor = vec4(col, alpha);\n}\n";
 
 const PORTRAIT = 'portrait-primary';
 const LANDSCAPE = 'landscape-primary';
@@ -40252,7 +40807,56 @@ const getScreenOrientation = (width, height) => {
     return height > width ? PORTRAIT : LANDSCAPE;
 };
 
-Application.registerPlugin(AppLoaderPlugin);
+class WaitEvents {
+    constructor(completeCallback, scope = null) {
+        this.setCompleteCallback(completeCallback, scope);
+        this.events = new Set();
+    }
+
+    shutdown() {
+        this.setCompleteCallback(undefined, undefined);
+        this.events.clear();
+        this.event = undefined;
+        return this;
+    }
+
+    destroy() {
+        this.shutdown();
+        return this;
+    }
+
+    setCompleteCallback(callback, scope = null) {
+        this.completeCallback = callback;
+        this.scope = scope;
+        return this;
+    }
+
+    waitCallback() {
+        const self = this;
+        const callback = () => {
+            self.remove(callback);
+        };
+        this.events.add(callback);
+        return callback;
+    }
+
+    waitEvent(eventEmitter, eventName) {
+        eventEmitter.once(eventName, this.waitCallback());
+        return this;
+    }
+
+    remove(eventEmitter) {
+        this.events.delete(eventEmitter);
+        if (this.events.size === 0) {
+            if (this.scope) {
+                this.completeCallback.call(this.scope);
+            } else {
+                this.completeCallback();
+            }
+        }
+        return this;
+    }
+}
 
 const gameContainer = document.querySelector('.game_container');
 
@@ -40262,7 +40866,7 @@ const app = new Application({
     resolution: window.devicePixelRatio || 1.0,
     autoDensity: true,
     resizeTo: gameContainer,
-    backgroundColor: 0x000000,
+    backgroundColor: 0xaaaaaa,
     forceFXAA: false,
     antialias: false,
     powerPreference: 'high-performance',
@@ -40278,16 +40882,24 @@ document.body.appendChild(stats.dom);
 
 app.loader.baseUrl = './assets';
 
-const diffMap = CubeTexture.from([
-    'assets/r_dragon_diff.png',
-    'assets/l_dragon_diff.png',
-    'assets/t_dragon_diff.png',
-    'assets/bo_dragon_diff.png',
-    'assets/f_dragon_diff.png',
-    'assets/b_dragon_diff.png'
-]);
+let waitEvents = new WaitEvents(start);
+
+const diffMap = CubeTexture.from(
+    [
+        'assets/r_dragon_diff.png',
+        'assets/l_dragon_diff.png',
+        'assets/t_dragon_diff.png',
+        'assets/bo_dragon_diff.png',
+        'assets/f_dragon_diff.png',
+        'assets/b_dragon_diff.png'
+    ],
+    {
+        autoLoad: false
+    }
+);
+waitEvents.waitEvent(diffMap, 'loaded');
 diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
-diffMap.update();
+diffMap.resource.load();
 
 const normalMap = CubeTexture.from(
     [
@@ -40298,97 +40910,117 @@ const normalMap = CubeTexture.from(
         'assets/f_dragon_norm.png',
         'assets/b_dragon_norm.png'
     ],
-    { autoLoad: false }
+    {
+        autoLoad: false
+    }
 );
+waitEvents.waitEvent(normalMap, 'loaded');
 normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
 normalMap.premultiplyAlpha = false;
 normalMap.resource.items.forEach(item => {
     item.resource.premultiplyAlpha = false;
 });
 normalMap.resource.load();
-console.log(normalMap);
 
-const specMap = CubeTexture.from([
-    'assets/r_dragon_spec.png',
-    'assets/l_dragon_spec.png',
-    'assets/t_dragon_spec.png',
-    'assets/bo_dragon_spec.png',
-    'assets/f_dragon_spec.png',
-    'assets/b_dragon_spec.png'
-]);
+const specMap = CubeTexture.from(
+    [
+        'assets/r_dragon_spec.png',
+        'assets/l_dragon_spec.png',
+        'assets/t_dragon_spec.png',
+        'assets/bo_dragon_spec.png',
+        'assets/f_dragon_spec.png',
+        'assets/b_dragon_spec.png'
+    ],
+    {
+        autoLoad: false
+    }
+);
+waitEvents.waitEvent(specMap, 'loaded');
 specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
 specMap.premultiplyAlpha = false;
-specMap.update();
+specMap.resource.items.forEach(item => {
+    item.resource.premultiplyAlpha = false;
+});
+specMap.resource.load();
 
-const noiseTex = BaseTexture.from('assets/rgba_noise256.png');
+const noiseTex = BaseTexture.from('assets/rgba_noise256.png', {
+    autoLoad: false
+});
+waitEvents.waitEvent(noiseTex, 'loaded');
 noiseTex.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
 noiseTex.wrapMode = WRAP_MODES.REPEAT;
 noiseTex.premultiplyAlpha = false;
-noiseTex.update();
+noiseTex.resource.load();
 
-const container = new Container();
+function start() {
+    waitEvents.destroy();
+    waitEvents = undefined;
+    const container = new Container();
 
-container.filterArea = new Rectangle();
-resize(container, app);
-window.addEventListener('resize', () => resize(container, app));
-window.addEventListener('orientationchange', () => resize(container, app));
-app.stage.addChild(container);
+    container.filterArea = new Rectangle();
+    resize(container, app);
+    app.stage.addChild(container);
+    const resizeThrottled = lodash_throttle(() => {
+        resize(container, app);
+    }, 100);
+    window.onresize = resizeThrottled;
 
-const filter = new Filter(vs, fs, {
-    diffMap,
-    normalMap,
-    specMap,
-    noiseTex,
-    angle: [0.0, 0.0],
-    uDissolveSettings: [0.0, 0.01],
-    uEdgeColor: [0.89, 0.47, 0.2, 1.0]
-});
-filter.autoFit = false;
+    const filter = new Filter(vs, fs, {
+        diffMap,
+        normalMap,
+        specMap,
+        noiseTex,
+        angle: [0.0, 0.0],
+        uDissolveSettings: [0.0, 0.02],
+        uEdgeColor: [0.89, 0.47, 0.2, 1.0]
+    });
+    filter.autoFit = false;
 
-container.filters = [filter];
+    container.filters = [filter];
 
-let a = 0.001;
-let b = 1.0;
-const r = 0.5 * container.filterArea.width;
-const startY = container.filterArea.y;
+    let a = 0.002;
+    let b = 1.0;
+    const r = 0.5 * container.filterArea.width;
+    const startY = container.filterArea.y;
 
-app.ticker.add(delta => {
-    stats.begin();
-    // filter.uniforms.angle[1] -= 0.0005;
-    container.filterArea.y += b;
-    if (
-        container.filterArea.y + b > app.screen.height - container.filterArea.height ||
-        container.filterArea.y + b < 0.0
-    )
-        b *= -1.0;
+    app.ticker.add(delta => {
+        stats.begin();
+        // filter.uniforms.angle[1] -= 0.0005;
+        container.filterArea.y += b;
+        if (
+            container.filterArea.y + b > app.screen.height - container.filterArea.height ||
+            container.filterArea.y + b < 0.0
+        )
+            b *= -1.0;
 
-    filter.uniforms.angle[0] = ((startY - container.filterArea.y) / r) % (2.0 * Math.PI);
+        filter.uniforms.angle[0] = ((startY - container.filterArea.y) / r) % (2.0 * Math.PI);
 
-    filter.uniforms.uDissolveSettings[0] += a;
-    if (
-        filter.uniforms.uDissolveSettings[0] + a < 0.0 ||
-        filter.uniforms.uDissolveSettings[0] + a > 0.6
-    )
-        a *= -1.0;
-    stats.end();
-});
+        if (
+            filter.uniforms.uDissolveSettings[0] + a < 0.0 ||
+            filter.uniforms.uDissolveSettings[0] + a > 0.55
+        )
+            a *= -1.0;
+        filter.uniforms.uDissolveSettings[0] += a;
+        stats.end();
+    });
 
-app.ticker.start();
+    app.ticker.start();
+}
 
-function resize(obj, appl) {
-    const orientation = getScreenOrientation(app.screen.width, app.screen.height);
+function resize(obj, a) {
+    const orientation = getScreenOrientation(a.screen.width, a.screen.height);
     // eslint-disable-next-line no-bitwise
-    let cS = ~~(appl.screen.height * 0.2);
+    let cS = ~~(a.screen.height * 0.2);
     if (orientation === PORTRAIT) {
         // eslint-disable-next-line no-bitwise
-        cS = ~~(appl.screen.width * 0.2);
+        cS = ~~(a.screen.width * 0.2);
     }
     // eslint-disable-next-line no-bitwise
     const halfcS = ~~(0.5 * cS);
     // eslint-disable-next-line no-bitwise
-    const halfW = ~~(0.5 * appl.screen.width);
+    const halfW = ~~(0.5 * a.screen.width);
     // eslint-disable-next-line no-bitwise
-    const halfH = ~~(0.5 * appl.screen.height);
+    const halfH = ~~(0.5 * a.screen.height);
     obj.filterArea.x = halfW - halfcS;
     obj.filterArea.y = halfH - halfcS;
     obj.filterArea.width = cS;
