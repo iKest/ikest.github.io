@@ -23656,30 +23656,6 @@ function autoDetectRenderer(options)
 var defaultFilter = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nvec2 filterTextureCoord( void )\n{\n    return aVertexPosition * (outputFrame.zw * inputSize.zw);\n}\n\nvoid main(void)\n{\n    gl_Position = filterVertexPosition();\n    vTextureCoord = filterTextureCoord();\n}\n";
 
 /**
- * A Texture that depends on six other resources.
- *
- * @class
- * @extends PIXI.BaseTexture
- * @memberof PIXI
- */
-var CubeTexture = /*@__PURE__*/(function (BaseTexture) {
-    function CubeTexture () {
-        BaseTexture.apply(this, arguments);
-    }
-
-    if ( BaseTexture ) CubeTexture.__proto__ = BaseTexture;
-    CubeTexture.prototype = Object.create( BaseTexture && BaseTexture.prototype );
-    CubeTexture.prototype.constructor = CubeTexture;
-
-    CubeTexture.from = function from (resources, options)
-    {
-        return new CubeTexture(new CubeResource(resources, options));
-    };
-
-    return CubeTexture;
-}(BaseTexture));
-
-/**
  * Used by the batcher to draw batches.
  * Each one of these contains all information required to draw a bound geometry.
  *
@@ -40767,9 +40743,9 @@ Application.registerPlugin(TickerPlugin);
 Application.registerPlugin(AppLoaderPlugin);
 //# sourceMappingURL=pixi.es.js.map
 
-var vs = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nuniform vec2 angle;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nvec2 filterTextureCoord( void )\n{\n    return vec2(2.0) * aVertexPosition - vec2(1.0);\n}\n\nmat3 rotationXY( vec2 angle ) {\n    vec2 c = cos( angle );\n    vec2 s = sin( angle );\n\n    return mat3(\n        c.y      ,  0.0, -s.y,\n        s.y * s.x,  c.x,  c.y * s.x,\n        s.y * c.x, -s.x,  c.y * c.x\n    );\n}\n\nvoid main(void) {\n\n    rot = rotationXY(angle);\n\tvTextureCoord = filterTextureCoord();\n    gl_Position = filterVertexPosition();\n}\n";
+var vs = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nuniform vec4 rotation;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nmat3 rotMatrix(vec3 axis, float a) {\n    float c = cos( a );\n    float s = sin( a );\n    float oc=1.0-c;\n    vec3 as=axis*s;\n    mat3 p=mat3(axis.x*axis,axis.y*axis,axis.z*axis);\n    mat3 q=mat3(c,-as.z,as.y,as.z,c,-as.x,-as.y,as.x,c);\n    return p*oc+q;\n}\n\nvoid main(void) {\n\n    rot = rotMatrix(rotation.xyz, rotation.w);\n\tvTextureCoord = vec2(2.0) * aVertexPosition - vec2(1.0);\n    gl_Position = filterVertexPosition();\n}\n";
 
-var fs = "uniform vec4 inputPixel;\n\nuniform samplerCube diffMap;\nuniform samplerCube normalMap;\nuniform samplerCube specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nuniform float resolution;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n\n    return abs(dfdx) + abs(dfdy);\n}\n\nfloat noise( vec3 x )\n{\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D(noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nlowp vec4 permute(in lowp vec4 x){return mod(x*x*34.+x,289.);}\nlowp float snoise(in mediump vec3 v){\n    const lowp vec2 C = vec2(0.16666666666,0.33333333333);\n    const lowp vec4 D = vec4(0,.5,1,2);\n    lowp vec3 i  = floor(C.y*(v.x+v.y+v.z) + v);\n    lowp vec3 x0 = C.x*(i.x+i.y+i.z) + (v - i);\n    lowp vec3 g = step(x0.yzx, x0);\n    lowp vec3 l = (1. - g).zxy;\n    lowp vec3 i1 = min( g, l );\n    lowp vec3 i2 = max( g, l );\n    lowp vec3 x1 = x0 - i1 + C.x;\n    lowp vec3 x2 = x0 - i2 + C.y;\n    lowp vec3 x3 = x0 - D.yyy;\n    i = mod(i,289.);\n    lowp vec4 p = permute( permute( permute(\n\t    i.z + vec4(0., i1.z, i2.z, 1.))\n\t    + i.y + vec4(0., i1.y, i2.y, 1.))\n\t    + i.x + vec4(0., i1.x, i2.x, 1.));\n    lowp vec3 ns = .142857142857 * D.wyz - D.xzx;\n    lowp vec4 j = -49. * floor(p * ns.z * ns.z) + p;\n    lowp vec4 x_ = floor(j * ns.z);\n    lowp vec4 x = x_ * ns.x + ns.yyyy;\n    lowp vec4 y = floor(j - 7. * x_ ) * ns.x + ns.yyyy;\n    lowp vec4 h = 1. - abs(x) - abs(y);\n    lowp vec4 b0 = vec4( x.xy, y.xy );\n    lowp vec4 b1 = vec4( x.zw, y.zw );\n    lowp vec4 sh = -step(h, vec4(0));\n    lowp vec4 a0 = b0.xzyw + (floor(b0)*2.+ 1.).xzyw*sh.xxyy;\n    lowp vec4 a1 = b1.xzyw + (floor(b1)*2.+ 1.).xzyw*sh.zzww;\n    lowp vec3 p0 = vec3(a0.xy,h.x);\n    lowp vec3 p1 = vec3(a0.zw,h.y);\n    lowp vec3 p2 = vec3(a1.xy,h.z);\n    lowp vec3 p3 = vec3(a1.zw,h.w);\n    lowp vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n    p0 *= norm.x;\n    p1 *= norm.y;\n    p2 *= norm.z;\n    p3 *= norm.w;\n    lowp vec4 m = max(.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.);\n    return .5 + 10. * dot( m * m * m, vec4( dot(p0,x0), dot(p1,x1),dot(p2,x2), dot(p3,x3) ) );\n}\n\nconst mat3 mat = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\nvec3 getNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, float lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 po = d * vec3(dotLN);\n    vec3 color =   po + vec3(s * pow(dotRV, alpha));\n\n    if (dotRV < 0.0) {\n        color = po;\n    }\n\n    if (dotLN < 0.0) {\n\n        color = vec3(0.0);\n    }\n\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n\n    vec3 ambientLight = vec3(1.0) * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * vec3(0.2, 0.2, 0.2);\n    vec3 lightPos = vec3(0.0, 0.0, -5.0);\n    float lightIntensity = 0.6;\n    color += phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\nfloat getAlpha(vec3 p, float r, float t) {\n float n = 0.0;\n vec3 q = vec3(1.0 / r) * p;\n    n  = 0.5000*noise( q );\n    q = mat*q*2.01;\n    n += 0.2500*noise( q );\n    q = mat*q*2.02;\n    n += 0.1250*noise( q );\n    q = mat*q*2.03;\n    n += 0.0625*noise( q );\n    n = sqrt (n * t);\n    return n;\n}\n\n\nvoid main(void) {\n\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n        return;\n    };\n\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n    vec3 ro = vec3(vTextureCoord, - 2.0*z);\n\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n\n    //float no1 = getAlpha(tpos1, resolution, 0.6);\n    //float no2 = getAlpha(tpos2, resolution, 0.6);\n    float no1 = snoise(tpos1* vec3(resolution)*2.0) * .5;\n    float no2 = snoise(tpos2* vec3(resolution)*2.0) * .5;\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n\n    vec4 bg = vec4(0.0);\n\n    vec4 col1 = textureCube(diffMap, tpos1);\n    float s1 = textureCube(specMap, tpos1).r;\n    //col1.rgb += col1.rgb * vec3(0.5, 0.75, 1.0) * s1 * 2.0;\n    vec4 col2 = textureCube(diffMap, tpos2);\n    //col2.rgb *= vec3(0.6);\n    vec3 n1 = RNMBlendUnpacked(pos1, getNorm(textureCube(normalMap, tpos1).rgb));\n    vec3 n2 = RNMBlendUnpacked(pos2, -1.0 * getNorm(textureCube(normalMap, tpos2).rgb));\n    float s2 = textureCube(specMap, tpos2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec3 coloredEdge1 = vec3(edge1) * uEdgeColor.rgb;\n    dissolvedTexture1.rgb +=  coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec3 coloredEdge2 = vec3(edge2) * uEdgeColor.rgb;\n    dissolvedTexture2.rgb += coloredEdge2;\n    dissolvedTexture1 = mix( dissolvedTexture1, vec4(0.0), step(no1, uDissolveSettings.x));\n    dissolvedTexture2 = mix( dissolvedTexture2, vec4(0.0), step(no2, uDissolveSettings.x));\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3(1.0 - dissolvedTexture1.a);\n    col.rgb *= alpha;\n    //gl_FragColor = vec4(vec3()normalMap, tpos1).rgb, 1.0);\n    // vec3 gamma = vec3(1.0/2.2);\n    // gl_FragColor = vec4(pow(col.rgb, gamma), alpha);\n    gl_FragColor = vec4(col, alpha);\n}\n";
+var fs = "#define M_2_PI 0.63661977236758134308\n\nuniform vec4 inputPixel;\nuniform sampler2D diffMap;\nuniform sampler2D normalMap;\nuniform sampler2D specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n    return abs(dfdx) + abs(dfdy);\n}\n\nvec2 toast (vec3 p)\n{\n    float r = sqrt(1. - abs(p.z));\n    float phi = atan(abs(p.y), abs(p.x)) * M_2_PI;\n    vec2 uv = vec2(r) * vec2(1.-phi, phi);\n    uv = sign(p.xy) * mix(uv, vec2(1.)-uv.yx, step(p.z, 0.0));\n    uv = .5 * uv + vec2 (.5); // [-1;1] -> [0;1]\n\treturn uv;\n}\n\nfloat noise( in vec3 x ) {\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D( noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nconst mat3 m = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\nfloat getNoise(vec3 p, float factor) {\n    float f = 0.0;\n    vec3 q = vec3(factor)*p;\n    f  = 0.5000*noise( q );\n    q = m*q*2.01;\n    f += 0.2500*noise( q );\n    q = m*q*2.02;\n    f += 0.1250*noise( q );\n    q = m*q*2.03;\n    f += 0.0625*noise( q );\n    return f;\n}\n\nvec3 unPackNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, vec3 lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 po = d * vec3(dotLN);\n    vec3 color =   po + vec3(s * pow(dotRV, alpha));\n    if (dotRV < 0.0) {\n        color = po;\n    }\n    if (dotLN < 0.0) {\n        color = vec3(0.0);\n    }\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 a, vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n    const vec3 ambientLight = 0.5 * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * a;\n    vec3 lightPos = vec3(0.0, 0.0, 5.0);\n    vec3 lightIntensity = vec3(0.4, 0.4, 0.4);\n    color = phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvoid main(void) {\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) discard;\n    vec3 ro = vec3(vTextureCoord,  2.0*z);\n    vec3 pos1 = vec3(vTextureCoord, z);\n    vec3 pos2 = vec3( vTextureCoord, -z);\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n    vec2 uv1 = toast(tpos1);\n    vec2 uv2 = toast(tpos2);\n    vec3 n1 = RNMBlendUnpacked(pos1, unPackNorm(texture2D(normalMap, uv1).rgb));\n    vec3 n2 = RNMBlendUnpacked(pos2, vec3(-1.0) * unPackNorm(texture2D(normalMap, uv2).rgb));\n    float no1 = getNoise(tpos1, 2.0);\n    float no2 = getNoise(tpos2, 2.0);\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n    vec4 bg = vec4(0.0);\n    vec4 col1 = texture2D(diffMap, uv1);\n    vec4 col2 = texture2D(diffMap, uv2);\n    vec3 a1 = vec3(1.5, 1.5, 1.5);\n    float s1 = texture2D(specMap, uv1).r;\n    vec3 a2 = vec3(1.5, 1.5, 1.5);\n    float s2 = texture2D(specMap, uv2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(a1, col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(a2, col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec3 coloredEdge1 = edge1 * uEdgeColor.rgb;\n    dissolvedTexture1.rgb += coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec3 coloredEdge2 = edge2 * uEdgeColor.rgb;\n    dissolvedTexture2.rgb *= 0.6;\n    dissolvedTexture2.rgb +=  coloredEdge2;\n    if(no1 <= uDissolveSettings.x) {\n        dissolvedTexture1 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    if(no2 <= uDissolveSettings.x) {\n            dissolvedTexture2 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3((1.0 - dissolvedTexture1.a));\n    vec3 gamma = vec3(1.0/2.2);\n    col = pow(col.rgb, gamma);\n    gl_FragColor = vec4(col, 1.0);\n}\n";
 
 const PORTRAIT = 'portrait-primary';
 const LANDSCAPE = 'landscape-primary';
@@ -40866,7 +40842,7 @@ const app = new Application({
     resolution: window.devicePixelRatio || 1.0,
     autoDensity: true,
     resizeTo: gameContainer,
-    backgroundColor: 0xaaaaaa,
+    transparent: true,
     forceFXAA: false,
     antialias: false,
     powerPreference: 'high-performance',
@@ -40880,75 +40856,40 @@ const stats = new stats_min();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
 
-app.loader.baseUrl = './assets';
+const baseUrl = 'assets/';
 
 let waitEvents = new WaitEvents(start);
 
-const diffMap = CubeTexture.from(
-    [
-        'assets/r_dragon_diff.png',
-        'assets/l_dragon_diff.png',
-        'assets/t_dragon_diff.png',
-        'assets/bo_dragon_diff.png',
-        'assets/f_dragon_diff.png',
-        'assets/b_dragon_diff.png'
-    ],
-    {
-        autoLoad: false
-    }
-);
+const diffMap = BaseTexture.from(`${baseUrl}v_dragon_diff@2x.png`, {
+    autoLoad: false
+});
 waitEvents.waitEvent(diffMap, 'loaded');
 diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+diffMap.wrapMode = WRAP_MODES.MIRRORED_REPEAT;
 diffMap.resource.load();
 
-const normalMap = CubeTexture.from(
-    [
-        'assets/r_dragon_norm.png',
-        'assets/l_dragon_norm.png',
-        'assets/t_dragon_norm.png',
-        'assets/bo_dragon_norm.png',
-        'assets/f_dragon_norm.png',
-        'assets/b_dragon_norm.png'
-    ],
-    {
-        autoLoad: false
-    }
-);
+const normalMap = BaseTexture.from(`${baseUrl}v_dragon_norm@2x.png`, {
+    autoLoad: false
+});
 waitEvents.waitEvent(normalMap, 'loaded');
 normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
 normalMap.premultiplyAlpha = false;
-normalMap.resource.items.forEach(item => {
-    item.resource.premultiplyAlpha = false;
-});
 normalMap.resource.load();
 
-const specMap = CubeTexture.from(
-    [
-        'assets/r_dragon_spec.png',
-        'assets/l_dragon_spec.png',
-        'assets/t_dragon_spec.png',
-        'assets/bo_dragon_spec.png',
-        'assets/f_dragon_spec.png',
-        'assets/b_dragon_spec.png'
-    ],
-    {
-        autoLoad: false
-    }
-);
+const specMap = BaseTexture.from(`${baseUrl}v_dragon_spec@2x.png`, {
+    autoLoad: false
+});
 waitEvents.waitEvent(specMap, 'loaded');
 specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
-specMap.premultiplyAlpha = false;
-specMap.resource.items.forEach(item => {
-    item.resource.premultiplyAlpha = false;
-});
+specMap.resource.premultiplyAlpha = false;
 specMap.resource.load();
 
-const noiseTex = BaseTexture.from('assets/rgba_noise256.png', {
+const noiseTex = BaseTexture.from(`${baseUrl}rgba_noise256.png`, {
     autoLoad: false
 });
 waitEvents.waitEvent(noiseTex, 'loaded');
 noiseTex.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
-noiseTex.wrapMode = WRAP_MODES.REPEAT;
+// noiseTex.wrapMode = PIXI.WRAP_MODES.LINEAR;
 noiseTex.premultiplyAlpha = false;
 noiseTex.resource.load();
 
@@ -40970,15 +40911,16 @@ function start() {
         normalMap,
         specMap,
         noiseTex,
-        angle: [0.0, 0.0],
+        rotation: [1.0, 0.0, 0.0, Math.PI],
         uDissolveSettings: [0.0, 0.02],
         uEdgeColor: [0.89, 0.47, 0.2, 1.0]
     });
     filter.autoFit = false;
 
     container.filters = [filter];
+    console.log(filter);
 
-    let a = 0.002;
+    let a = 0.0;
     let b = 1.0;
     const r = 0.5 * container.filterArea.width;
     const startY = container.filterArea.y;
@@ -40993,11 +40935,12 @@ function start() {
         )
             b *= -1.0;
 
-        filter.uniforms.angle[0] = ((startY - container.filterArea.y) / r) % (2.0 * Math.PI);
+        filter.uniforms.rotation[3] =
+            Math.PI + (((container.filterArea.y - startY) / r) % (2.0 * Math.PI));
 
         if (
             filter.uniforms.uDissolveSettings[0] + a < 0.0 ||
-            filter.uniforms.uDissolveSettings[0] + a > 0.55
+            filter.uniforms.uDissolveSettings[0] + a > 0.65
         )
             a *= -1.0;
         filter.uniforms.uDissolveSettings[0] += a;
@@ -41010,17 +40953,17 @@ function start() {
 function resize(obj, a) {
     const orientation = getScreenOrientation(a.screen.width, a.screen.height);
     // eslint-disable-next-line no-bitwise
-    let cS = ~~(a.screen.height * 0.2);
+    let cS = Math.floor(a.screen.height * 0.4);
     if (orientation === PORTRAIT) {
         // eslint-disable-next-line no-bitwise
-        cS = ~~(a.screen.width * 0.2);
+        cS = Math.floor(a.screen.width * 0.4);
     }
     // eslint-disable-next-line no-bitwise
-    const halfcS = ~~(0.5 * cS);
+    const halfcS = Math.floor(0.5 * cS);
     // eslint-disable-next-line no-bitwise
-    const halfW = ~~(0.5 * a.screen.width);
+    const halfW = Math.floor(0.5 * a.screen.width);
     // eslint-disable-next-line no-bitwise
-    const halfH = ~~(0.5 * a.screen.height);
+    const halfH = Math.floor(0.5 * a.screen.height);
     obj.filterArea.x = halfW - halfcS;
     obj.filterArea.y = halfH - halfcS;
     obj.filterArea.width = cS;
