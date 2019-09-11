@@ -40745,7 +40745,7 @@ Application.registerPlugin(AppLoaderPlugin);
 
 var vs = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nuniform vec4 rotation;\n\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nmat3 rotMatrix(vec3 axis, float a) {\n    float c = cos( a );\n    float s = sin( a );\n    float oc=1.0-c;\n    vec3 as=axis*s;\n    mat3 p=mat3(axis.x*axis,axis.y*axis,axis.z*axis);\n    mat3 q=mat3(c,-as.z,as.y,as.z,c,-as.x,-as.y,as.x,c);\n    return p*oc+q;\n}\n\nvoid main(void) {\n\n    rot = rotMatrix(rotation.xyz, rotation.w);\n\tvTextureCoord = vec2(2.0) * aVertexPosition - vec2(1.0);\n    gl_Position = filterVertexPosition();\n}\n";
 
-var fs = "#define M_2_PI 0.63661977236758134308\n\nuniform vec4 inputPixel;\nuniform sampler2D diffMap;\nuniform sampler2D normalMap;\nuniform sampler2D specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n    return abs(dfdx) + abs(dfdy);\n}\n\nvec2 toast (vec3 p)\n{\n    float r = sqrt(1. - abs(p.z));\n    float phi = atan(abs(p.y), abs(p.x)) * M_2_PI;\n    vec2 uv = vec2(r) * vec2(1.-phi, phi);\n    uv = sign(p.xy) * mix(uv, vec2(1.)-uv.yx, step(p.z, 0.0));\n    uv = .5 * uv + vec2 (.5); // [-1;1] -> [0;1]\n\treturn uv;\n}\n\nfloat noise( in vec3 x ) {\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D( noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nconst mat3 m = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\nfloat getNoise(vec3 p, float factor) {\n    float f = 0.0;\n    vec3 q = vec3(factor)*p;\n    f  = 0.5000*noise( q );\n    q = m*q*2.01;\n    f += 0.2500*noise( q );\n    q = m*q*2.02;\n    f += 0.1250*noise( q );\n    q = m*q*2.03;\n    f += 0.0625*noise( q );\n    return f;\n}\n\nvec3 unPackNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, vec3 lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 po = d * vec3(dotLN);\n    vec3 color =   po + vec3(s * pow(dotRV, alpha));\n    if (dotRV < 0.0) {\n        color = po;\n    }\n    if (dotLN < 0.0) {\n        color = vec3(0.0);\n    }\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 a, vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n    const vec3 ambientLight = 0.5 * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * a;\n    vec3 lightPos = vec3(0.0, 0.0, 5.0);\n    vec3 lightIntensity = vec3(0.4, 0.4, 0.4);\n    color = phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvoid main(void) {\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) discard;\n    vec3 ro = vec3(vTextureCoord,  2.0*z);\n    vec3 pos1 = vec3(vTextureCoord, z);\n    vec3 pos2 = vec3( vTextureCoord, -z);\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n    vec2 uv1 = toast(tpos1);\n    vec2 uv2 = toast(tpos2);\n    vec3 n1 = RNMBlendUnpacked(pos1, unPackNorm(texture2D(normalMap, uv1).rgb));\n    vec3 n2 = RNMBlendUnpacked(pos2, vec3(-1.0) * unPackNorm(texture2D(normalMap, uv2).rgb));\n    float no1 = getNoise(tpos1, 2.0);\n    float no2 = getNoise(tpos2, 2.0);\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n    vec4 bg = vec4(0.0);\n    vec4 col1 = texture2D(diffMap, uv1);\n    vec4 col2 = texture2D(diffMap, uv2);\n    vec3 a1 = vec3(1.5, 1.5, 1.5);\n    float s1 = texture2D(specMap, uv1).r;\n    vec3 a2 = vec3(1.5, 1.5, 1.5);\n    float s2 = texture2D(specMap, uv2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(a1, col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(a2, col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec3 coloredEdge1 = edge1 * uEdgeColor.rgb;\n    dissolvedTexture1.rgb += coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec3 coloredEdge2 = edge2 * uEdgeColor.rgb;\n    dissolvedTexture2.rgb *= 0.6;\n    dissolvedTexture2.rgb +=  coloredEdge2;\n    if(no1 <= uDissolveSettings.x) {\n        dissolvedTexture1 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    if(no2 <= uDissolveSettings.x) {\n            dissolvedTexture2 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3((1.0 - dissolvedTexture1.a));\n    vec3 gamma = vec3(1.0/2.2);\n    col = pow(col.rgb, gamma);\n    gl_FragColor = vec4(col, 1.0);\n}\n";
+var fs = "#define M_2_PI 0.63661977236758134308\n\nuniform vec4 inputPixel;\nuniform sampler2D diffMap;\nuniform sampler2D normalMap;\nuniform sampler2D specMap;\nuniform sampler2D noiseTex;\nuniform vec2 uDissolveSettings;\nuniform vec4 uEdgeColor;\nvarying vec2 vTextureCoord;\nvarying mat3 rot;\n\nconst float PI = 3.14159265359;\nconst float DEG_TO_RAD = PI / 180.0;\n\nfloat helpFunc(vec2 p) {\n    return p.x*p.x - p.y;\n}\n\nfloat fwidthCustom(vec2 p) {\n    float cur = helpFunc(p);\n    float dfdx = helpFunc(p + inputPixel.z) - cur;\n    float dfdy = helpFunc(p + inputPixel.w) - cur;\n    return abs(dfdx) + abs(dfdy);\n}\n\nvec2 toast (vec3 p)\n{\n    float r = sqrt(1. - abs(p.z));\n    float phi = atan(abs(p.y), abs(p.x)) * M_2_PI;\n    vec2 uv = vec2(r) * vec2(1.-phi, phi);\n    uv = sign(p.xy) * mix(uv, vec2(1.)-uv.yx, step(p.z, 0.0));\n    uv = .5 * uv + vec2 (.5); // [-1;1] -> [0;1]\n\treturn uv;\n}\n\nfloat noise( in vec3 x ) {\n    vec3 p = floor(x);\n    vec3 f = fract(x);\n\tf = f*f*(3.0-2.0*f);\n\tvec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;\n\tvec2 rg = texture2D( noiseTex, (uv+0.5)/256.0, 0.0).yx;\n\treturn mix( rg.x, rg.y, f.z );\n}\n\nconst mat3 m = mat3( 0.00,  0.80,  0.60,\n                    -0.80,  0.36, -0.48,\n                    -0.60, -0.48,  0.64 );\n\nfloat getNoise(vec3 p, float factor) {\n    float f = 0.0;\n    vec3 q = vec3(factor)*p;\n    f  = 0.5000*noise( q );\n    q = m*q*2.01;\n    f += 0.2500*noise( q );\n    q = m*q*2.02;\n    f += 0.1250*noise( q );\n    q = m*q*2.03;\n    f += 0.0625*noise( q );\n    return f;\n}\n\nvec3 unPackNorm(vec3 tex) {\n    return normalize(vec3(tex * vec3(2.0) - vec3(1.0)));\n}\n\nvec3 RNMBlendUnpacked(vec3 n1, vec3 n2)\n{\n    n1 += vec3( 0,  0, 1);\n    n2 *= vec3(-1, -1, 1);\n    return n1*dot(n1, n2)/n1.z - n2;\n}\n\nvec3 phongContribForLight(vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye,\n    vec3 lightPos, vec3 lightIntensity) {\n    vec3 L = normalize(lightPos - p);\n    vec3 V = normalize(eye - p);\n    vec3 R = normalize(reflect(-L, n));\n    float dotLN = dot(L, n);\n    float dotRV = dot(R, V);\n    vec3 po = d * vec3(dotLN);\n    vec3 color =   po + vec3(s * pow(dotRV, alpha));\n    if (dotRV < 0.0) {\n        color = po;\n    }\n    if (dotLN < 0.0) {\n        color = vec3(0.0);\n    }\n    return vec3(lightIntensity) * color;\n}\n\nvec3 phongIllumination(vec3 a, vec3 d, float s, vec3 n, float alpha, vec3 p, vec3 eye) {\n    const vec3 ambientLight = 0.5 * vec3(1.0, 1.0, 1.0);\n    vec3 color = ambientLight * a;\n    vec3 lightPos = vec3(0.0, 0.0, -5.0);\n    vec3 lightIntensity = vec3(0.4, 0.4, 0.4);\n    color = phongContribForLight(d, s, n, alpha, p, eye, lightPos, lightIntensity);\n    return color;\n}\n\nvoid main(void) {\n    float z = sqrt(1.0 - dot( vTextureCoord,  vTextureCoord));\n    float dist = length( vTextureCoord);\n    if (dist > 1.0) discard;\n    vec3 ro = vec3(vTextureCoord,  -2.0*z);\n    vec3 pos1 = vec3(vTextureCoord, -z);\n    vec3 pos2 = vec3( vTextureCoord, z);\n    vec3 tpos1 = rot * pos1;\n    vec3 tpos2 = rot * pos2;\n    vec2 uv1 = toast(tpos1);\n    vec2 uv2 = toast(tpos2);\n    vec3 n1 = RNMBlendUnpacked(pos1, unPackNorm(texture2D(normalMap, uv1).rgb));\n    vec3 n2 = RNMBlendUnpacked(-1.0 * pos2, unPackNorm(texture2D(normalMap, uv2).rgb));\n    float no1 = getNoise(tpos1, 2.0);\n    float no2 = getNoise(tpos2, 2.0);\n    float edgeSize = uDissolveSettings.x + uDissolveSettings.y;\n    float dissolveUsage = ceil(uDissolveSettings.x);\n    float edge1 = step(no1, edgeSize) * dissolveUsage;\n    float edge2 = step(no2, edgeSize) * dissolveUsage;\n    vec4 bg = vec4(0.0);\n    vec4 col1 = texture2D(diffMap, uv1);\n    vec4 col2 = texture2D(diffMap, uv2);\n    vec3 a1 = vec3(1.5, 1.5, 1.5);\n    float s1 = texture2D(specMap, uv1).r;\n    vec3 a2 = vec3(1.5, 1.5, 1.5);\n    float s2 = texture2D(specMap, uv2).r;\n    float shininess = 10.0;\n    col1  = vec4(phongIllumination(a1, col1.rgb, s1, n1, shininess, pos1, ro), col1.a);\n    col2  = vec4(phongIllumination(a2, col2.rgb, s2, n2, shininess, pos2, ro), col2.a);\n    vec4 dissolvedTexture1 = col1 - edge1;\n    vec3 coloredEdge1 = edge1 * uEdgeColor.rgb;\n    dissolvedTexture1.rgb += coloredEdge1;\n    vec4 dissolvedTexture2 = col2 - edge2;\n    vec3 coloredEdge2 = edge2 * uEdgeColor.rgb;\n    dissolvedTexture2.rgb *= 0.6;\n    dissolvedTexture2.rgb +=  coloredEdge2;\n    if(no1 <= uDissolveSettings.x) {\n        dissolvedTexture1 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    if(no2 <= uDissolveSettings.x) {\n        dissolvedTexture2 = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n    float alpha = dissolvedTexture1.a + dissolvedTexture2.a * (1.0 - dissolvedTexture1.a);\n    vec3 col = dissolvedTexture1.rgb + dissolvedTexture2.rgb * vec3((1.0 - dissolvedTexture1.a));\n    vec3 gamma = vec3(1.0/2.2);\n    col = pow(col.rgb, gamma);\n    gl_FragColor = vec4(col.rgb, alpha);\n}\n";
 
 const PORTRAIT = 'portrait-primary';
 const LANDSCAPE = 'landscape-primary';
@@ -40860,28 +40860,30 @@ const baseUrl = 'assets/';
 
 let waitEvents = new WaitEvents(start);
 
-const diffMap = BaseTexture.from(`${baseUrl}v_dragon_diff@2x.png`, {
+const diffMap = BaseTexture.from(`${baseUrl}v_dragon_diff.png`, {
     autoLoad: false
 });
 waitEvents.waitEvent(diffMap, 'loaded');
-diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
-diffMap.wrapMode = WRAP_MODES.MIRRORED_REPEAT;
+diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
+diffMap.wrapMode = WRAP_MODES.CLAMP;
 diffMap.resource.load();
 
-const normalMap = BaseTexture.from(`${baseUrl}v_dragon_norm@2x.png`, {
+const normalMap = BaseTexture.from(`${baseUrl}v_dragon_norm.png`, {
     autoLoad: false
 });
 waitEvents.waitEvent(normalMap, 'loaded');
-normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
+normalMap.wrapMode = WRAP_MODES.CLAMP;
 normalMap.premultiplyAlpha = false;
 normalMap.resource.load();
 
-const specMap = BaseTexture.from(`${baseUrl}v_dragon_spec@2x.png`, {
+const specMap = BaseTexture.from(`${baseUrl}v_dragon_spec.png`, {
     autoLoad: false
 });
 waitEvents.waitEvent(specMap, 'loaded');
-specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.ON);
+specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
 specMap.resource.premultiplyAlpha = false;
+diffMap.wrapMode = WRAP_MODES.CLAMP;
 specMap.resource.load();
 
 const noiseTex = BaseTexture.from(`${baseUrl}rgba_noise256.png`, {
@@ -40889,61 +40891,65 @@ const noiseTex = BaseTexture.from(`${baseUrl}rgba_noise256.png`, {
 });
 waitEvents.waitEvent(noiseTex, 'loaded');
 noiseTex.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
-// noiseTex.wrapMode = PIXI.WRAP_MODES.LINEAR;
+noiseTex.wrapMode = WRAP_MODES.REPEAT;
 noiseTex.premultiplyAlpha = false;
 noiseTex.resource.load();
 
 function start() {
     waitEvents.destroy();
     waitEvents = undefined;
-    const container = new Container();
+    const containers = [];
+    const filters = [];
+    for (let i = 0; i < 10; i++) {
+        const container = new Container();
+        containers.push(container);
+        container.filterArea = new Rectangle();
+        app.stage.addChild(container);
+        const filter = new Filter(vs, fs, {
+            diffMap,
+            normalMap,
+            specMap,
+            noiseTex,
+            rotation: [1.0, 0.0, 0.0, 0, 0],
+            uDissolveSettings: [0.0, 0.02],
+            uEdgeColor: [0.89, 0.47, 0.2, 1.0]
+        });
+        filters.push(filter);
+        filter.autoFit = false;
+        container.filters = [filter];
+    }
 
-    container.filterArea = new Rectangle();
-    resize(container, app);
-    app.stage.addChild(container);
+    resize(containers, app);
     const resizeThrottled = lodash_throttle(() => {
-        resize(container, app);
+        resize(containers, app);
     }, 100);
     window.onresize = resizeThrottled;
 
-    const filter = new Filter(vs, fs, {
-        diffMap,
-        normalMap,
-        specMap,
-        noiseTex,
-        rotation: [1.0, 0.0, 0.0, Math.PI],
-        uDissolveSettings: [0.0, 0.02],
-        uEdgeColor: [0.89, 0.47, 0.2, 1.0]
-    });
-    filter.autoFit = false;
-
-    container.filters = [filter];
-    console.log(filter);
-
-    let a = 0.0;
+    let a = 0.001;
     let b = 1.0;
-    const r = 0.5 * container.filterArea.width;
-    const startY = container.filterArea.y;
+    const r = 0.5 * containers[0].filterArea.width;
+    const startY = containers[0].filterArea.y;
 
     app.ticker.add(delta => {
         stats.begin();
         // filter.uniforms.angle[1] -= 0.0005;
-        container.filterArea.y += b;
-        if (
-            container.filterArea.y + b > app.screen.height - container.filterArea.height ||
-            container.filterArea.y + b < 0.0
-        )
-            b *= -1.0;
+        containers.forEach((container, i) => {
+            container.filterArea.y += b;
+            if (
+                container.filterArea.y + b > app.screen.height - container.filterArea.height ||
+                container.filterArea.y + b < 0.0
+            )
+                b *= -1.0;
+            filters[i].uniforms.rotation[3] =
+                ((container.filterArea.y - startY) / r) % (2.0 * Math.PI);
 
-        filter.uniforms.rotation[3] =
-            Math.PI + (((container.filterArea.y - startY) / r) % (2.0 * Math.PI));
-
-        if (
-            filter.uniforms.uDissolveSettings[0] + a < 0.0 ||
-            filter.uniforms.uDissolveSettings[0] + a > 0.65
-        )
-            a *= -1.0;
-        filter.uniforms.uDissolveSettings[0] += a;
+            if (
+                filters[i].uniforms.uDissolveSettings[0] + a < 0.0 ||
+                filters[i].uniforms.uDissolveSettings[0] + a > 0.65
+            )
+                a *= -1.0;
+            filters[i].uniforms.uDissolveSettings[0] += a;
+        });
         stats.end();
     });
 
@@ -40952,21 +40958,18 @@ function start() {
 
 function resize(obj, a) {
     const orientation = getScreenOrientation(a.screen.width, a.screen.height);
-    // eslint-disable-next-line no-bitwise
-    let cS = Math.floor(a.screen.height * 0.4);
+    let cS = Math.floor(a.screen.height * 0.1);
     if (orientation === PORTRAIT) {
-        // eslint-disable-next-line no-bitwise
-        cS = Math.floor(a.screen.width * 0.4);
+        cS = Math.floor(a.screen.width * 0.1);
     }
-    // eslint-disable-next-line no-bitwise
     const halfcS = Math.floor(0.5 * cS);
-    // eslint-disable-next-line no-bitwise
-    const halfW = Math.floor(0.5 * a.screen.width);
-    // eslint-disable-next-line no-bitwise
+
     const halfH = Math.floor(0.5 * a.screen.height);
-    obj.filterArea.x = halfW - halfcS;
-    obj.filterArea.y = halfH - halfcS;
-    obj.filterArea.width = cS;
-    obj.filterArea.height = cS;
+    obj.forEach((item, i) => {
+        item.filterArea.x = a.screen.width * 0.01 + i * a.screen.width * 0.1;
+        item.filterArea.y = halfH - halfcS;
+        item.filterArea.width = cS;
+        item.filterArea.height = cS;
+    });
 }
 //# sourceMappingURL=bundle.js.map
