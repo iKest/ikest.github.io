@@ -40865,7 +40865,7 @@ const diffMap = BaseTexture.from(`${baseUrl}v_dragon_diff.png`, {
 });
 waitEvents.waitEvent(diffMap, 'loaded');
 diffMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
-diffMap.wrapMode = WRAP_MODES.CLAMP;
+diffMap.wrapMode = WRAP_MODES.MIRROR_REPEAT;
 diffMap.resource.load();
 
 const normalMap = BaseTexture.from(`${baseUrl}v_dragon_norm.png`, {
@@ -40873,7 +40873,7 @@ const normalMap = BaseTexture.from(`${baseUrl}v_dragon_norm.png`, {
 });
 waitEvents.waitEvent(normalMap, 'loaded');
 normalMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
-normalMap.wrapMode = WRAP_MODES.CLAMP;
+normalMap.wrapMode = WRAP_MODES.MIRRORED_REPEAT;
 normalMap.premultiplyAlpha = false;
 normalMap.resource.load();
 
@@ -40883,7 +40883,7 @@ const specMap = BaseTexture.from(`${baseUrl}v_dragon_spec.png`, {
 waitEvents.waitEvent(specMap, 'loaded');
 specMap.setStyle(SCALE_MODES.LINEAR, MIPMAP_MODES.OFF);
 specMap.resource.premultiplyAlpha = false;
-diffMap.wrapMode = WRAP_MODES.CLAMP;
+diffMap.wrapMode = WRAP_MODES.MIRRORED_REPEAT;
 specMap.resource.load();
 
 const noiseTex = BaseTexture.from(`${baseUrl}rgba_noise256.png`, {
