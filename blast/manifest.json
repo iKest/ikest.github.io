@@ -16,5 +16,5 @@
     "background_color": "black",
     "name": "The Blast Game",
     "short_name": "Blast",
-    "orientation": "portrait-primary"
+    "orientation": "portrait"
 }
