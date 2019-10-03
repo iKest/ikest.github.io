@@ -1,0 +1,63 @@
+{
+    "BackScene": {
+        "bg": {
+            "frames":["bg"]
+        }
+    },
+    "HelloScene":{
+        "bg": {
+            "atlas":"atlas",
+            "frames": ["logo_em", "logo_it", "start_u", "start_ul","start_ur","start_d","start_dl","start_dr","start_l","start_r"]
+        },
+        "iu": {
+            "btn" : {
+                "type": "button",
+                "action": "playGame",
+                "img": {
+                    "atlas": "atlas",
+                    "frame": "play",
+                    "font": "KomikaTitle-AxisRUS-LAT",
+                    "fontSize": 32
+                }
+            }
+        }
+    },
+    "WinScene": {
+        "bg": {
+            "atlas":"atlas",
+            "frames":["logo_em", "logo_it","promo", "victory_up", "victory_ul", "victory_ur", "victory_l", "victory_r", "victory_dc", "victory_dl", "victory_dr", "victory_dcl", "victory_dcr"]
+        },
+        "iu": {
+            "btn" : {
+                "type": "button",
+                "action": "playGame",
+                "img": {
+                    "atlas": "atlas",
+                    "frame": "play_again",
+                    "font": "KomikaTitle-AxisRUS-LAT",
+                    "fontSize": 32
+                }
+            }
+        }
+    },
+    "GameScene": {
+        "bg": {
+            "atlas":"atlas",
+            "frames":["matches", "score"]
+        }
+    },
+    "HUDScene": {
+        "iu": {
+            "btn" : {
+                "type": "button",
+                "action": "playGame",
+                "img": {
+                    "atlas": "atlas",
+                    "frame": "restart",
+                    "font": "KomikaTitle-AxisRUS-LAT",
+                    "fontSize": 32
+                }
+            }
+        }
+    }
+}

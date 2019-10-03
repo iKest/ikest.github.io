@@ -8,19 +8,7 @@
             },
             {
                 "type": "atlas",
-                "key": "atlas1",
-                "textureURL": "atlases/atlas1.png",
-                "atlasURL": "atlases/atlas1.json"
-            },
-            {
-                "type": "atlas",
-                "key": "atlas2",
-                "textureURL": "atlases/atlas2.png",
-                "atlasURL": "atlases/atlas2.json"
-            },
-            {
-                "type": "atlas",
-                "key": "atlas3",
+                "key": "atlas",
                 "textureURL": "atlases/atlas3.png",
                 "atlasURL": "atlases/atlas3.json"
             },
