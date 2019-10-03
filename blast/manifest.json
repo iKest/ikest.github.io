@@ -1,16 +1,16 @@
 {
     "lang": "en",
     "icons": [{
-        "src": "https://ikest.github.io/blast/assets/icons/icon192.png",
+        "src": "/assets/icons/icon192.png",
         "sizes": "192x192",
         "type": "image/png"
     }, {
-        "src": "https://ikest.github.io/blast/assets/icons/icon512.png",
+        "src": "/assets/icons/icon512.png",
         "sizes": "512x512",
         "type": "image/png"
     }],
-    "scope": "https://ikest.github.io/blast/",
-    "start_url": "https://ikest.github.io/blast/",
+    "scope": "https://ikest.github.io/blast",
+    "start_url": "/",
     "display": "standalone",
     "theme_color": "black",
     "background_color": "black",
