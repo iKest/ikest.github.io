@@ -66,6 +66,16 @@
                 "type": "json",
                 "key": "atlas_data",
                 "url": "jsons/atlas_data.json"
+            },
+            {
+                "type": "rexWebFont",
+                "key": "webfont",
+                "config": {
+                    "custom": {
+                        "families": ["KomikaTitle", "Antikvar"],
+                        "urls": ["assets/fonts/komika/stylesheet.css", "assets/fonts/antikvar/stylesheet.css"]
+                    }
+                }
             }
         ]
     },

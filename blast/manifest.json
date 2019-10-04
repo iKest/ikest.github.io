@@ -1,20 +1,20 @@
 {
     "lang": "en",
     "icons": [{
-        "src": "blast/assets/icons/icon192.png",
+        "src": "assets/icons/icon192.png",
         "sizes": "192x192",
         "type": "image/png"
     }, {
-        "src": "blast/assets/icons/icon512.png",
+        "src": "assets/icons/icon512.png",
         "sizes": "512x512",
         "type": "image/png"
     }],
-    "scope": "/blast",
+    "scope": "/",
     "start_url": "/",
     "display": "standalone",
     "theme_color": "black",
     "background_color": "black",
     "name": "The Blast Game",
     "short_name": "Blast",
-    "orientation": "portrait"
+    "orientation": "portrait-primary"
 }

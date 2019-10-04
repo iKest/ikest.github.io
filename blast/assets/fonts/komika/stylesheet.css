@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'KomikaTitle';
+    src: url('KomikaTitle-AxisRUS-LAT.eot');
+    src: local('Komika Title - Axis RUS-LAT'), local('KomikaTitle-AxisRUS-LAT'),local('KomikaTitle'),
+        url('KomikaTitle-AxisRUS-LAT.eot?#iefix') format('embedded-opentype'),
+        url('KomikaTitle-AxisRUS-LAT.woff2') format('woff2'),
+        url('KomikaTitle-AxisRUS-LAT.woff') format('woff'),
+        url('KomikaTitle-AxisRUS-LAT.ttf') format('truetype'),
+        url('KomikaTitle-AxisRUS-LAT.svg#KomikaTitle-AxisRUS-LAT') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

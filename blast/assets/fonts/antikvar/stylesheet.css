@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'Antikvar';
+    src: url('Antikvar-Roman.eot');
+    src: local('Antikvar Roman'), local('Antikvar-Roman'),local('Antikvar'),
+        url('Antikvar-Roman.eot?#iefix') format('embedded-opentype'),
+        url('Antikvar-Roman.woff2') format('woff2'),
+        url('Antikvar-Roman.woff') format('woff'),
+        url('Antikvar-Roman.ttf') format('truetype'),
+        url('Antikvar-Roman.svg#Antikvar-Roman') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

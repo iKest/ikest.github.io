@@ -9,17 +9,23 @@
             "atlas":"atlas",
             "frames": ["logo_em", "logo_it", "start_u", "start_ul","start_ur","start_d","start_dl","start_dr","start_l","start_r"]
         },
-        "iu": {
-            "btn" : {
-                "type": "button",
-                "action": "playGame",
-                "img": {
-                    "atlas": "atlas",
-                    "frame": "play",
-                    "font": "KomikaTitle-AxisRUS-LAT",
-                    "fontSize": 32
+        "ui": {
+            "btn" : [
+                {
+                    "action": "switchScene",
+                    "target": "GameScene",
+                    "img": {
+                        "atlas": "atlas",
+                        "frame": "play"
+                    },
+                    "txt": {
+                        "font":"KomikaTitle",
+                        "size": 112,
+                        "color": "#FAE9E7",
+                        "text": ["играть", "play"]
+                    }
                 }
-            }
+            ]
         }
     },
     "WinScene": {
@@ -27,37 +33,73 @@
             "atlas":"atlas",
             "frames":["logo_em", "logo_it","promo", "victory_up", "victory_ul", "victory_ur", "victory_l", "victory_r", "victory_dc", "victory_dl", "victory_dr", "victory_dcl", "victory_dcr"]
         },
-        "iu": {
-            "btn" : {
-                "type": "button",
-                "action": "playGame",
-                "img": {
-                    "atlas": "atlas",
-                    "frame": "play_again",
-                    "font": "KomikaTitle-AxisRUS-LAT",
-                    "fontSize": 32
+        "ui": {
+            "btn" : [
+                {
+                    "action": "switchScene",
+                    "target": "GameScene",
+                    "img": {
+                        "atlas": "atlas",
+                        "frame": "play_again"
+                    },
+                    "txt": {
+                        "font":"KomikaTitle",
+                        "size": 100,
+                        "color": "#FAE9E7",
+                        "text": ["играть снова", "play again"]
+                    }
                 }
-            }
+            ]
         }
     },
     "GameScene": {
         "bg": {
             "atlas":"atlas",
-            "frames":["matches", "score"]
+            "frames":["matches", "score"],
+            "txt": [
+                {
+                    "font":"Antikvar",
+                    "size": 50,
+                    "color": "#793C1D",
+                    "text": ["Счёт", "Score"],
+                    "x": 166,
+                    "y": 220,
+                    "originX": 0.5,
+                    "originY": 1,
+                    "style": "bold"
+                },
+                {
+                    "font":"Antikvar",
+                    "size": 50,
+                    "color": "#793C1D",
+                    "text": ["Ходы", "Moves"],
+                    "x": 497,
+                    "y": 220,
+                    "originX": 0.5,
+                    "originY": 1,
+                    "style": "bold"
+                }
+            ]
         }
     },
     "HUDScene": {
-        "iu": {
-            "btn" : {
-                "type": "button",
-                "action": "playGame",
-                "img": {
-                    "atlas": "atlas",
-                    "frame": "restart",
-                    "font": "KomikaTitle-AxisRUS-LAT",
-                    "fontSize": 32
+        "ui": {
+            "btn" : [
+                {
+                    "action": "restartScene",
+                    "target": "GameScene",
+                    "img": {
+                        "atlas": "atlas",
+                        "frame": "restart"
+                    },
+                    "txt": {
+                        "font":"KomikaTitle",
+                        "size": 38,
+                        "color": "#FAE9E7",
+                        "text": ["рестарт", "restart"]
+                    }
                 }
-            }
+            ]
         }
     }
 }
