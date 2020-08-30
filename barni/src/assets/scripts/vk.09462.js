@@ -1,0 +1,1 @@
+var VkSupport={isVk:!1,share:()=>{VkSupport.isVk?vkBridge.sendPromise("VKWebAppShare"):window.open("https://vk.com/share.php?url="+window.location,"_blank")}};vkBridge.send("VKWebAppInit"),vkBridge.subscribe(e=>{e.detail&&"VKWebAppInitResult"===e.detail.type&&e.detail.data&&e.detail.data.result&&(VkSupport.isVk=!0)});

@@ -1,0 +1,1 @@
+let SceneTransitions={in(t){cc.tween(t).set({opacity:0,scale:1.1}).to(.2,{opacity:255,scale:1}).start()},out(t,c){cc.tween(t).to(.2,{opacity:0,scale:1.5}).call(c).start()}};

@@ -1,0 +1,1 @@
+var GlobalData={musicId:null,musicVolume:.4};
