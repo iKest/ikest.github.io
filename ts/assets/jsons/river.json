@@ -1,0 +1,30 @@
+{
+	"generator_info": "Shape definitions generated with PhysicsEditor. Visit https://www.codeandweb.com/physicseditor",
+	"river": {
+		"type": "fromPhysicsEditor",
+		"label": "river",
+		"isStatic": true,
+		"density": 0.1,
+		"restitution": 0,
+		"friction": 0.1,
+		"frictionAir": 0.01,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":521, "y":270.5 }, { "x":521, "y":159.5 }, { "x":366, "y":94.5 }, { "x":406, "y":215.5 } ],
+					[ { "x":406, "y":215.5 }, { "x":366, "y":94.5 }, { "x":252, "y":55.5 }, { "x":238, "y":153.5 } ],
+					[ { "x":2, "y":109.5 }, { "x":109, "y":120.5 }, { "x":128, "y":24.5 }, { "x":2, "y":11.5 }, { "x":1, "y":11.5 } ],
+					[ { "x":238, "y":153.5 }, { "x":252, "y":55.5 }, { "x":128, "y":24.5 }, { "x":109, "y":120.5 } ]
+				]
+			}
+		]
+	}
+}
