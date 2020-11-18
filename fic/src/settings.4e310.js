@@ -1,0 +1,1 @@
+window._CCSettings={platform:"web-mobile",groupList:["default","capture"],collisionMatrix:[[true,true],[true,true]],hasResourcesBundle:true,hasStartSceneBundle:false,remoteBundles:[],subpackages:[],launchScene:"db://assets/Scenes/Upload Scene.fire",orientation:"portrait",jsList:[],bundleVers:{internal:"fbb78",resources:"23eea",main:"03e6a"}};
